@@ -32,7 +32,8 @@
     "dashboard": "儀表板",
     "instances": "多開實例",
     "githubCopilot": "GitHub Copilot",
-    "windsurf": "Windsurf"
+    "windsurf": "Windsurf",
+    "morePlatforms": "更多平台"
   },
   "settings": {
     "title": "應用程式設定",
@@ -1332,5 +1333,16 @@
       "reason": "權限需求：讀取 Windsurf 認證資料庫（state.vscdb），並呼叫系統加密能力（Windows DPAPI / macOS Keychain / Linux Secret Service）進行解密與寫回。",
       "storage": "讀取範圍：僅處理 Windsurf 登入工作階段相關資料，所有流程均在本機執行。"
     }
+  },
+  "platformLayout": {
+    "title": "平台佈局",
+    "sidebarSelected": "側邊欄已選擇 {{count}}/{{max}}",
+    "reset": "恢復預設",
+    "tip": "拖曳可排序；側邊欄最多可顯示兩個平台。若只選擇一個，側邊欄只顯示一個。",
+    "sidebarToggle": "側邊欄顯示",
+    "dashboardToggle": "儀表板顯示",
+    "hiddenBadge": "已隱藏",
+    "openFromMore": "管理平台佈局",
+    "dragHandleLabel": "拖曳排序"
   }
 }

@@ -32,7 +32,8 @@
     "dashboard": "Tableau de bord",
     "instances": "Multi-Instance",
     "githubCopilot": "GitHub Copilot",
-    "windsurf": "Windsurf"
+    "windsurf": "Windsurf",
+    "morePlatforms": "Plus de plateformes"
   },
   "settings": {
     "title": "Paramètres de l'application",
@@ -1332,5 +1333,16 @@
       "reason": "Portée des autorisations : lire la base d’authentification Windsurf (state.vscdb) et appeler le chiffrement système (Windows DPAPI / macOS Keychain / Linux Secret Service) pour déchiffrer et réécrire.",
       "storage": "Portée de lecture : seules les données liées aux sessions de connexion Windsurf sont traitées ; tous les processus sont exécutés localement."
     }
+  },
+  "platformLayout": {
+    "title": "Disposition des plateformes",
+    "sidebarSelected": "Sélectionnées dans la barre latérale {{count}}/{{max}}",
+    "reset": "Réinitialiser par défaut",
+    "tip": "Faites glisser pour réorganiser. Jusqu'à deux plateformes peuvent être affichées dans la barre latérale. Si une seule est sélectionnée, une seule est affichée.",
+    "sidebarToggle": "Afficher dans la barre latérale",
+    "dashboardToggle": "Afficher dans le tableau de bord",
+    "hiddenBadge": "Masqué",
+    "openFromMore": "Gérer la disposition des plateformes",
+    "dragHandleLabel": "Glisser pour réorganiser"
   }
 }

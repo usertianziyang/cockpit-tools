@@ -32,7 +32,8 @@
     "dashboard": "ダッシュボード",
     "instances": "マルチインスタンス",
     "githubCopilot": "GitHub Copilot",
-    "windsurf": "Windsurf"
+    "windsurf": "Windsurf",
+    "morePlatforms": "その他のプラットフォーム"
   },
   "settings": {
     "title": "アプリ設定",
@@ -1332,5 +1333,16 @@
       "reason": "必要な権限: Windsurf 認証データベース（state.vscdb）を読み取り、システム暗号化機能（Windows DPAPI / macOS Keychain / Linux Secret Service）を呼び出して復号・再書き込みを行います。",
       "storage": "読み取り範囲: Windsurf ログインセッション関連データのみを処理し、すべての処理はローカルで実行されます。"
     }
+  },
+  "platformLayout": {
+    "title": "プラットフォームレイアウト",
+    "sidebarSelected": "サイドバーで選択済み {{count}}/{{max}}",
+    "reset": "デフォルトにリセット",
+    "tip": "ドラッグして並び替え。サイドバーには最大2つまで表示できます。1つだけ選択した場合は1つだけ表示されます。",
+    "sidebarToggle": "サイドバーに表示",
+    "dashboardToggle": "ダッシュボードに表示",
+    "hiddenBadge": "非表示",
+    "openFromMore": "プラットフォームレイアウトを管理",
+    "dragHandleLabel": "ドラッグして並び替え"
   }
 }

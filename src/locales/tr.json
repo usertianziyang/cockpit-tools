@@ -32,7 +32,8 @@
     "dashboard": "Gösterge Paneli",
     "instances": "Çoklu Örnek",
     "githubCopilot": "GitHub Copilot",
-    "windsurf": "Windsurf"
+    "windsurf": "Windsurf",
+    "morePlatforms": "Daha Fazla Platform"
   },
   "settings": {
     "title": "Uygulama Ayarları",
@@ -1332,5 +1333,16 @@
       "reason": "İzin kapsamı: Windsurf kimlik doğrulama veritabanını (state.vscdb) okumak ve şifre çözme/geri yazma için sistem şifreleme yeteneklerini (Windows DPAPI / macOS Keychain / Linux Secret Service) çağırmak.",
       "storage": "Okuma kapsamı: yalnızca Windsurf oturum açma oturumu ile ilgili veriler işlenir; tüm işlemler yerel olarak yürütülür."
     }
+  },
+  "platformLayout": {
+    "title": "Platform Düzeni",
+    "sidebarSelected": "Kenar çubuğunda seçili {{count}}/{{max}}",
+    "reset": "Varsayılana sıfırla",
+    "tip": "Sıralamayı değiştirmek için sürükleyin. Kenar çubuğunda en fazla iki platform gösterilebilir. Yalnızca bir platform seçilirse yalnızca bir platform gösterilir.",
+    "sidebarToggle": "Kenar çubuğunda göster",
+    "dashboardToggle": "Panoda göster",
+    "hiddenBadge": "Gizli",
+    "openFromMore": "Platform düzenini yönet",
+    "dragHandleLabel": "Sürükleyerek sırala"
   }
 }

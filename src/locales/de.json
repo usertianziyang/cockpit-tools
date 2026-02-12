@@ -32,7 +32,8 @@
     "dashboard": "Dashboard",
     "instances": "Multi-Instanz",
     "githubCopilot": "GitHub Copilot",
-    "windsurf": "Windsurf"
+    "windsurf": "Windsurf",
+    "morePlatforms": "Weitere Plattformen"
   },
   "settings": {
     "title": "App-Einstellungen",
@@ -1332,5 +1333,16 @@
       "reason": "Berechtigungsumfang: Lesen der VS-Code-Auth-Datenbank (state.vscdb) und Aufruf der System-Verschlüsselung (Windows DPAPI / macOS Keychain / Linux Secret Service) zum Entschlüsseln und Zurückschreiben.",
       "storage": "Lesebereich: Es werden nur Windsurf-Login-Sitzungsdaten verarbeitet; alle Prozesse werden lokal ausgeführt."
     }
+  },
+  "platformLayout": {
+    "title": "Plattformlayout",
+    "sidebarSelected": "In der Seitenleiste ausgewählt {{count}}/{{max}}",
+    "reset": "Auf Standard zurücksetzen",
+    "tip": "Zum Neuanordnen ziehen. In der Seitenleiste können maximal zwei Plattformen angezeigt werden. Wenn nur eine ausgewählt ist, wird nur eine angezeigt.",
+    "sidebarToggle": "In Seitenleiste anzeigen",
+    "dashboardToggle": "Im Dashboard anzeigen",
+    "hiddenBadge": "Ausgeblendet",
+    "openFromMore": "Plattformlayout verwalten",
+    "dragHandleLabel": "Zum Neuanordnen ziehen"
   }
 }

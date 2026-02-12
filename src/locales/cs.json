@@ -32,7 +32,8 @@
     "dashboard": "Dashboard",
     "instances": "Více instancí",
     "githubCopilot": "GitHub Copilot",
-    "windsurf": "Windsurf"
+    "windsurf": "Windsurf",
+    "morePlatforms": "Další platformy"
   },
   "settings": {
     "title": "Nastavení aplikace",
@@ -1332,5 +1333,16 @@
       "reason": "Rozsah oprávnění: čtení databáze ověření Windsurf (state.vscdb) a volání systémového šifrování (Windows DPAPI / macOS Keychain / Linux Secret Service) pro dešifrování a zpětný zápis.",
       "storage": "Rozsah čtení: zpracovávají se pouze položky související s relací přihlášení Windsurf a veškeré procesy probíhají lokálně."
     }
+  },
+  "platformLayout": {
+    "title": "Rozložení platforem",
+    "sidebarSelected": "Vybráno v postranním panelu {{count}}/{{max}}",
+    "reset": "Obnovit výchozí",
+    "tip": "Přetažením změňte pořadí. V postranním panelu lze zobrazit nejvýše dvě platformy. Pokud je vybrána jen jedna, zobrazí se pouze jedna.",
+    "sidebarToggle": "Zobrazit v postranním panelu",
+    "dashboardToggle": "Zobrazit na nástěnce",
+    "hiddenBadge": "Skryto",
+    "openFromMore": "Spravovat rozložení platforem",
+    "dragHandleLabel": "Přetažením změnit pořadí"
   }
 }

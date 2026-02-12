@@ -32,7 +32,8 @@
     "dashboard": "Bảng điều khiển",
     "instances": "Đa Phiên Bản",
     "githubCopilot": "GitHub Copilot",
-    "windsurf": "Windsurf"
+    "windsurf": "Windsurf",
+    "morePlatforms": "Thêm nền tảng"
   },
   "settings": {
     "title": "Cài đặt ứng dụng",
@@ -1332,5 +1333,16 @@
       "reason": "Phạm vi quyền: đọc cơ sở dữ liệu xác thực Windsurf (state.vscdb) và gọi khả năng mã hóa hệ thống (Windows DPAPI / macOS Keychain / Linux Secret Service) để giải mã/ghi lại.",
       "storage": "Phạm vi đọc: chỉ xử lý dữ liệu liên quan đến phiên đăng nhập Windsurf; mọi quy trình đều được thực thi cục bộ."
     }
+  },
+  "platformLayout": {
+    "title": "Bố cục nền tảng",
+    "sidebarSelected": "Đã chọn trên thanh bên {{count}}/{{max}}",
+    "reset": "Đặt lại mặc định",
+    "tip": "Kéo để sắp xếp lại. Thanh bên chỉ hiển thị tối đa hai nền tảng. Nếu chỉ chọn một, chỉ một nền tảng sẽ được hiển thị.",
+    "sidebarToggle": "Hiển thị ở thanh bên",
+    "dashboardToggle": "Hiển thị trên bảng điều khiển",
+    "hiddenBadge": "Ẩn",
+    "openFromMore": "Quản lý bố cục nền tảng",
+    "dragHandleLabel": "Kéo để sắp xếp lại"
   }
 }

@@ -32,7 +32,8 @@
     "githubCopilot": "GitHub Copilot",
     "dashboard": "Painel",
     "instances": "Multi-Instância",
-    "windsurf": "Windsurf"
+    "windsurf": "Windsurf",
+    "morePlatforms": "Mais plataformas"
   },
   "settings": {
     "title": "Configurações do App",
@@ -1332,5 +1333,16 @@
       "reason": "Escopo de permissões: ler o banco de autenticação do Windsurf (state.vscdb) e chamar a criptografia do sistema (Windows DPAPI / macOS Keychain / Linux Secret Service) para descriptografar e gravar de volta.",
       "storage": "Escopo de leitura: apenas dados relacionados à sessão de login do Windsurf são processados; todos os processos são executados localmente."
     }
+  },
+  "platformLayout": {
+    "title": "Layout de plataformas",
+    "sidebarSelected": "Selecionadas na barra lateral {{count}}/{{max}}",
+    "reset": "Restaurar padrão",
+    "tip": "Arraste para reordenar. É possível exibir no máximo duas plataformas na barra lateral. Se apenas uma for selecionada, apenas uma será exibida.",
+    "sidebarToggle": "Mostrar na barra lateral",
+    "dashboardToggle": "Mostrar no painel",
+    "hiddenBadge": "Oculto",
+    "openFromMore": "Gerenciar layout de plataformas",
+    "dragHandleLabel": "Arrastar para reordenar"
   }
 }

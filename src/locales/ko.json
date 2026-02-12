@@ -32,7 +32,8 @@
     "dashboard": "대시보드",
     "instances": "멀티 인스턴스",
     "githubCopilot": "GitHub Copilot",
-    "windsurf": "Windsurf"
+    "windsurf": "Windsurf",
+    "morePlatforms": "더 많은 플랫폼"
   },
   "settings": {
     "title": "앱 설정",
@@ -1332,5 +1333,16 @@
       "reason": "권한 범위: Windsurf 인증 데이터베이스(state.vscdb)를 읽고 시스템 암호화 기능(Windows DPAPI / macOS Keychain / Linux Secret Service)을 호출해 복호화 및 재기록을 수행합니다.",
       "storage": "읽기 범위: Windsurf 로그인 세션 관련 데이터만 처리하며, 모든 과정은 로컬에서 실행됩니다."
     }
+  },
+  "platformLayout": {
+    "title": "플랫폼 레이아웃",
+    "sidebarSelected": "사이드바 선택 {{count}}/{{max}}",
+    "reset": "기본값으로 재설정",
+    "tip": "드래그하여 순서를 변경하세요. 사이드바에는 최대 2개 플랫폼만 표시할 수 있습니다. 1개만 선택하면 1개만 표시됩니다.",
+    "sidebarToggle": "사이드바에 표시",
+    "dashboardToggle": "대시보드에 표시",
+    "hiddenBadge": "숨김",
+    "openFromMore": "플랫폼 레이아웃 관리",
+    "dragHandleLabel": "드래그하여 순서 변경"
   }
 }

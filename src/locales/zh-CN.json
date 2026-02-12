@@ -32,7 +32,19 @@
     "codex": "Codex 账号",
     "githubCopilot": "GitHub Copilot",
     "windsurf": "Windsurf",
+    "morePlatforms": "更多平台",
     "instances": "多开实例"
+  },
+  "platformLayout": {
+    "title": "平台布局",
+    "sidebarSelected": "侧边栏已选择 {{count}}/{{max}}",
+    "reset": "恢复默认",
+    "tip": "拖拽可排序；最多选择两个平台显示在侧边栏。若只选择一个，侧边栏只显示一个。",
+    "sidebarToggle": "侧边栏显示",
+    "dashboardToggle": "仪表盘显示",
+    "hiddenBadge": "已隐藏",
+    "openFromMore": "管理平台布局",
+    "dragHandleLabel": "拖拽排序"
   },
   "privacy": {
     "hideSensitive": "隐藏邮箱",

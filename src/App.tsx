@@ -16,6 +16,7 @@ import { WakeupTasksPage } from './pages/WakeupTasksPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { InstancesPage } from './pages/InstancesPage';
 import { SideNav } from './components/layout/SideNav';
+import { PlatformLayoutModal } from './components/PlatformLayoutModal';
 import { UpdateNotification } from './components/UpdateNotification';
 import { CloseConfirmDialog } from './components/CloseConfirmDialog';
 import { Page } from './types/navigation';
@@ -70,6 +71,7 @@ function App() {
   const [showUpdateNotification, setShowUpdateNotification] = useState(false);
   const [updateNotificationKey, setUpdateNotificationKey] = useState(0);
   const [showCloseDialog, setShowCloseDialog] = useState(false);
+  const [showPlatformLayoutModal, setShowPlatformLayoutModal] = useState(false);
   const [appPathMissing, setAppPathMissing] = useState<AppPathMissingDetail | null>(null);
   const [appPathSetting, setAppPathSetting] = useState(false);
   const [appPathDraft, setAppPathDraft] = useState('');
@@ -508,12 +510,16 @@ function App() {
       />
       
       {/* 左侧悬浮导航 */}
-      <SideNav page={page} setPage={setPage} />
+      <SideNav page={page} setPage={setPage} onOpenPlatformLayout={() => setShowPlatformLayoutModal(true)} />
+
+      <PlatformLayoutModal open={showPlatformLayoutModal} onClose={() => setShowPlatformLayoutModal(false)} />
 
       <div className="main-wrapper">
         {/* overview 现在是合并后的账号总览页面 */}
 
-        {page === 'dashboard' && <DashboardPage onNavigate={setPage} />}
+        {page === 'dashboard' && (
+          <DashboardPage onNavigate={setPage} onOpenPlatformLayout={() => setShowPlatformLayoutModal(true)} />
+        )}
         {page === 'overview' && <AccountsPage onNavigate={setPage} />}
         {page === 'codex' && <CodexAccountsPage />}
         {page === 'github-copilot' && <GitHubCopilotAccountsPage />}

@@ -32,7 +32,19 @@
     "githubCopilot": "GitHub Copilot",
     "windsurf": "Windsurf",
     "dashboard": "Dashboard",
+    "morePlatforms": "More Platforms",
     "instances": "Multi-Instance"
+  },
+  "platformLayout": {
+    "title": "Platform Layout",
+    "sidebarSelected": "Sidebar selected {{count}}/{{max}}",
+    "reset": "Reset to default",
+    "tip": "Drag to reorder. Up to two platforms can be shown in the sidebar. If only one is selected, only one is shown.",
+    "sidebarToggle": "Show in sidebar",
+    "dashboardToggle": "Show in dashboard",
+    "hiddenBadge": "Hidden",
+    "openFromMore": "Manage platform layout",
+    "dragHandleLabel": "Drag to reorder"
   },
   "privacy": {
     "hideSensitive": "Hide emails",

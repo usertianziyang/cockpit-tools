@@ -32,7 +32,8 @@
     "dashboard": "Dashboard",
     "instances": "Multi-Istanza",
     "githubCopilot": "GitHub Copilot",
-    "windsurf": "Windsurf"
+    "windsurf": "Windsurf",
+    "morePlatforms": "Altre piattaforme"
   },
   "settings": {
     "title": "Impostazioni App",
@@ -1332,5 +1333,16 @@
       "reason": "Ambito permessi: leggere il database di autenticazione di Windsurf (state.vscdb) e usare la cifratura di sistema (Windows DPAPI / macOS Keychain / Linux Secret Service) per decifrare e riscrivere.",
       "storage": "Ambito di lettura: vengono trattati solo i dati relativi alle sessioni di accesso Windsurf; tutti i processi vengono eseguiti in locale."
     }
+  },
+  "platformLayout": {
+    "title": "Layout piattaforme",
+    "sidebarSelected": "Selezionate nella barra laterale {{count}}/{{max}}",
+    "reset": "Ripristina predefiniti",
+    "tip": "Trascina per riordinare. Nella barra laterale possono essere mostrate al massimo due piattaforme. Se ne selezioni solo una, verrà mostrata solo una.",
+    "sidebarToggle": "Mostra nella barra laterale",
+    "dashboardToggle": "Mostra nella dashboard",
+    "hiddenBadge": "Nascosto",
+    "openFromMore": "Gestisci layout piattaforme",
+    "dragHandleLabel": "Trascina per riordinare"
   }
 }

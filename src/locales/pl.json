@@ -32,7 +32,8 @@
     "dashboard": "Panel",
     "instances": "Multi-Instancja",
     "githubCopilot": "GitHub Copilot",
-    "windsurf": "Windsurf"
+    "windsurf": "Windsurf",
+    "morePlatforms": "Więcej platform"
   },
   "settings": {
     "title": "Ustawienia aplikacji",
@@ -1332,5 +1333,16 @@
       "reason": "Zakres uprawnień: odczyt bazy uwierzytelniania Windsurf (state.vscdb) oraz użycie szyfrowania systemowego (Windows DPAPI / macOS Keychain / Linux Secret Service) do odszyfrowania i ponownego zapisu.",
       "storage": "Zakres odczytu: przetwarzane są tylko dane związane z sesją logowania Windsurf; wszystkie procesy są wykonywane lokalnie."
     }
+  },
+  "platformLayout": {
+    "title": "Układ platform",
+    "sidebarSelected": "Wybrane na pasku bocznym {{count}}/{{max}}",
+    "reset": "Przywróć domyślne",
+    "tip": "Przeciągnij, aby zmienić kolejność. Na pasku bocznym można wyświetlić maksymalnie dwie platformy. Jeśli wybrana jest tylko jedna, zostanie wyświetlona tylko jedna.",
+    "sidebarToggle": "Pokaż na pasku bocznym",
+    "dashboardToggle": "Pokaż na pulpicie",
+    "hiddenBadge": "Ukryte",
+    "openFromMore": "Zarządzaj układem platform",
+    "dragHandleLabel": "Przeciągnij, aby zmienić kolejność"
   }
 }

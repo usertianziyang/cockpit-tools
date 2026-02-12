@@ -32,7 +32,8 @@
     "githubCopilot": "GitHub Copilot",
     "dashboard": "لوحة التحكم",
     "instances": "مثيلات متعددة",
-    "windsurf": "Windsurf"
+    "windsurf": "Windsurf",
+    "morePlatforms": "المزيد من المنصات"
   },
   "settings": {
     "title": "إعدادات التطبيق",
@@ -1332,5 +1333,16 @@
       "reason": "نطاق الأذونات: قراءة قاعدة بيانات مصادقة Windsurf ‏(state.vscdb) واستدعاء قدرات التشفير في النظام (Windows DPAPI / macOS Keychain / Linux Secret Service) لفك التشفير وإعادة الكتابة.",
       "storage": "نطاق القراءة: تتم معالجة بيانات جلسات تسجيل الدخول المرتبطة بـ Windsurf فقط، وجميع العمليات تُنفّذ محليًا."
     }
+  },
+  "platformLayout": {
+    "title": "تخطيط المنصات",
+    "sidebarSelected": "المحدد في الشريط الجانبي {{count}}/{{max}}",
+    "reset": "إعادة إلى الافتراضي",
+    "tip": "اسحب لإعادة الترتيب. يمكن عرض منصتين كحد أقصى في الشريط الجانبي. إذا تم اختيار منصة واحدة فقط، فستُعرض منصة واحدة فقط.",
+    "sidebarToggle": "إظهار في الشريط الجانبي",
+    "dashboardToggle": "إظهار في لوحة المعلومات",
+    "hiddenBadge": "مخفي",
+    "openFromMore": "إدارة تخطيط المنصات",
+    "dragHandleLabel": "اسحب لإعادة الترتيب"
   }
 }
