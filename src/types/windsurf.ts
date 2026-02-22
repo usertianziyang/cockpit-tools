@@ -602,25 +602,31 @@ function parseWindsurfProtoSummary(account: WindsurfAccount): WindsurfProtoSumma
       }
     }
 
-    promptCreditsLeft = normalizeProtoCreditsValue(
+    const promptAvailable = normalizeProtoCreditsValue(
       promptAvailableFromPlanStatus ?? monthlyPromptCreditsFromPlanInfo,
     );
     promptCreditsUsed = normalizeProtoCreditsValue(promptUsedFromPlanStatus);
-    if (promptCreditsLeft != null && promptCreditsUsed != null) {
-      promptCreditsTotal = Math.max(0, promptCreditsLeft + promptCreditsUsed);
-    } else {
-      promptCreditsTotal = normalizeProtoCreditsValue(monthlyPromptCreditsFromPlanInfo);
-    }
+    // availablePromptCredits = total monthly quota, NOT remaining
+    // total = monthly quota; remaining = total - used
+    promptCreditsTotal =
+      normalizeProtoCreditsValue(monthlyPromptCreditsFromPlanInfo) ??
+      promptAvailable;
+    promptCreditsLeft =
+      promptCreditsTotal != null && promptCreditsUsed != null
+        ? Math.max(0, promptCreditsTotal - promptCreditsUsed)
+        : promptAvailable;
 
-    addOnCreditsLeft = normalizeProtoCreditsValue(
+    const addOnAvailable = normalizeProtoCreditsValue(
       flexAvailableFromPlanStatus ?? monthlyFlexCreditsFromPlanInfo,
     );
     addOnCreditsUsed = normalizeProtoCreditsValue(flexUsedFromPlanStatus);
-    if (addOnCreditsLeft != null && addOnCreditsUsed != null) {
-      addOnCreditsTotal = Math.max(0, addOnCreditsLeft + addOnCreditsUsed);
-    } else {
-      addOnCreditsTotal = normalizeProtoCreditsValue(monthlyFlexCreditsFromPlanInfo);
-    }
+    addOnCreditsTotal =
+      normalizeProtoCreditsValue(monthlyFlexCreditsFromPlanInfo) ??
+      addOnAvailable;
+    addOnCreditsLeft =
+      addOnCreditsTotal != null && addOnCreditsUsed != null
+        ? Math.max(0, addOnCreditsTotal - addOnCreditsUsed)
+        : addOnAvailable;
   }
 
   return {
@@ -771,16 +777,14 @@ export function getWindsurfCreditsSummary(account: WindsurfAccount): WindsurfCre
     getNormalizedNumberFromPaths(planInfo, [['monthlyPromptCredits'], ['monthly_prompt_credits']]) ??
     protoSummary?.promptCreditsTotal;
 
+  // availablePromptCredits = total monthly quota (same as monthlyPromptCredits), NOT remaining
+  // total = monthlyPromptCredits ?? available; remaining = total - used
   let promptCreditsTotal =
-    promptCreditsLeft != null && usedPromptCredits != null
-      ? Math.max(0, promptCreditsLeft + usedPromptCredits)
-      : promptCreditsMonthlyTotal ??
-        normalizeProtoCreditsValue(usage.totalCompletions ?? null) ??
-        (promptCreditsLeft ?? null);
+    promptCreditsMonthlyTotal ??
+    normalizeProtoCreditsValue(usage.totalCompletions ?? null) ??
+    promptCreditsLeft ??
+    null;
   if (promptCreditsTotal == null && promptCreditsLeft != null) {
-    promptCreditsTotal = promptCreditsLeft;
-  }
-  if (promptCreditsTotal != null && promptCreditsLeft != null && promptCreditsTotal < promptCreditsLeft) {
     promptCreditsTotal = promptCreditsLeft;
   }
   const promptCreditsUsed =
@@ -790,6 +794,11 @@ export function getWindsurfCreditsSummary(account: WindsurfAccount): WindsurfCre
       : promptCreditsLeft != null
       ? 0
       : null);
+  // Compute true remaining = total - used
+  const promptCreditsLeftActual =
+    promptCreditsTotal != null && promptCreditsUsed != null
+      ? Math.max(0, promptCreditsTotal - promptCreditsUsed)
+      : promptCreditsLeft;
 
   const addOnCredits =
     getNormalizedNumberFromPaths(planStatus, [
@@ -829,10 +838,11 @@ export function getWindsurfCreditsSummary(account: WindsurfAccount): WindsurfCre
       ['monthly_top_up_credits'],
     ]) ?? protoSummary?.addOnCreditsTotal;
 
+  // Same fix for add-on credits
   let addOnCreditsTotal =
-    addOnCredits != null && usedAddOnCredits != null
-      ? Math.max(0, addOnCredits + usedAddOnCredits)
-      : addOnCreditsMonthlyTotal ?? (addOnCredits ?? null);
+    addOnCreditsMonthlyTotal ??
+    addOnCredits ??
+    null;
   if (addOnCreditsTotal != null && addOnCredits != null && addOnCreditsTotal < addOnCredits) {
     addOnCreditsTotal = addOnCredits;
   }
@@ -843,6 +853,10 @@ export function getWindsurfCreditsSummary(account: WindsurfAccount): WindsurfCre
       : addOnCredits != null
       ? 0
       : null);
+  const addOnCreditsLeftActual =
+    addOnCreditsTotal != null && addOnCreditsUsed != null
+      ? Math.max(0, addOnCreditsTotal - addOnCreditsUsed)
+      : addOnCredits ?? null;
 
   const planStartsAt =
     parseTimestampSeconds(getPathValue(planStatus, ['planStart'])) ??
@@ -868,11 +882,11 @@ export function getWindsurfCreditsSummary(account: WindsurfAccount): WindsurfCre
       account.copilot_plan ??
       account.plan_type ??
       null,
-    creditsLeft: promptCreditsLeft,
-    promptCreditsLeft,
+    creditsLeft: promptCreditsLeftActual,
+    promptCreditsLeft: promptCreditsLeftActual,
     promptCreditsUsed,
     promptCreditsTotal,
-    addOnCredits,
+    addOnCredits: addOnCreditsLeftActual,
     addOnCreditsUsed,
     addOnCreditsTotal,
     planStartsAt,
