@@ -47,6 +47,8 @@ interface DashboardPageProps {
 const GHCP_CURRENT_ACCOUNT_ID_KEY = 'agtools.github_copilot.current_account_id';
 const WINDSURF_CURRENT_ACCOUNT_ID_KEY = 'agtools.windsurf.current_account_id';
 const KIRO_CURRENT_ACCOUNT_ID_KEY = 'agtools.kiro.current_account_id';
+const DASHBOARD_DEFERRED_PREFETCH_DELAY_MS = 1200;
+let dashboardStartupPrefetched = false;
 
 function toFiniteNumber(value: number | null | undefined): number | null {
   return typeof value === 'number' && Number.isFinite(value) ? value : null;
@@ -143,20 +145,51 @@ export function DashboardPage({ onNavigate, onOpenPlatformLayout, onEasterEggTri
   }, [codexAccounts, codexCurrent, codexCurrentId]);
 
   React.useEffect(() => {
-    fetchAgAccounts();
-    fetchAgCurrent();
-    getDisplayGroups()
-      .then((groups) => {
-        setAgDisplayGroups(groups);
-      })
-      .catch((error) => {
-        console.error('Failed to load display groups:', error);
-      });
-    fetchCodexAccounts();
-    fetchCodexCurrent();
-    fetchGitHubCopilotAccounts();
-    fetchWindsurfAccounts();
-    fetchKiroAccounts();
+    let disposed = false;
+    let deferredTimer: number | null = null;
+
+    const loadDisplayGroups = () => {
+      getDisplayGroups()
+        .then((groups) => {
+          if (!disposed) {
+            setAgDisplayGroups(groups);
+          }
+        })
+        .catch((error) => {
+          console.error('Failed to load display groups:', error);
+        });
+    };
+
+    // 首屏优先：先拉 Antigravity 数据，其它平台延后，避免启动期并发请求过多。
+    void Promise.allSettled([fetchAgAccounts(), fetchAgCurrent()]);
+    loadDisplayGroups();
+
+    const loadDeferredPlatforms = () => {
+      if (disposed) {
+        return;
+      }
+      void Promise.allSettled([
+        fetchCodexAccounts(),
+        fetchCodexCurrent(),
+        fetchGitHubCopilotAccounts(),
+        fetchWindsurfAccounts(),
+        fetchKiroAccounts(),
+      ]);
+    };
+
+    if (!dashboardStartupPrefetched) {
+      dashboardStartupPrefetched = true;
+      deferredTimer = window.setTimeout(loadDeferredPlatforms, DASHBOARD_DEFERRED_PREFETCH_DELAY_MS);
+    } else {
+      loadDeferredPlatforms();
+    }
+
+    return () => {
+      disposed = true;
+      if (deferredTimer !== null) {
+        window.clearTimeout(deferredTimer);
+      }
+    };
   }, []);
 
   // Statistics

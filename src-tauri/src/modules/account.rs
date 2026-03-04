@@ -4,6 +4,7 @@ use std::fs;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
+use std::time::{Duration, Instant};
 use uuid::Uuid;
 
 use crate::models::{
@@ -17,8 +18,13 @@ static ACCOUNT_INDEX_LOCK: std::sync::LazyLock<Mutex<()>> =
 static AUTO_SWITCH_IN_PROGRESS: AtomicBool = AtomicBool::new(false);
 static QUOTA_ALERT_LAST_SENT: std::sync::LazyLock<Mutex<HashMap<String, i64>>> =
     std::sync::LazyLock::new(|| Mutex::new(HashMap::new()));
+static LIST_ACCOUNTS_CACHE: std::sync::LazyLock<Mutex<Option<ListAccountsCacheEntry>>> =
+    std::sync::LazyLock::new(|| Mutex::new(None));
+static LIST_ACCOUNTS_LOAD_LOCK: std::sync::LazyLock<Mutex<()>> =
+    std::sync::LazyLock::new(|| Mutex::new(()));
 
 const QUOTA_ALERT_COOLDOWN_SECONDS: i64 = 300;
+const LIST_ACCOUNTS_CACHE_TTL_MS: u64 = 800;
 
 // 使用与 AntigravityCockpit 插件相同的数据目录
 const DATA_DIR: &str = ".antigravity_cockpit";
@@ -30,6 +36,43 @@ const DELETED_ACCOUNT_FP_BINDINGS: &str = "deleted_account_fingerprint_bindings.
 struct DeletedAccountFingerprintBindings {
     #[serde(default)]
     by_email: HashMap<String, String>,
+}
+
+#[derive(Clone)]
+struct ListAccountsCacheEntry {
+    cached_at: Instant,
+    accounts: Vec<Account>,
+}
+
+fn invalidate_list_accounts_cache() {
+    if let Ok(mut cache) = LIST_ACCOUNTS_CACHE.lock() {
+        *cache = None;
+    }
+}
+
+fn read_list_accounts_cache() -> Option<Vec<Account>> {
+    let Ok(cache) = LIST_ACCOUNTS_CACHE.lock() else {
+        return None;
+    };
+
+    let Some(entry) = cache.as_ref() else {
+        return None;
+    };
+
+    if entry.cached_at.elapsed() > Duration::from_millis(LIST_ACCOUNTS_CACHE_TTL_MS) {
+        return None;
+    }
+
+    Some(entry.accounts.clone())
+}
+
+fn write_list_accounts_cache(accounts: &[Account]) {
+    if let Ok(mut cache) = LIST_ACCOUNTS_CACHE.lock() {
+        *cache = Some(ListAccountsCacheEntry {
+            cached_at: Instant::now(),
+            accounts: accounts.to_vec(),
+        });
+    }
 }
 
 fn normalize_account_email_key(email: &str) -> String {
@@ -189,7 +232,9 @@ pub fn save_account_index(index: &AccountIndex) -> Result<(), String> {
 
     fs::write(&temp_path, content).map_err(|e| format!("写入临时索引文件失败: {}", e))?;
 
-    fs::rename(temp_path, index_path).map_err(|e| format!("替换索引文件失败: {}", e))
+    fs::rename(temp_path, index_path).map_err(|e| format!("替换索引文件失败: {}", e))?;
+    invalidate_list_accounts_cache();
+    Ok(())
 }
 
 /// 加载账号数据
@@ -215,7 +260,9 @@ pub fn save_account(account: &Account) -> Result<(), String> {
     let content =
         serde_json::to_string_pretty(account).map_err(|e| format!("序列化账号数据失败: {}", e))?;
 
-    fs::write(&account_path, content).map_err(|e| format!("保存账号数据失败: {}", e))
+    fs::write(&account_path, content).map_err(|e| format!("保存账号数据失败: {}", e))?;
+    invalidate_list_accounts_cache();
+    Ok(())
 }
 
 fn normalize_tags(tags: Vec<String>) -> Result<Vec<String>, String> {
@@ -254,6 +301,18 @@ pub fn update_account_tags(account_id: &str, tags: Vec<String>) -> Result<Accoun
 
 /// 列出所有账号
 pub fn list_accounts() -> Result<Vec<Account>, String> {
+    if let Some(accounts) = read_list_accounts_cache() {
+        return Ok(accounts);
+    }
+
+    let _load_guard = LIST_ACCOUNTS_LOAD_LOCK
+        .lock()
+        .map_err(|e| format!("获取账号列表锁失败: {}", e))?;
+
+    if let Some(accounts) = read_list_accounts_cache() {
+        return Ok(accounts);
+    }
+
     modules::logger::log_info("开始列出账号...");
     let index = load_account_index()?;
     let mut accounts = Vec::new();
@@ -270,6 +329,7 @@ pub fn list_accounts() -> Result<Vec<Account>, String> {
         }
     }
 
+    write_list_accounts_cache(&accounts);
     Ok(accounts)
 }
 
