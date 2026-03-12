@@ -892,6 +892,13 @@ export function AccountsPage({ onNavigate }: AccountsPageProps) {
     setOauthUrlCopied(false)
   }, [showAddModal, addTab, oauthUrl])
 
+  useEffect(() => {
+    return () => {
+      if (!showAddModalRef.current || addTabRef.current !== 'oauth') return
+      accountService.cancelOAuthLogin().catch(() => { })
+    }
+  }, [])
+
   const handleRefresh = async (accountId: string) => {
     setRefreshing((prev) => new Set(prev).add(accountId))
     try {

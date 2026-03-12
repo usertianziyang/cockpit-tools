@@ -29,7 +29,11 @@
         "addOnPromptCredits": "Doplňkové kredity promptů",
         "credits": "Kredity",
         "email": "E-mail",
-        "promptCredits": "Kredity promptů"
+        "promptCredits": "Kredity promptů",
+        "creditPackage": "Balíček kreditů",
+        "sharedCreditPackage": "Sdílený balíček kreditů",
+        "account": "Účet",
+        "createdAt": "Čas vytvoření"
       },
       "empty": {
         "title": "Žádné účty"
@@ -141,6 +145,9 @@
       "usage": {
         "resetLine": "Limit se obnoví {{dateText}}.",
         "resetUnknown": "Limit se obnoví -"
+      },
+      "updated": {
+        "label": "Aktualizováno před {{relative}}"
       }
     }
   },
@@ -162,8 +169,10 @@
       "restart": "Restartovat",
       "installing": "Instalace"
     },
-    "gemini": "Účty Gemini",
-    "codebuddy": "Účty CodeBuddy"
+    "gemini": "Účty Gemini Cli",
+    "codebuddy": "Účty CodeBuddy",
+    "qoder": "Účty Qoder",
+    "trae": "Trae"
   },
   "platformLayout": {
     "title": "Rozložení platforem",
@@ -403,7 +412,6 @@
       "hideDockIconDesc": "Nezávisle řídí viditelnost ikony v Docku bez vlivu chování minimalizace okna",
       "hideDockIconOff": "Ne (Zobrazit ikonu v Docku)",
       "hideDockIconOn": "Ano (Skrýt ikonu v Docku)",
-      "storageTitle": "Adresáře a úložiště",
       "dataDir": "Datový adresář",
       "dataDirDesc": "Umístění pro uložení účtů a konfiguračních souborů.",
       "fpDir": "Úložiště Antigravity",
@@ -469,7 +477,15 @@
       "codebuddyAppPathDesc": "Pro výchozí cestu ponechte prázdné",
       "codebuddyAppPathPlaceholder": "Výchozí cesta",
       "codebuddyPathSelect": "Vybrat",
-      "codebuddyPathReset": "Obnovit výchozí"
+      "codebuddyPathReset": "Obnovit výchozí",
+      "qoderPathReset": "Obnovit výchozí",
+      "traeAutoRefresh": "Automatické obnovení kvóty Trae",
+      "traeAutoRefreshDesc": "Interval automatického obnovení na pozadí",
+      "traeAppPath": "Spouštěcí cesta Trae",
+      "traeAppPathDesc": "Pro výchozí cestu ponechte prázdné",
+      "traeAppPathPlaceholder": "Výchozí cesta",
+      "traePathSelect": "Vybrat",
+      "traePathReset": "Obnovit výchozí"
     },
     "network": {
       "apiTitle": "Antigravity Cockpit API",
@@ -581,7 +597,9 @@
       "byGroupReset": "Podle času resetu {{group}}",
       "descTooltip": "Sestupně, kliknutím přepnete na vzestupně",
       "ascTooltip": "Vzestupně, kliknutím přepnete na sestupně",
-      "toggleDirection": "Přepnout směr řazení"
+      "toggleDirection": "Přepnout směr řazení",
+      "plan": "Podle plánu",
+      "quota": "Podle kvóty"
     },
     "filterTags": "Filtrovat štítky",
     "filterTagsCount": "Štítky",
@@ -1386,8 +1404,8 @@
     },
     "cursorRefreshInterval": "Automatická obnova kvóty",
     "gemini": {
-      "title": "Nastavení Gemini",
-      "appPath": "Cesta k Gemini"
+      "title": "Nastavení Gemini Cli",
+      "appPath": "Cesta k Gemini Cli"
     },
     "geminiRefreshInterval": "Automatická obnova kvóty",
     "codebuddy": {
@@ -1399,6 +1417,14 @@
       "saveFailed": "Nepodařilo se uložit konfiguraci: {{error}}",
       "pickPathFailed": "Nepodařilo se vybrat cestu: {{error}}",
       "resetPathFailed": "Nepodařilo se resetovat cestu: {{error}}"
+    },
+    "qoder": {
+      "title": "Nastavení Qoder",
+      "appPath": "Cesta Qoder"
+    },
+    "trae": {
+      "title": "Nastavení Trae",
+      "appPath": "Cesta Trae"
     }
   },
   "quotaAlert": {
@@ -1903,7 +1929,7 @@
     }
   },
   "gemini": {
-    "injectToGemini": "Přepnout na Gemini",
+    "injectToGemini": "Přepnout na Gemini Cli",
     "updated": {
       "label": "Aktualizováno před {{relative}}"
     },
@@ -1916,10 +1942,10 @@
       "resetsUnknown": "Čas obnovení není znám",
       "onDemand": "Na vyžádání"
     },
-    "title": "Správa účtů Gemini",
+    "title": "Správa účtů Gemini Cli",
     "instances": {
-      "unsupported": "Správa více instancí Gemini zatím není podporována.",
-      "unsupportedDescPlatform": "Více instancí Gemini je podporováno pouze na macOS, Windows a Linuxu.",
+      "unsupported": "Správa více instancí Gemini Cli zatím není podporována.",
+      "unsupportedDescPlatform": "Více instancí Gemini Cli je podporováno pouze na macOS, Windows a Linuxu.",
       "launchDialogTitle": "Spustit instanci",
       "launchHint": "Zkopírujte příkaz a spusťte jej ručně, nebo jej spusťte přímo v terminálu.",
       "runInTerminal": "Spustit v terminálu"
@@ -1928,28 +1954,28 @@
       "success": "Účet byl úspěšně přepnut"
     },
     "empty": {
-      "description": "Klikněte na „Přidat účet“ a začněte spravovat své účty Gemini"
+      "description": "Klikněte na „Přidat účet“ a začněte spravovat své účty Gemini Cli"
     },
     "addModal": {
-      "title": "Přidat účet Gemini"
+      "title": "Přidat účet Gemini Cli"
     },
     "oauth": {
-      "desc": "Klikněte na tlačítko níže a dokončete autorizaci Gemini v prohlížeči."
+      "desc": "Klikněte na tlačítko níže a dokončete autorizaci Gemini Cli v prohlížeči."
     },
     "token": {
-      "desc": "Vložte svůj přístupový token Gemini (JWT) nebo exportovaná JSON data.",
+      "desc": "Vložte svůj přístupový token Gemini Cli (JWT) nebo exportovaná JSON data.",
       "formatHint": "Povinná pole a příklady (klikněte pro rozbalení)",
       "formatRequired": "Jeden token: vložte JWT přímo; hromadný import: použijte formát JSON pole",
       "singleExample": "Příklad jednoho tokenu (JWT)",
       "batchExample": "Příklad hromadného importu (JSON)"
     },
     "import": {
-      "localDesc": "Importujte data účtu z místního klienta Gemini nebo souboru JSON.",
-      "localClient": "Import z místního Gemini"
+      "localDesc": "Importujte data účtu z místního klienta Gemini Cli nebo souboru JSON.",
+      "localClient": "Import z místního Gemini Cli"
     },
     "flowNotice": {
-      "title": "Průvodce účtem Gemini (klikněte pro rozbalení/sbalení)",
-      "desc": "Spravujte účty Gemini importem z místní instalace Gemini nebo vložením tokenů JWT. Data jsou zpracovávána pouze lokálně.",
+      "title": "Průvodce účtem Gemini Cli (klikněte pro rozbalení/sbalení)",
+      "desc": "Spravujte účty Gemini Cli importem z místní instalace Gemini Cli nebo vložením tokenů JWT. Data jsou zpracovávána pouze lokálně.",
       "reason": "Rozsah oprávnění: čtení a zápis oauth_creds.json, google_accounts.json a settings.json v výchozím ~/.gemini nebo v cestě instance (GEMINI_CLI_HOME/.gemini) pro import účtů a lokální injekci přihlašovacích údajů (přepnutí účtu).",
       "storage": "Síťový rozsah: OAuth a obnovení kvóty volají oficiální API Google/Gemini (např. oauth2.googleapis.com a googleapis.com). Odesílají se jen nutná pole pro autentizaci/kvótu; lokální soubory se na servery třetích stran nenahrávají."
     }
@@ -2120,6 +2146,84 @@
       "status": {
         "loginConfirm": "Na této stránce dokončete přihlášení a autorizaci."
       }
+    }
+  },
+  "qoder": {
+    "title": "Správa účtů Qoder",
+    "comingSoon": {
+      "title": "Funkce více instancí již brzy",
+      "desc": "Spusťte více instancí Qoder.app s různými účty současně, zůstaňte naladěni."
+    },
+    "instances": {
+      "unsupported": {
+        "descPlatform": "Více instancí Qoder je podporováno pouze na macOS, Windows a Linuxu."
+      }
+    },
+    "oauth": {
+      "hint": "Dokončete přihlášení v otevřené stránce prohlížeče: pokud se přihlašovací stránka neotevřela automaticky, klikněte na „Kopírovat odkaz pro přihlášení“, zkopírujte odkaz a vložte jej do prohlížeče.",
+      "copyLoginUrl": "Kopírovat odkaz pro přihlášení"
+    },
+    "usageOverview": {
+      "title": "Přehled využití",
+      "viewDetails": "Zobrazit podrobnosti",
+      "includedCredits": "Kredity v rámci tarifu",
+      "usedOfTotal": "{{used}} / {{total}}",
+      "usedEmpty": "-- / --",
+      "upgradeHint": "Upgradujte tarif pro navýšení měsíčního limitu",
+      "upgradeAction": "Upgradovat"
+    },
+    "flowNotice": {
+      "title": "Prirucka k uctu Qoder (kliknutim rozbalit/sbalit)",
+      "desc": "Podporuje oficialni prihlaseni pres OAuth (callback), mistni import, import JSON, injekci pro prepnuti uctu, navazani vice instanci a prehled kvot. Prihlasovaci tok vychazi ze skutecnych ulozenych dat klienta Qoder.",
+      "permission": "Rozsah opravneni: cte mistni autentizacni uloziste Qoderu (prihlasovaci udaje auth a informace o uzivateli) pro prepinani uctu a injekci relace; vsechna data se zpracovavaji pouze lokalne na vasem zarizeni.",
+      "network": "Sitovy rozsah: prihlaseni pres OAuth vyzaduje spojeni s oficialnimi sluzbami Qoderu pro callback; dotazy na kvotu pouzivaji Qoder API. Mistni klice ani povereni se neodesilaji."
+    },
+    "addModal": {
+      "title": "Přidat účet Qoder"
+    },
+    "import": {
+      "localDesc": "Načte aktuální stav přihlášení z místního klienta Qoder, včetně informací o uživateli, plánu a využití kreditů."
+    }
+  },
+  "trae": {
+    "title": "Sprava uctu Trae",
+    "empty": {
+      "description": "Kliknete na „Pridat ucet“ a zacnete spravovat ucty Trae, nebo je importujte z mistnich dat Trae ci ze souboru JSON."
+    },
+    "addModal": {
+      "title": "Pridat ucet Trae"
+    },
+    "oauth": {
+      "desc": "Kliknete na tlacitko nize a dokoncete autorizaci Trae OAuth v prohlizeci."
+    },
+    "import": {
+      "localDesc": "Importuje aktualne prihlaseny ucet, informace o tarifu a cache kvoty z mistniho konfiguracniho adresare Trae.",
+      "jsonTab": "Soubor JSON"
+    },
+    "quota": {
+      "usedOfTotal": "Vyuzito $ {{used}} z $ {{total}}",
+      "usageUnknown": "Vyuziti: --",
+      "resetAt": "Cas resetu: {{date}}",
+      "resetUnknown": "Cas resetu neni znam",
+      "statusUnknown": "Stav: neznamy",
+      "statusNormal": "Stav: normalni",
+      "statusExhaustedFree": "Stav: vyuziti vycerpano, doporucujeme upgrade",
+      "statusExhaustedPro": "Stav: vyuziti vycerpano, upgradujte nebo zapnete prubezne uctovani",
+      "bonusUsed": "Bonus navic: +{{amount}}",
+      "bonusIncluded": "Bonus navic: zahrnut",
+      "bonusEmpty": "Bonus navic: --",
+      "packageConsuming": "Balicek pouziti: cerpa se",
+      "packageAvailable": "Balicek pouziti: dostupny",
+      "packageEmpty": "Balicek pouziti: --",
+      "payAsYouGoConsuming": "Prubezne uctovani: cerpa se",
+      "payAsYouGoEnabled": "Prubezne uctovani: zapnuto",
+      "payAsYouGoEmpty": "Prubezne uctovani: --"
+    },
+    "flowNotice": {
+      "title": "Prirucka k uctu Trae (kliknutim rozbalit/sbalit)",
+      "desc": "Podporuje oficialni prihlaseni OAuth, mistni import, import JSON a prepinani uctu pomoci lokalni injekce. Pri prepnuti zapisuje data podle skutecnych pravidel klienta Trae.",
+      "permission": "Rozsah opravneni: cte a zapisuje prihlasovaci pole v mistnim souboru Trae storage.json pro import uctu, injekci prepnuti uctu a zobrazeni tarifu. Vsechna data se zpracovavaji pouze lokalne na vasem zarizeni.",
+      "network": "Sitovy rozsah: prihlaseni OAuth, obnoveni tokenu a dotazy na tarif volaji oficialni API Trae. Mistni soubory uctu ani puvodni obsah uloziste se neodesilaji sluzbam tretich stran."
     }
   }
 }

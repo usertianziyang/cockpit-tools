@@ -211,6 +211,9 @@ export function CodexAccountsPage() {
     await fetchCurrentAccount();
     setAddStatus('success');
     setAddMessage(t('common.shared.oauth.success', '授权成功'));
+    oauthActiveRef.current = false;
+    oauthCompletingRef.current = false;
+    oauthLoginIdRef.current = null;
     setTimeout(() => {
       setShowAddModal(false);
       resetAddModalState();
@@ -269,6 +272,7 @@ export function CodexAccountsPage() {
   const prepareOauthUrl = useCallback(() => {
     if (!showAddModalRef.current || addTabRef.current !== 'oauth') return;
     if (oauthActiveRef.current) return;
+    const attemptSeq = ++oauthAttemptSeqRef.current;
     oauthActiveRef.current = true;
     setOauthPrepareError(null);
     setOauthPortInUse(null);
@@ -276,6 +280,13 @@ export function CodexAccountsPage() {
 
     codexService.startCodexOAuthLogin()
       .then(({ loginId, authUrl }) => {
+        if (attemptSeq !== oauthAttemptSeqRef.current) {
+          if (loginId) {
+            codexService.cancelCodexOAuthLogin(loginId).catch(() => { });
+          }
+          oauthLog('忽略过期 OAuth start 响应', { loginId, attemptSeq });
+          return;
+        }
         oauthLoginIdRef.current = loginId ?? null;
         if (typeof authUrl === 'string' && authUrl.length > 0 && showAddModalRef.current && addTabRef.current === 'oauth') {
           setOauthUrl(authUrl);
@@ -283,8 +294,17 @@ export function CodexAccountsPage() {
           oauthActiveRef.current = false;
         }
       })
-      .catch((e) => handleOauthPrepareError(e));
-  }, [handleOauthPrepareError]);
+      .catch((e) => {
+        if (attemptSeq !== oauthAttemptSeqRef.current) {
+          oauthLog('忽略过期 OAuth start 异常回调', {
+            attemptSeq,
+            error: String(e),
+          });
+          return;
+        }
+        handleOauthPrepareError(e);
+      });
+  }, [handleOauthPrepareError, oauthLog]);
 
   useEffect(() => {
     if (!showAddModal || addTab !== 'oauth' || oauthUrl || oauthTimeoutInfo) return;
@@ -293,15 +313,34 @@ export function CodexAccountsPage() {
 
   useEffect(() => {
     if (showAddModal && addTab === 'oauth') return;
-    if (!oauthActiveRef.current) return;
     const loginId = oauthLoginIdRef.current ?? undefined;
-    codexService.cancelCodexOAuthLogin(loginId).catch(() => { });
+    if (!loginId && !oauthActiveRef.current && !oauthCompletingRef.current) return;
+    oauthAttemptSeqRef.current += 1;
+    if (loginId) {
+      codexService.cancelCodexOAuthLogin(loginId).catch(() => { });
+    }
     oauthActiveRef.current = false;
+    oauthCompletingRef.current = false;
     oauthLoginIdRef.current = null;
     setOauthUrl('');
     setOauthUrlCopied(false);
     setOauthTimeoutInfo(null);
   }, [showAddModal, addTab]);
+
+  useEffect(
+    () => () => {
+      oauthAttemptSeqRef.current += 1;
+      const loginId = oauthLoginIdRef.current ?? undefined;
+      if (loginId) {
+        oauthLog('页面卸载，准备取消授权流程', { loginId });
+        codexService.cancelCodexOAuthLogin(loginId).catch(() => { });
+      }
+      oauthActiveRef.current = false;
+      oauthCompletingRef.current = false;
+      oauthLoginIdRef.current = null;
+    },
+    [oauthLog],
+  );
 
   const handleCopyOauthUrl = async () => {
     if (!oauthUrl) return;

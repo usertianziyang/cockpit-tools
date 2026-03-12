@@ -29,7 +29,11 @@
         "addOnPromptCredits": "Crédits de prompts additionnels",
         "credits": "Crédits",
         "email": "E-mail",
-        "promptCredits": "Crédits de prompts"
+        "promptCredits": "Crédits de prompts",
+        "creditPackage": "Pack de crédits",
+        "sharedCreditPackage": "Pack de crédits partagé",
+        "account": "Compte",
+        "createdAt": "Date de création"
       },
       "empty": {
         "title": "Aucun compte"
@@ -141,6 +145,9 @@
       "usage": {
         "resetLine": "L'allocation se réinitialise {{dateText}}.",
         "resetUnknown": "Réinitialisation de l'allocation -"
+      },
+      "updated": {
+        "label": "Mis à jour il y a {{relative}}"
       }
     }
   },
@@ -162,8 +169,10 @@
       "restart": "Redémarrer",
       "installing": "Installation"
     },
-    "gemini": "Comptes Gemini",
-    "codebuddy": "Comptes CodeBuddy"
+    "gemini": "Comptes Gemini Cli",
+    "codebuddy": "Comptes CodeBuddy",
+    "qoder": "Comptes Qoder",
+    "trae": "Trae"
   },
   "platformLayout": {
     "title": "Disposition des plateformes",
@@ -403,7 +412,6 @@
       "hideDockIconDesc": "Contrôle l’affichage de l’icône du Dock indépendamment du comportement de minimisation de la fenêtre",
       "hideDockIconOff": "Non (Afficher l’icône du Dock)",
       "hideDockIconOn": "Oui (Masquer l’icône du Dock)",
-      "storageTitle": "Répertoires et stockage",
       "dataDir": "Répertoire de données",
       "dataDirDesc": "Emplacement de stockage des comptes et fichiers de configuration.",
       "fpDir": "Stockage Antigravity",
@@ -469,7 +477,15 @@
       "codebuddyAppPathDesc": "Laisser vide pour utiliser le chemin par defaut",
       "codebuddyAppPathPlaceholder": "Chemin par defaut",
       "codebuddyPathSelect": "Selectionner",
-      "codebuddyPathReset": "Reinitialiser par defaut"
+      "codebuddyPathReset": "Reinitialiser par defaut",
+      "qoderPathReset": "Reinitialiser par defaut",
+      "traeAutoRefresh": "Actualisation automatique du quota Trae",
+      "traeAutoRefreshDesc": "Intervalle d'actualisation en arriere-plan",
+      "traeAppPath": "Chemin de lancement de Trae",
+      "traeAppPathDesc": "Laisser vide pour utiliser le chemin par defaut",
+      "traeAppPathPlaceholder": "Chemin par defaut",
+      "traePathSelect": "Selectionner",
+      "traePathReset": "Reinitialiser par defaut"
     },
     "network": {
       "apiTitle": "API du cockpit antigravité",
@@ -581,7 +597,9 @@
       "byGroupReset": "Par heure de réinitialisation de {{group}}",
       "descTooltip": "Descendant, cliquer pour Ascendant",
       "ascTooltip": "Ascendant, cliquer pour Descendant",
-      "toggleDirection": "Changer la direction"
+      "toggleDirection": "Changer la direction",
+      "plan": "Par forfait",
+      "quota": "Par quota"
     },
     "filterTags": "Filtrer les tags",
     "filterTagsCount": "Balises",
@@ -1386,8 +1404,8 @@
     },
     "cursorRefreshInterval": "Actualisation auto du quota",
     "gemini": {
-      "title": "Paramètres Gemini",
-      "appPath": "Chemin Gemini"
+      "title": "Paramètres Gemini Cli",
+      "appPath": "Chemin Gemini Cli"
     },
     "geminiRefreshInterval": "Actualisation auto du quota",
     "codebuddy": {
@@ -1399,6 +1417,14 @@
       "saveFailed": "Échec de la sauvegarde de la configuration : {{error}}",
       "pickPathFailed": "Échec de la sélection du chemin : {{error}}",
       "resetPathFailed": "Échec de la réinitialisation du chemin : {{error}}"
+    },
+    "qoder": {
+      "title": "Parametres Qoder",
+      "appPath": "Chemin Qoder"
+    },
+    "trae": {
+      "title": "Parametres Trae",
+      "appPath": "Chemin Trae"
     }
   },
   "quotaAlert": {
@@ -1903,7 +1929,7 @@
     }
   },
   "gemini": {
-    "injectToGemini": "Basculer vers Gemini",
+    "injectToGemini": "Basculer vers Gemini Cli",
     "updated": {
       "label": "Mis à jour il y a {{relative}}"
     },
@@ -1916,10 +1942,10 @@
       "resetsUnknown": "Heure de réinitialisation inconnue",
       "onDemand": "À la demande"
     },
-    "title": "Gestion des comptes Gemini",
+    "title": "Gestion des comptes Gemini Cli",
     "instances": {
-      "unsupported": "La gestion multi-instances Gemini n’est pas encore prise en charge.",
-      "unsupportedDescPlatform": "Le mode multi-instances Gemini est pris en charge uniquement sur macOS, Windows et Linux.",
+      "unsupported": "La gestion multi-instances Gemini Cli n’est pas encore prise en charge.",
+      "unsupportedDescPlatform": "Le mode multi-instances Gemini Cli est pris en charge uniquement sur macOS, Windows et Linux.",
       "launchDialogTitle": "Lancer l’instance",
       "launchHint": "Copiez la commande et exécutez-la manuellement, ou lancez-la directement dans le terminal.",
       "runInTerminal": "Exécuter dans le terminal"
@@ -1928,28 +1954,28 @@
       "success": "Compte changé avec succès"
     },
     "empty": {
-      "description": "Cliquez sur « Ajouter un compte » pour commencer à gérer vos comptes Gemini"
+      "description": "Cliquez sur « Ajouter un compte » pour commencer à gérer vos comptes Gemini Cli"
     },
     "addModal": {
-      "title": "Ajouter un compte Gemini"
+      "title": "Ajouter un compte Gemini Cli"
     },
     "oauth": {
-      "desc": "Cliquez sur le bouton ci-dessous et terminez l'autorisation Gemini dans le navigateur."
+      "desc": "Cliquez sur le bouton ci-dessous et terminez l'autorisation Gemini Cli dans le navigateur."
     },
     "token": {
-      "desc": "Collez votre jeton d'accès Gemini (JWT) ou des données JSON exportées.",
+      "desc": "Collez votre jeton d'accès Gemini Cli (JWT) ou des données JSON exportées.",
       "formatHint": "Champs obligatoires et exemples (cliquer pour développer)",
       "formatRequired": "Jeton unique : collez le JWT directement ; import en lot : utilisez le format tableau JSON",
       "singleExample": "Exemple unique (JWT)",
       "batchExample": "Exemple en lot (JSON)"
     },
     "import": {
-      "localDesc": "Importer les données de compte depuis le client Gemini local ou un fichier JSON.",
-      "localClient": "Importer depuis Gemini local"
+      "localDesc": "Importer les données de compte depuis le client Gemini Cli local ou un fichier JSON.",
+      "localClient": "Importer depuis Gemini Cli local"
     },
     "flowNotice": {
-      "title": "Guide du compte Gemini (cliquer pour développer/réduire)",
-      "desc": "Gérez les comptes Gemini en important depuis l'installation locale de Gemini ou en collant des jetons JWT. Les données sont traitées uniquement en local.",
+      "title": "Guide du compte Gemini Cli (cliquer pour développer/réduire)",
+      "desc": "Gérez les comptes Gemini Cli en important depuis l'installation locale de Gemini Cli ou en collant des jetons JWT. Les données sont traitées uniquement en local.",
       "reason": "Portée des autorisations : lecture et écriture de oauth_creds.json, google_accounts.json et settings.json sous ~/.gemini par défaut ou le chemin d’instance (GEMINI_CLI_HOME/.gemini) pour l’import de comptes et l’injection locale d’identifiants (changement de compte).",
       "storage": "Portée réseau : OAuth et l’actualisation du quota appellent les API officielles Google/Gemini (comme oauth2.googleapis.com et googleapis.com). Seuls les champs d’authentification/quota nécessaires sont envoyés ; les fichiers locaux ne sont pas téléversés vers des serveurs tiers."
     }
@@ -2120,6 +2146,84 @@
       "status": {
         "loginConfirm": "Veuillez terminer la connexion et l'autorisation sur cette page."
       }
+    }
+  },
+  "qoder": {
+    "title": "Gestion des comptes Qoder",
+    "comingSoon": {
+      "title": "Multi-Instance Bientôt Disponible",
+      "desc": "Exécutez plusieurs instances Qoder.app avec différents comptes simultanément."
+    },
+    "instances": {
+      "unsupported": {
+        "descPlatform": "Les instances multiples de Qoder sont prises en charge uniquement sur macOS, Windows et Linux."
+      }
+    },
+    "oauth": {
+      "hint": "Veuillez terminer la connexion dans la page du navigateur ouverte : si la page de connexion ne s’est pas ouverte automatiquement, cliquez sur « Copier le lien de connexion », copiez le lien puis collez-le dans votre navigateur pour terminer la connexion.",
+      "copyLoginUrl": "Copier le lien de connexion"
+    },
+    "usageOverview": {
+      "title": "Aperçu de l'utilisation",
+      "viewDetails": "Voir les détails",
+      "includedCredits": "Crédits inclus dans l'abonnement",
+      "usedOfTotal": "{{used}} / {{total}}",
+      "usedEmpty": "-- / --",
+      "upgradeHint": "Passez à une offre supérieure pour augmenter le quota mensuel",
+      "upgradeAction": "Mettre à niveau"
+    },
+    "flowNotice": {
+      "title": "Guide du compte Qoder (cliquez pour developper/reduire)",
+      "desc": "Prend en charge la connexion OAuth officielle (callback), l'import local, l'import JSON, l'injection pour changer de compte, l'association multi-instance et la vue d'ensemble du quota. Le flux de connexion suit les donnees reellement stockees par le client Qoder.",
+      "permission": "Portee des autorisations : lit le stockage d'authentification local de Qoder (identifiants auth et informations utilisateur) pour le changement de compte et l'injection de session ; toutes les donnees sont traitees localement sur votre machine.",
+      "network": "Portee reseau : la connexion OAuth requiert l'acces aux services officiels de Qoder pour terminer le callback ; les requetes de quota utilisent l'API Qoder. Aucune cle ni aucun identifiant local n'est televerse."
+    },
+    "addModal": {
+      "title": "Ajouter un compte Qoder"
+    },
+    "import": {
+      "localDesc": "Lit l’état de connexion actuel depuis le client Qoder local, y compris les informations utilisateur, le forfait et l’utilisation des crédits."
+    }
+  },
+  "trae": {
+    "title": "Gestion des comptes Trae",
+    "empty": {
+      "description": "Cliquez sur \"Ajouter un compte\" pour commencer a gerer vos comptes Trae, ou importez-les depuis les donnees locales de Trae ou un fichier JSON."
+    },
+    "addModal": {
+      "title": "Ajouter un compte Trae"
+    },
+    "oauth": {
+      "desc": "Cliquez sur le bouton ci-dessous et terminez l'autorisation OAuth de Trae dans votre navigateur."
+    },
+    "import": {
+      "localDesc": "Importe le compte actuellement connecte, les informations de forfait et les donnees de quota en cache depuis le dossier de configuration local de Trae.",
+      "jsonTab": "Fichier JSON"
+    },
+    "quota": {
+      "usedOfTotal": "Utilise $ {{used}} sur $ {{total}}",
+      "usageUnknown": "Utilisation : --",
+      "resetAt": "Reinitialisation : {{date}}",
+      "resetUnknown": "Heure de reinitialisation inconnue",
+      "statusUnknown": "Statut : inconnu",
+      "statusNormal": "Statut : normal",
+      "statusExhaustedFree": "Statut : utilisation epuisee, mise a niveau recommandee",
+      "statusExhaustedPro": "Statut : utilisation epuisee, mettez a niveau ou activez la facturation a l'usage",
+      "bonusUsed": "Bonus : +{{amount}}",
+      "bonusIncluded": "Bonus : inclus",
+      "bonusEmpty": "Bonus : --",
+      "packageConsuming": "Pack d'utilisation : en cours",
+      "packageAvailable": "Pack d'utilisation : disponible",
+      "packageEmpty": "Pack d'utilisation : --",
+      "payAsYouGoConsuming": "Paiement a l'usage : en cours",
+      "payAsYouGoEnabled": "Paiement a l'usage : active",
+      "payAsYouGoEmpty": "Paiement a l'usage : --"
+    },
+    "flowNotice": {
+      "title": "Guide du compte Trae (cliquez pour developper/reduire)",
+      "desc": "Prend en charge la connexion OAuth officielle, l'import local, l'import JSON et le changement de compte par injection locale. Lors du changement, les donnees sont reecrites selon les regles reelles de stockage du client Trae.",
+      "permission": "Portee des autorisations : lit et ecrit les champs lies a la connexion dans le storage.json local de Trae pour l'import de compte, l'injection de changement de compte et l'affichage du forfait. Toutes les donnees sont traitees localement sur votre machine.",
+      "network": "Portee reseau : la connexion OAuth, l'actualisation du jeton et les requetes de forfait appellent les API officielles de Trae. Les fichiers de compte locaux et le contenu brut du stockage ne sont pas televerses vers des services tiers."
     }
   }
 }

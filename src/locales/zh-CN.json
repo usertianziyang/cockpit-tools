@@ -29,7 +29,11 @@
         "addOnPromptCredits": "Add-on prompt credits",
         "credits": "制作人员",
         "email": "邮箱",
-        "promptCredits": "User Prompt credits"
+        "promptCredits": "User Prompt credits",
+        "creditPackage": "附加 Credits",
+        "sharedCreditPackage": "共享资源包",
+        "account": "账号",
+        "createdAt": "创建时间"
       },
       "empty": {
         "title": "暂无账号"
@@ -104,7 +108,7 @@
       "addModal": {
         "import": "本地导入",
         "oauth": "OAuth 授权",
-        "token": "令牌/JSON"
+        "token": "Token / JSON"
       },
       "overview": {
         "title": "账号总览"
@@ -141,6 +145,9 @@
       "usage": {
         "resetLine": "Allowance resets {{dateText}}.",
         "resetUnknown": "Allowance resets -"
+      },
+      "updated": {
+        "label": "更新于 {{relative}}前"
       }
     }
   },
@@ -154,7 +161,7 @@
     "codebuddy": "CodeBuddy 账号",
     "githubCopilot": "GitHub Copilot",
     "windsurf": "Windsurf",
-    "gemini": "Gemini",
+    "gemini": "Gemini Cli 账号",
     "dashboard": "仪表盘",
     "morePlatforms": "更多平台",
     "instances": "多开实例",
@@ -163,7 +170,9 @@
       "update": "更新",
       "restart": "重启",
       "installing": "安装中"
-    }
+    },
+    "qoder": "Qoder",
+    "trae": "Trae"
   },
   "platformLayout": {
     "title": "平台布局",
@@ -403,7 +412,6 @@
       "hideDockIconDesc": "独立控制程序坞图标显示状态，不受窗口最小化行为影响",
       "hideDockIconOff": "否（显示Dock图标）",
       "hideDockIconOn": "是（隐藏Dock图标）",
-      "storageTitle": "目录与存储",
       "dataDir": "数据目录",
       "dataDirDesc": "账号与配置文件的存储位置。",
       "fpDir": "Antigravity存储目录",
@@ -469,7 +477,15 @@
       "autoUpdate": "后台自动更新",
       "autoUpdateDesc": "检测到新版本时，在后台静默更新；完成后提示重启。",
       "autoUpdateOff": "关闭（手动更新）",
-      "autoUpdateOn": "开启（静默更新）"
+      "autoUpdateOn": "开启（静默更新）",
+      "qoderPathReset": "重置默认",
+      "traeAutoRefresh": "Trae 自动刷新配额",
+      "traeAutoRefreshDesc": "后台自动更新频率",
+      "traeAppPath": "Trae 启动路径",
+      "traeAppPathDesc": "留空则使用默认路径",
+      "traeAppPathPlaceholder": "默认路径",
+      "traePathSelect": "选择",
+      "traePathReset": "重置默认"
     },
     "network": {
       "apiTitle": "反重力驾驶舱 API",
@@ -581,7 +597,9 @@
       "byGroupReset": "按 {{group}} 重置时间",
       "descTooltip": "当前：降序，点击切换为升序",
       "ascTooltip": "当前：升序，点击切换为降序",
-      "toggleDirection": "切换排序方向"
+      "toggleDirection": "切换排序方向",
+      "plan": "按套餐",
+      "quota": "按配额"
     },
     "filterTags": "标签筛选",
     "filterTagsCount": "标签",
@@ -1558,8 +1576,8 @@
       "appPath": "CodeBuddy 路径"
     },
     "gemini": {
-      "title": "Gemini 设置",
-      "appPath": "Gemini CLI 路径"
+      "title": "Gemini Cli 设置",
+      "appPath": "Gemini Cli 路径"
     },
     "geminiRefreshInterval": "配额自动刷新",
     "error": {
@@ -1567,6 +1585,14 @@
       "saveFailed": "保存配置失败：{{error}}",
       "pickPathFailed": "选择路径失败：{{error}}",
       "resetPathFailed": "重置路径失败：{{error}}"
+    },
+    "qoder": {
+      "title": "Qoder 设置",
+      "appPath": "Qoder 路径"
+    },
+    "trae": {
+      "title": "Trae 设置",
+      "appPath": "Trae 路径"
     }
   },
   "quotaAlert": {
@@ -1750,7 +1776,7 @@
     }
   },
   "gemini": {
-    "injectToGemini": "切换到 Gemini",
+    "injectToGemini": "切换到 Gemini Cli",
     "updated": {
       "label": "更新于 {{relative}}前"
     },
@@ -1763,10 +1789,10 @@
       "resetsUnknown": "重置时间未知",
       "onDemand": "按需使用"
     },
-    "title": "Gemini 账号管理",
+    "title": "Gemini Cli 账号管理",
     "instances": {
-      "unsupported": "Gemini 暂不支持多开实例管理。",
-      "unsupportedDescPlatform": "Gemini 多开实例仅支持 macOS、Windows 和 Linux。",
+      "unsupported": "Gemini Cli 暂不支持多开实例管理。",
+      "unsupportedDescPlatform": "Gemini Cli 多开实例仅支持 macOS、Windows 和 Linux。",
       "launchDialogTitle": "启动实例",
       "launchHint": "可复制命令手动执行，或点击下方按钮直接在终端执行。",
       "runInTerminal": "终端执行"
@@ -1775,28 +1801,28 @@
       "success": "切号成功"
     },
     "empty": {
-      "description": "点击\"添加账号\"开始管理您的 Gemini 账号"
+      "description": "点击\"添加账号\"开始管理您的 Gemini Cli 账号"
     },
     "addModal": {
-      "title": "添加 Gemini 账号"
+      "title": "添加 Gemini Cli 账号"
     },
     "oauth": {
-      "desc": "点击下方按钮，在浏览器中完成 Gemini OAuth 授权登录。"
+      "desc": "点击下方按钮，在浏览器中完成 Gemini Cli OAuth 授权登录。"
     },
     "token": {
-      "desc": "粘贴您的 Gemini Access Token（JWT）或导出的 JSON 数据。",
+      "desc": "粘贴您的 Gemini Cli Access Token（JWT）或导出的 JSON 数据。",
       "formatHint": "必填字段与示例（点击展开）",
       "formatRequired": "单条 Token 直接粘贴 JWT；批量导入使用 JSON 数组格式",
       "singleExample": "单条示例（JWT）",
       "batchExample": "批量示例（JSON）"
     },
     "import": {
-      "localDesc": "支持从本机 Gemini 配置目录（~/.gemini）或 JSON 文件导入账号数据。",
-      "localClient": "从本机 Gemini 导入"
+      "localDesc": "支持从本机 Gemini Cli 配置目录（~/.gemini）或 JSON 文件导入账号数据。",
+      "localClient": "从本机 Gemini Cli 导入"
     },
     "flowNotice": {
-      "title": "Gemini 账号管理说明（点击展开/收起）",
-      "desc": "支持从本机 Gemini 配置目录导入、粘贴 JWT 令牌或 OAuth 授权登录来管理 Gemini 账号。",
+      "title": "Gemini Cli 账号管理说明（点击展开/收起）",
+      "desc": "支持从本机 Gemini Cli 配置目录导入、粘贴 JWT 令牌或 OAuth 授权登录来管理 Gemini Cli 账号。",
       "reason": "权限范围：读取并写入默认 ~/.gemini 或实例目录（GEMINI_CLI_HOME/.gemini）下的 oauth_creds.json、google_accounts.json、settings.json，用于账号导入与本地凭证注入（切号）。",
       "storage": "网络请求范围：OAuth 与刷新会调用 Google/Gemini 官方接口（如 oauth2.googleapis.com、googleapis.com）；仅发送认证与配额所需字段，不向第三方服务器上传账号文件。"
     }
@@ -2120,6 +2146,84 @@
       },
       "summary": "用于定时运行唤醒任务和批量验证结果，帮助你持续跟踪账号可用性与状态。",
       "title": "唤醒任务与验证"
+    }
+  },
+  "qoder": {
+    "title": "Qoder 账号管理",
+    "flowNotice": {
+      "title": "Qoder 账号接入说明（点击展开/收起）",
+      "desc": "当前支持官方 CLI device login 授权、本地导入、JSON 导入、切号注入、多开实例绑定与配额概览。浏览器授权无需保持 Qoder 运行；切号注入按 Qoder 客户端真实落盘规则写回。",
+      "permission": "权限范围：读取 Qoder 本地认证存储、用户信息与机器标识缓存（如 machine_token.json、cache/id），用于官方授权登录、本地导入、账号切换与会话注入；所有数据仅在本机处理。",
+      "network": "网络范围：OAuth 授权登录会在浏览器中打开 Qoder 官方 device login 页面，并轮询 Qoder 官方 OpenAPI 完成授权；配额查询通过 Qoder API 获取用量数据。不上传本地密钥、凭证或原始存储内容。"
+    },
+    "oauth": {
+      "hint": "点击下方按钮，在浏览器中完成 Qoder 官方授权。该流程走官方 CLI device login 链路，无需保持 Qoder 运行。",
+      "copyLoginUrl": "复制登录链接"
+    },
+    "usageOverview": {
+      "title": "用量概览",
+      "viewDetails": "查看详情",
+      "includedCredits": "套餐内 Credits",
+      "usedOfTotal": "{{used}} / {{total}}",
+      "usedEmpty": "-- / --",
+      "upgradeHint": "升级套餐以提升每月额度",
+      "upgradeAction": "升级"
+    },
+    "comingSoon": {
+      "title": "Qoder 账号接入准备中",
+      "desc": "当前版本已支持 Qoder 多开实例、平台管理与菜单栏入口，账号登录与配额面板将在后续版本开放。"
+    },
+    "instances": {
+      "unsupported": {
+        "descPlatform": "Qoder 多开实例仅支持 macOS、Windows 和 Linux。"
+      }
+    },
+    "addModal": {
+      "title": "添加 Qoder 账号"
+    },
+    "import": {
+      "localDesc": "从本机 Qoder 客户端读取当前登录状态（包含用户信息、套餐与 Credits 使用情况）。"
+    }
+  },
+  "trae": {
+    "title": "Trae 账号管理",
+    "empty": {
+      "description": "点击“添加账号”开始管理您的 Trae 账号，也可以从本机 Trae 数据或 JSON 文件导入。"
+    },
+    "addModal": {
+      "title": "添加 Trae 账号"
+    },
+    "oauth": {
+      "desc": "点击下方按钮，在浏览器中完成 Trae OAuth 授权登录。"
+    },
+    "import": {
+      "localDesc": "支持从本机 Trae 配置目录读取当前登录账号、套餐信息和配额缓存数据。",
+      "jsonTab": "JSON 文件"
+    },
+    "quota": {
+      "usedOfTotal": "${{used}} / ${{total}}",
+      "usageUnknown": "用量：--",
+      "resetAt": "订阅重置：{{date}}",
+      "resetUnknown": "订阅重置：--",
+      "statusUnknown": "状态：--",
+      "statusNormal": "状态：正常",
+      "statusExhaustedFree": "状态：用量已耗尽，建议升级方案",
+      "statusExhaustedPro": "状态：用量已耗尽，建议升级方案或开启超额自动扣费",
+      "bonusUsed": "Bonus：+{{amount}}",
+      "bonusIncluded": "Bonus：已包含",
+      "bonusEmpty": "Bonus：--",
+      "packageConsuming": "用量包：消耗中",
+      "packageAvailable": "用量包：可用",
+      "packageEmpty": "用量包：--",
+      "payAsYouGoConsuming": "超额自动扣费：消耗中",
+      "payAsYouGoEnabled": "超额自动扣费：已开启",
+      "payAsYouGoEmpty": "超额自动扣费：--"
+    },
+    "flowNotice": {
+      "title": "Trae 账号接入说明（点击展开/收起）",
+      "desc": "支持官方 OAuth 授权、本机导入、JSON 导入与本地注入切号；切号过程按 Trae 客户端真实落盘规则写回。",
+      "permission": "权限范围：读取并写入本机 Trae 配置目录中的 storage.json 登录相关字段，用于账号导入、切号注入与套餐信息展示；所有数据仅在本机处理。",
+      "network": "网络范围：OAuth 登录、令牌刷新和套餐查询会请求 Trae 官方接口；不会向第三方服务上传本地账号文件或原始存储内容。"
     }
   }
 }

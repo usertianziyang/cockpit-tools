@@ -29,7 +29,11 @@
         "addOnPromptCredits": "Crediti prompt aggiuntivi",
         "credits": "Crediti",
         "email": "E-mail",
-        "promptCredits": "Crediti prompt"
+        "promptCredits": "Crediti prompt",
+        "creditPackage": "Pacchetto crediti",
+        "sharedCreditPackage": "Pacchetto crediti condiviso",
+        "account": "Account",
+        "createdAt": "Data di creazione"
       },
       "empty": {
         "title": "Nessun account"
@@ -141,6 +145,9 @@
       "usage": {
         "resetLine": "Il limite si reimposta {{dateText}}.",
         "resetUnknown": "Il limite si reimposta -"
+      },
+      "updated": {
+        "label": "Aggiornato {{relative}} fa"
       }
     }
   },
@@ -162,8 +169,10 @@
       "restart": "Riavvia",
       "installing": "Installazione"
     },
-    "gemini": "Account Gemini",
-    "codebuddy": "Account CodeBuddy"
+    "gemini": "Account Gemini Cli",
+    "codebuddy": "Account CodeBuddy",
+    "qoder": "Account Qoder",
+    "trae": "Trae"
   },
   "platformLayout": {
     "title": "Layout piattaforme",
@@ -403,7 +412,6 @@
       "hideDockIconDesc": "Controlla la visibilità dell’icona del Dock in modo indipendente dal comportamento di minimizzazione della finestra",
       "hideDockIconOff": "No (Mostra icona del Dock)",
       "hideDockIconOn": "Sì (Nascondi icona del Dock)",
-      "storageTitle": "Directory e archiviazione",
       "dataDir": "Directory dati",
       "dataDirDesc": "Posizione di archiviazione per account e file di configurazione.",
       "fpDir": "Archiviazione Antigravity",
@@ -469,7 +477,15 @@
       "codebuddyAppPathDesc": "Lascia vuoto per usare il percorso predefinito",
       "codebuddyAppPathPlaceholder": "Percorso predefinito",
       "codebuddyPathSelect": "Seleziona",
-      "codebuddyPathReset": "Ripristina predefinito"
+      "codebuddyPathReset": "Ripristina predefinito",
+      "qoderPathReset": "Ripristina predefinito",
+      "traeAutoRefresh": "Aggiornamento automatico quota Trae",
+      "traeAutoRefreshDesc": "Intervallo di aggiornamento automatico in background",
+      "traeAppPath": "Percorso di avvio di Trae",
+      "traeAppPathDesc": "Lascia vuoto per usare il percorso predefinito",
+      "traeAppPathPlaceholder": "Percorso predefinito",
+      "traePathSelect": "Seleziona",
+      "traePathReset": "Ripristina predefinito"
     },
     "network": {
       "apiTitle": "API della cabina di pilotaggio antigravità",
@@ -581,7 +597,9 @@
       "byGroupReset": "Per ora di reset {{group}}",
       "descTooltip": "Decrescente, clicca per Ascendente",
       "ascTooltip": "Ascendente, clicca per Decrescente",
-      "toggleDirection": "Inverti ordine"
+      "toggleDirection": "Inverti ordine",
+      "plan": "Per piano",
+      "quota": "Per quota"
     },
     "filterTags": "Filtra tag",
     "filterTagsCount": "Tag",
@@ -1386,8 +1404,8 @@
     },
     "cursorRefreshInterval": "Aggiornamento automatico quota",
     "gemini": {
-      "title": "Impostazioni Gemini",
-      "appPath": "Percorso Gemini"
+      "title": "Impostazioni Gemini Cli",
+      "appPath": "Percorso Gemini Cli"
     },
     "geminiRefreshInterval": "Aggiornamento automatico quota",
     "codebuddy": {
@@ -1399,6 +1417,14 @@
       "saveFailed": "Salvataggio configurazione non riuscito: {{error}}",
       "pickPathFailed": "Selezione percorso non riuscita: {{error}}",
       "resetPathFailed": "Ripristino percorso non riuscito: {{error}}"
+    },
+    "qoder": {
+      "title": "Impostazioni Qoder",
+      "appPath": "Percorso Qoder"
+    },
+    "trae": {
+      "title": "Impostazioni Trae",
+      "appPath": "Percorso Trae"
     }
   },
   "quotaAlert": {
@@ -1903,7 +1929,7 @@
     }
   },
   "gemini": {
-    "injectToGemini": "Passa a Gemini",
+    "injectToGemini": "Passa a Gemini Cli",
     "updated": {
       "label": "Aggiornato {{relative}} fa"
     },
@@ -1916,10 +1942,10 @@
       "resetsUnknown": "Ora di reimpostazione sconosciuta",
       "onDemand": "Su richiesta"
     },
-    "title": "Gestione account Gemini",
+    "title": "Gestione account Gemini Cli",
     "instances": {
-      "unsupported": "La gestione multi-istanza di Gemini non è ancora supportata.",
-      "unsupportedDescPlatform": "La multi-istanza Gemini è supportata solo su macOS, Windows e Linux.",
+      "unsupported": "La gestione multi-istanza di Gemini Cli non è ancora supportata.",
+      "unsupportedDescPlatform": "La multi-istanza Gemini Cli è supportata solo su macOS, Windows e Linux.",
       "launchDialogTitle": "Avvia istanza",
       "launchHint": "Copia il comando ed eseguilo manualmente, oppure eseguilo direttamente nel terminale.",
       "runInTerminal": "Esegui nel terminale"
@@ -1928,28 +1954,28 @@
       "success": "Account cambiato con successo"
     },
     "empty": {
-      "description": "Fai clic su \"Aggiungi account\" per iniziare a gestire i tuoi account Gemini"
+      "description": "Fai clic su \"Aggiungi account\" per iniziare a gestire i tuoi account Gemini Cli"
     },
     "addModal": {
-      "title": "Aggiungi account Gemini"
+      "title": "Aggiungi account Gemini Cli"
     },
     "oauth": {
-      "desc": "Fai clic sul pulsante qui sotto e completa l'autorizzazione di Gemini nel browser."
+      "desc": "Fai clic sul pulsante qui sotto e completa l'autorizzazione di Gemini Cli nel browser."
     },
     "token": {
-      "desc": "Incolla il tuo token di accesso Gemini (JWT) o i dati JSON esportati.",
+      "desc": "Incolla il tuo token di accesso Gemini Cli (JWT) o i dati JSON esportati.",
       "formatHint": "Campi obbligatori ed esempi (clicca per espandere)",
       "formatRequired": "Token singolo: incolla direttamente il JWT; importazione in blocco: usa il formato array JSON",
       "singleExample": "Esempio singolo (JWT)",
       "batchExample": "Esempio in blocco (JSON)"
     },
     "import": {
-      "localDesc": "Importa i dati dell'account dal client Gemini locale o da un file JSON.",
-      "localClient": "Importa da Gemini locale"
+      "localDesc": "Importa i dati dell'account dal client Gemini Cli locale o da un file JSON.",
+      "localClient": "Importa da Gemini Cli locale"
     },
     "flowNotice": {
-      "title": "Guida account Gemini (clicca per espandere/comprimere)",
-      "desc": "Gestisci gli account Gemini importando dall'installazione locale di Gemini o incollando token JWT. I dati vengono elaborati solo localmente.",
+      "title": "Guida account Gemini Cli (clicca per espandere/comprimere)",
+      "desc": "Gestisci gli account Gemini Cli importando dall'installazione locale di Gemini Cli o incollando token JWT. I dati vengono elaborati solo localmente.",
       "reason": "Ambito autorizzazioni: lettura e scrittura di oauth_creds.json, google_accounts.json e settings.json nel percorso predefinito ~/.gemini o nel percorso istanza (GEMINI_CLI_HOME/.gemini) per importare account e iniettare credenziali locali (cambio account).",
       "storage": "Ambito rete: OAuth e aggiornamento quota chiamano le API ufficiali Google/Gemini (come oauth2.googleapis.com e googleapis.com). Vengono inviati solo i campi necessari di autenticazione/quota; i file locali non vengono caricati su server di terze parti."
     }
@@ -2120,6 +2146,84 @@
       "status": {
         "loginConfirm": "Completa l'accesso e l'autorizzazione in questa pagina."
       }
+    }
+  },
+  "qoder": {
+    "title": "Gestione account Qoder",
+    "comingSoon": {
+      "title": "Multi-Istanza In Arrivo",
+      "desc": "Esegui più istanze Qoder.app con account diversi contemporaneamente."
+    },
+    "instances": {
+      "unsupported": {
+        "descPlatform": "Le istanze multiple di Qoder sono supportate solo su macOS, Windows e Linux."
+      }
+    },
+    "oauth": {
+      "hint": "Completa l'accesso nella pagina del browser aperta: se la pagina di accesso non si apre automaticamente, fai clic su «Copia link di accesso», copia il link e incollalo nel browser per completare l'accesso.",
+      "copyLoginUrl": "Copia link di accesso"
+    },
+    "usageOverview": {
+      "title": "Panoramica utilizzo",
+      "viewDetails": "Vedi dettagli",
+      "includedCredits": "Crediti inclusi nel piano",
+      "usedOfTotal": "{{used}} / {{total}}",
+      "usedEmpty": "-- / --",
+      "upgradeHint": "Esegui l'upgrade del piano per aumentare la quota mensile",
+      "upgradeAction": "Aggiorna piano"
+    },
+    "flowNotice": {
+      "title": "Guida account Qoder (clicca per espandere/ridurre)",
+      "desc": "Supporta accesso OAuth ufficiale (callback), importazione locale, importazione JSON, iniezione per cambio account, associazione multiistanza e panoramica quota. Il flusso di accesso segue i dati realmente salvati dal client Qoder.",
+      "permission": "Ambito permessi: legge lo storage di autenticazione locale di Qoder (credenziali auth e informazioni utente) per cambio account e iniezione della sessione; tutti i dati vengono elaborati localmente sul dispositivo.",
+      "network": "Ambito rete: il login OAuth richiede accesso ai servizi ufficiali di Qoder per completare il callback; le richieste di quota usano la Qoder API. Nessuna chiave o credenziale locale viene caricata."
+    },
+    "addModal": {
+      "title": "Aggiungi account Qoder"
+    },
+    "import": {
+      "localDesc": "Legge lo stato di accesso corrente dal client Qoder locale, incluse le informazioni utente, il piano e l’utilizzo dei crediti."
+    }
+  },
+  "trae": {
+    "title": "Gestione account Trae",
+    "empty": {
+      "description": "Fai clic su \"Aggiungi account\" per iniziare a gestire i tuoi account Trae, oppure importali dai dati locali di Trae o da un file JSON."
+    },
+    "addModal": {
+      "title": "Aggiungi account Trae"
+    },
+    "oauth": {
+      "desc": "Fai clic sul pulsante qui sotto e completa l'autorizzazione OAuth di Trae nel browser."
+    },
+    "import": {
+      "localDesc": "Importa l'account attualmente connesso, le informazioni del piano e i dati di quota in cache dalla directory di configurazione locale di Trae.",
+      "jsonTab": "File JSON"
+    },
+    "quota": {
+      "usedOfTotal": "Utilizzati $ {{used}} di $ {{total}}",
+      "usageUnknown": "Utilizzo: --",
+      "resetAt": "Reset: {{date}}",
+      "resetUnknown": "Ora di reset sconosciuta",
+      "statusUnknown": "Stato: sconosciuto",
+      "statusNormal": "Stato: normale",
+      "statusExhaustedFree": "Stato: utilizzo esaurito, upgrade consigliato",
+      "statusExhaustedPro": "Stato: utilizzo esaurito, aggiorna il piano o abilita il consumo on-demand",
+      "bonusUsed": "Credito bonus: +{{amount}}",
+      "bonusIncluded": "Credito bonus: incluso",
+      "bonusEmpty": "Credito bonus: --",
+      "packageConsuming": "Pacchetto utilizzo: in consumo",
+      "packageAvailable": "Pacchetto utilizzo: disponibile",
+      "packageEmpty": "Pacchetto utilizzo: --",
+      "payAsYouGoConsuming": "Consumo on-demand: in consumo",
+      "payAsYouGoEnabled": "Consumo on-demand: attivo",
+      "payAsYouGoEmpty": "Consumo on-demand: --"
+    },
+    "flowNotice": {
+      "title": "Guida account Trae (clicca per espandere/ridurre)",
+      "desc": "Supporta accesso OAuth ufficiale, importazione locale, importazione JSON e cambio account tramite iniezione locale. Durante il cambio, i dati vengono riscritti seguendo le regole reali di persistenza del client Trae.",
+      "permission": "Ambito permessi: legge e scrive i campi relativi al login nel file locale Trae storage.json per importazione account, iniezione del cambio account e visualizzazione del piano. Tutti i dati vengono elaborati localmente sul dispositivo.",
+      "network": "Ambito rete: accesso OAuth, refresh del token e query del piano chiamano le API ufficiali di Trae. I file account locali e il contenuto grezzo dello storage non vengono caricati verso servizi di terze parti."
     }
   }
 }

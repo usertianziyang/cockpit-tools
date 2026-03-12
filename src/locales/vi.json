@@ -29,7 +29,11 @@
         "addOnPromptCredits": "Tín dụng prompt bổ sung",
         "credits": "Tín dụng",
         "email": "E-mail",
-        "promptCredits": "Tín dụng prompt"
+        "promptCredits": "Tín dụng prompt",
+        "creditPackage": "Gói credit",
+        "sharedCreditPackage": "Gói credit dùng chung",
+        "account": "Tài khoản",
+        "createdAt": "Thời gian tạo"
       },
       "empty": {
         "title": "Chưa có tài khoản"
@@ -141,6 +145,9 @@
       "usage": {
         "resetLine": "Hạn mức sẽ được đặt lại {{dateText}}.",
         "resetUnknown": "Hạn mức sẽ đặt lại sau -"
+      },
+      "updated": {
+        "label": "Cập nhật {{relative}} trước"
       }
     }
   },
@@ -162,8 +169,10 @@
       "restart": "Khởi động lại",
       "installing": "Đang cài đặt"
     },
-    "gemini": "Song Tử",
-    "codebuddy": "Tài khoản CodeBuddy"
+    "gemini": "Tài khoản Gemini Cli",
+    "codebuddy": "Tài khoản CodeBuddy",
+    "qoder": "Tài khoản Qoder",
+    "trae": "Trae"
   },
   "platformLayout": {
     "title": "Bố cục nền tảng",
@@ -403,7 +412,6 @@
       "hideDockIconDesc": "Điều khiển hiển thị biểu tượng Dock độc lập, không phụ thuộc vào hành vi thu nhỏ cửa sổ",
       "hideDockIconOff": "Không (Hiện biểu tượng Dock)",
       "hideDockIconOn": "Có (Ẩn biểu tượng Dock)",
-      "storageTitle": "Thư mục & Lưu trữ",
       "dataDir": "Thư mục dữ liệu",
       "dataDirDesc": "Vị trí lưu trữ tài khoản và cấu hình.",
       "fpDir": "Thư mục lưu trữ Antigravity",
@@ -469,7 +477,15 @@
       "codebuddyAppPathDesc": "Để trống để dùng đường dẫn mặc định",
       "codebuddyAppPathPlaceholder": "Đường dẫn mặc định",
       "codebuddyPathSelect": "Chọn",
-      "codebuddyPathReset": "Đặt lại mặc định"
+      "codebuddyPathReset": "Đặt lại mặc định",
+      "qoderPathReset": "Đặt lại mặc định",
+      "traeAutoRefresh": "Tự động làm mới hạn ngạch Trae",
+      "traeAutoRefreshDesc": "Tần suất tự động cập nhật nền",
+      "traeAppPath": "Đường dẫn khởi động Trae",
+      "traeAppPathDesc": "Để trống để dùng đường dẫn mặc định",
+      "traeAppPathPlaceholder": "Đường dẫn mặc định",
+      "traePathSelect": "Chọn",
+      "traePathReset": "Đặt lại mặc định"
     },
     "network": {
       "apiTitle": "API Antigravity Cockpit",
@@ -581,7 +597,9 @@
       "byGroupReset": "Theo thời gian đặt lại {{group}}",
       "descTooltip": "Giảm dần, nhấn để chuyển Tăng dần",
       "ascTooltip": "Tăng dần, nhấn để chuyển Giảm dần",
-      "toggleDirection": "Đổi hướng sắp xếp"
+      "toggleDirection": "Đổi hướng sắp xếp",
+      "plan": "Theo gói",
+      "quota": "Theo hạn mức"
     },
     "filterTags": "Lọc thẻ",
     "filterTagsCount": "Thẻ",
@@ -1386,8 +1404,8 @@
     },
     "cursorRefreshInterval": "Tự động làm mới hạn mức",
     "gemini": {
-      "title": "Cài đặt Song Tử",
-      "appPath": "Đường dẫn CLI của Song Tử"
+      "title": "Cài đặt Gemini Cli",
+      "appPath": "Đường dẫn Gemini Cli"
     },
     "geminiRefreshInterval": "Tự động làm mới hạn ngạch",
     "codebuddy": {
@@ -1399,6 +1417,14 @@
       "saveFailed": "Lưu cấu hình thất bại: {{error}}",
       "pickPathFailed": "Chọn đường dẫn thất bại: {{error}}",
       "resetPathFailed": "Đặt lại đường dẫn thất bại: {{error}}"
+    },
+    "qoder": {
+      "title": "Cài đặt Qoder",
+      "appPath": "Đường dẫn Qoder"
+    },
+    "trae": {
+      "title": "Cài đặt Trae",
+      "appPath": "Đường dẫn Trae"
     }
   },
   "quotaAlert": {
@@ -1903,31 +1929,31 @@
     }
   },
   "gemini": {
-    "injectToGemini": "Chuyển sang cung Song Tử",
-    "title": "Quản lý tài khoản Song Tử",
+    "injectToGemini": "Chuyển sang Gemini Cli",
+    "title": "Quản lý tài khoản Gemini Cli",
     "empty": {
-      "description": "Nhấp vào \"Thêm tài khoản\" để bắt đầu quản lý tài khoản Gemini của bạn"
+      "description": "Nhấp vào \"Thêm tài khoản\" để bắt đầu quản lý tài khoản Gemini Cli của bạn"
     },
     "addModal": {
-      "title": "Thêm tài khoản Song Tử"
+      "title": "Thêm tài khoản Gemini Cli"
     },
     "oauth": {
-      "desc": "Nhấp vào nút bên dưới và hoàn tất ủy quyền Gemini OAuth trong trình duyệt của bạn."
+      "desc": "Nhấp vào nút bên dưới và hoàn tất ủy quyền Gemini Cli OAuth trong trình duyệt của bạn."
     },
     "token": {
-      "desc": "Dán Mã thông báo truy cập Gemini (JWT) hoặc dữ liệu JSON đã xuất của bạn.",
+      "desc": "Dán Mã thông báo truy cập Gemini Cli (JWT) hoặc dữ liệu JSON đã xuất của bạn.",
       "formatHint": "Các trường và ví dụ bắt buộc (bấm vào để mở rộng)",
       "formatRequired": "Mã thông báo đơn: dán JWT trực tiếp; nhập hàng loạt: sử dụng định dạng mảng JSON",
       "singleExample": "Ví dụ đơn (JWT)",
       "batchExample": "Ví dụ về lô (JSON)"
     },
     "import": {
-      "localDesc": "Nhập dữ liệu tài khoản Gemini từ thư mục cấu hình Gemini cục bộ (~/.gemini) hoặc tệp JSON.",
-      "localClient": "Nhập khẩu từ Gemini địa phương"
+      "localDesc": "Nhập dữ liệu tài khoản Gemini Cli từ thư mục cấu hình Gemini Cli cục bộ (~/.gemini) hoặc tệp JSON.",
+      "localClient": "Nhập từ Gemini Cli cục bộ"
     },
     "flowNotice": {
-      "title": "Hướng dẫn tài khoản Gemini (bấm vào để mở rộng/thu gọn)",
-      "desc": "Quản lý tài khoản Gemini bằng cách nhập từ cấu hình Gemini cục bộ, dán mã thông báo JWT hoặc đăng nhập qua OAuth.",
+      "title": "Hướng dẫn tài khoản Gemini Cli (bấm vào để mở rộng/thu gọn)",
+      "desc": "Quản lý tài khoản Gemini Cli bằng cách nhập từ cấu hình Gemini Cli cục bộ, dán mã thông báo JWT hoặc đăng nhập qua OAuth.",
       "reason": "Phạm vi quyền: đọc và ghi oauth_creds.json, google_accounts.json và settings.json theo mặc định ~/.gemini hoặc đường dẫn phiên bản (GEMINI_CLI_HOME/.gemini) để nhập tài khoản và chèn thông tin xác thực cục bộ (chuyển đổi tài khoản).",
       "storage": "Phạm vi mạng: OAuth và làm mới cuộc gọi API Google/Gemini chính thức (chẳng hạn như oauth2.googleapis.com và googleapis.com). Chỉ các trường xác thực/hạn ngạch bắt buộc mới được gửi; các tệp tài khoản cục bộ không được tải lên máy chủ của bên thứ ba."
     },
@@ -1944,8 +1970,8 @@
       "onDemand": "Theo yêu cầu"
     },
     "instances": {
-      "unsupported": "Quản lý đa phiên bản Gemini chưa được hỗ trợ.",
-      "unsupportedDescPlatform": "Phiên bản đa phiên bản Gemini chỉ được hỗ trợ trên macOS, Windows và Linux.",
+      "unsupported": "Quản lý đa phiên bản Gemini Cli chưa được hỗ trợ.",
+      "unsupportedDescPlatform": "Phiên bản đa phiên bản Gemini Cli chỉ được hỗ trợ trên macOS, Windows và Linux.",
       "launchDialogTitle": "Khởi chạy phiên bản",
       "launchHint": "Sao chép lệnh và chạy thủ công hoặc thực thi trực tiếp trong terminal.",
       "runInTerminal": "Chạy trong Terminal"
@@ -2120,6 +2146,84 @@
       "status": {
         "loginConfirm": "Vui lòng hoàn tất đăng nhập và ủy quyền trên trang này."
       }
+    }
+  },
+  "qoder": {
+    "title": "Quản lý tài khoản Qoder",
+    "comingSoon": {
+      "title": "Đa Phiên Bản Sắp Ra Mắt",
+      "desc": "Chạy nhiều phiên bản Qoder.app với các tài khoản khác nhau cùng lúc."
+    },
+    "instances": {
+      "unsupported": {
+        "descPlatform": "Đa phiên bản Qoder chỉ được hỗ trợ trên macOS, Windows và Linux."
+      }
+    },
+    "oauth": {
+      "hint": "Hãy hoàn tất đăng nhập trên trang trình duyệt đã mở: nếu trang đăng nhập không tự động mở, hãy nhấp vào \"Sao chép liên kết đăng nhập\", sao chép liên kết rồi dán vào trình duyệt để hoàn tất đăng nhập.",
+      "copyLoginUrl": "Sao chép liên kết đăng nhập"
+    },
+    "usageOverview": {
+      "title": "Tổng quan sử dụng",
+      "viewDetails": "Xem chi tiết",
+      "includedCredits": "Credits trong gói",
+      "usedOfTotal": "{{used}} / {{total}}",
+      "usedEmpty": "-- / --",
+      "upgradeHint": "Nâng cấp gói để tăng hạn mức hàng tháng",
+      "upgradeAction": "Nâng cấp"
+    },
+    "flowNotice": {
+      "title": "Huong dan tai khoan Qoder (nhan de mo rong/thu gon)",
+      "desc": "Ho tro dang nhap OAuth chinh thuc (callback), nhap cuc bo, nhap JSON, tiem chuyen tai khoan, gan nhieu instance va tong quan han muc. Luong dang nhap su dung dung du lieu luu tru thuc te cua Qoder client.",
+      "permission": "Pham vi quyen: doc kho xac thuc cuc bo cua Qoder (thong tin auth va thong tin nguoi dung) de phuc vu chuyen tai khoan va tiem phien; moi du lieu deu duoc xu ly cuc bo tren may cua ban.",
+      "network": "Pham vi mang: dang nhap OAuth can truy cap dich vu chinh thuc cua Qoder de hoan tat callback; truy van han muc su dung Qoder API. Khong tai len khoa hay thong tin xac thuc cuc bo."
+    },
+    "addModal": {
+      "title": "Thêm tài khoản Qoder"
+    },
+    "import": {
+      "localDesc": "Đọc trạng thái đăng nhập hiện tại từ ứng dụng Qoder cục bộ, bao gồm thông tin người dùng, gói và mức sử dụng tín dụng."
+    }
+  },
+  "trae": {
+    "title": "Quan ly tai khoan Trae",
+    "empty": {
+      "description": "Nhan \"Them tai khoan\" de bat dau quan ly cac tai khoan Trae, hoac nhap tu du lieu Trae cuc bo hay tep JSON."
+    },
+    "addModal": {
+      "title": "Them tai khoan Trae"
+    },
+    "oauth": {
+      "desc": "Nhan nut ben duoi va hoan tat uy quyen OAuth cua Trae trong trinh duyet."
+    },
+    "import": {
+      "localDesc": "Nhap tai khoan dang dang nhap, thong tin goi va du lieu han muc da luu cache tu thu muc cau hinh Trae cuc bo.",
+      "jsonTab": "Tep JSON"
+    },
+    "quota": {
+      "usedOfTotal": "Da dung $ {{used}} / $ {{total}}",
+      "usageUnknown": "Muc dung: --",
+      "resetAt": "Thoi gian dat lai: {{date}}",
+      "resetUnknown": "Khong ro thoi gian dat lai",
+      "statusUnknown": "Trang thai: chua ro",
+      "statusNormal": "Trang thai: binh thuong",
+      "statusExhaustedFree": "Trang thai: da het muc dung, nen nang cap goi",
+      "statusExhaustedPro": "Trang thai: da het muc dung, hay nang cap goi hoac bat thanh toan theo muc dung",
+      "bonusUsed": "Thuong them: +{{amount}}",
+      "bonusIncluded": "Thuong them: da bao gom",
+      "bonusEmpty": "Thuong them: --",
+      "packageConsuming": "Goi muc dung: dang tieu thu",
+      "packageAvailable": "Goi muc dung: kha dung",
+      "packageEmpty": "Goi muc dung: --",
+      "payAsYouGoConsuming": "Thanh toan theo muc dung: dang tieu thu",
+      "payAsYouGoEnabled": "Thanh toan theo muc dung: da bat",
+      "payAsYouGoEmpty": "Thanh toan theo muc dung: --"
+    },
+    "flowNotice": {
+      "title": "Huong dan tai khoan Trae (nhan de mo rong/thu gon)",
+      "desc": "Ho tro dang nhap OAuth chinh thuc, nhap cuc bo, nhap JSON va chuyen tai khoan bang cach tiem du lieu cuc bo. Khi chuyen tai khoan, du lieu duoc ghi lai theo dung quy tac luu tru thuc te cua Trae client.",
+      "permission": "Pham vi quyen: doc va ghi cac truong lien quan den dang nhap trong storage.json cuc bo cua Trae de phuc vu viec nhap tai khoan, tiem chuyen tai khoan va hien thi goi. Moi du lieu deu duoc xu ly cuc bo tren may cua ban.",
+      "network": "Pham vi mang: dang nhap OAuth, lam moi token va truy van goi se goi cac API chinh thuc cua Trae. Tep tai khoan cuc bo va noi dung luu tru thuan khong duoc tai len dich vu ben thu ba."
     }
   }
 }

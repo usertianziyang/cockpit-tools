@@ -29,7 +29,11 @@
         "addOnPromptCredits": "追加プロンプトクレジット",
         "credits": "クレジット",
         "email": "メール",
-        "promptCredits": "プロンプトクレジット"
+        "promptCredits": "プロンプトクレジット",
+        "creditPackage": "追加 Credits",
+        "sharedCreditPackage": "共有 Credits パッケージ",
+        "account": "アカウント",
+        "createdAt": "作成日時"
       },
       "empty": {
         "title": "アカウントなし"
@@ -141,6 +145,9 @@
       "usage": {
         "resetLine": "利用枠は{{dateText}}にリセットされます。",
         "resetUnknown": "利用枠のリセットまで -"
+      },
+      "updated": {
+        "label": "{{relative}}前に更新"
       }
     }
   },
@@ -162,8 +169,10 @@
       "restart": "再起動",
       "installing": "インストール中"
     },
-    "gemini": "Geminiアカウント",
-    "codebuddy": "CodeBuddyアカウント"
+    "gemini": "Gemini Cliアカウント",
+    "codebuddy": "CodeBuddyアカウント",
+    "qoder": "Qoderアカウント",
+    "trae": "Trae"
   },
   "platformLayout": {
     "title": "プラットフォームレイアウト",
@@ -403,7 +412,6 @@
       "hideDockIconDesc": "Dockアイコンの表示状態を独立して制御します。ウィンドウの最小化動作の影響を受けません",
       "hideDockIconOff": "いいえ（Dockアイコンを表示）",
       "hideDockIconOn": "はい（Dockアイコンを隠す）",
-      "storageTitle": "ディレクトリとストレージ",
       "dataDir": "データディレクトリ",
       "dataDirDesc": "アカウントと設定ファイルの保存場所。",
       "fpDir": "Antigravityストレージ",
@@ -469,7 +477,15 @@
       "codebuddyAppPathDesc": "空欄の場合はデフォルトパスを使用します",
       "codebuddyAppPathPlaceholder": "デフォルトパス",
       "codebuddyPathSelect": "選択",
-      "codebuddyPathReset": "デフォルトに戻す"
+      "codebuddyPathReset": "デフォルトに戻す",
+      "qoderPathReset": "デフォルトに戻す",
+      "traeAutoRefresh": "Trae クォータ自動更新",
+      "traeAutoRefreshDesc": "バックグラウンドでの自動更新頻度",
+      "traeAppPath": "Trae 起動パス",
+      "traeAppPathDesc": "空欄の場合はデフォルトパスを使用します",
+      "traeAppPathPlaceholder": "デフォルトパス",
+      "traePathSelect": "選択",
+      "traePathReset": "デフォルトに戻す"
     },
     "network": {
       "apiTitle": "反重力コックピット API",
@@ -581,7 +597,9 @@
       "byGroupReset": "{{group}} リセット時間順",
       "descTooltip": "降順（クリックで昇順へ）",
       "ascTooltip": "昇順（クリックで降順へ）",
-      "toggleDirection": "並べ替え順序を切り替え"
+      "toggleDirection": "並べ替え順序を切り替え",
+      "plan": "プラン順",
+      "quota": "クォータ順"
     },
     "filterTags": "タグで絞り込み",
     "filterTagsCount": "タグ",
@@ -1386,8 +1404,8 @@
     },
     "cursorRefreshInterval": "クォータ自動更新",
     "gemini": {
-      "title": "Gemini 設定",
-      "appPath": "Gemini パス"
+      "title": "Gemini Cli 設定",
+      "appPath": "Gemini Cli パス"
     },
     "geminiRefreshInterval": "クォータ自動更新",
     "codebuddy": {
@@ -1399,6 +1417,14 @@
       "saveFailed": "設定の保存に失敗しました：{{error}}",
       "pickPathFailed": "パスの選択に失敗しました：{{error}}",
       "resetPathFailed": "パスのリセットに失敗しました：{{error}}"
+    },
+    "qoder": {
+      "title": "Qoder 設定",
+      "appPath": "Qoder パス"
+    },
+    "trae": {
+      "title": "Trae 設定",
+      "appPath": "Trae パス"
     }
   },
   "quotaAlert": {
@@ -1903,7 +1929,7 @@
     }
   },
   "gemini": {
-    "injectToGemini": "Gemini に切り替え",
+    "injectToGemini": "Gemini Cli に切り替え",
     "updated": {
       "label": "{{relative}}前に更新"
     },
@@ -1916,10 +1942,10 @@
       "resetsUnknown": "リセット時刻不明",
       "onDemand": "オンデマンド"
     },
-    "title": "Gemini アカウント管理",
+    "title": "Gemini Cli アカウント管理",
     "instances": {
-      "unsupported": "Gemini のマルチインスタンス管理は現在未対応です。",
-      "unsupportedDescPlatform": "Gemini のマルチインスタンスは macOS、Windows、Linux のみ対応しています。",
+      "unsupported": "Gemini Cli のマルチインスタンス管理は現在未対応です。",
+      "unsupportedDescPlatform": "Gemini Cli のマルチインスタンスは macOS、Windows、Linux のみ対応しています。",
       "launchDialogTitle": "インスタンスを起動",
       "launchHint": "コマンドをコピーして手動実行するか、ターミナルで直接実行してください。",
       "runInTerminal": "ターミナルで実行"
@@ -1928,28 +1954,28 @@
       "success": "アカウントの切り替えに成功しました"
     },
     "empty": {
-      "description": "「アカウント追加」をクリックして Gemini アカウントの管理を開始してください"
+      "description": "「アカウント追加」をクリックして Gemini Cli アカウントの管理を開始してください"
     },
     "addModal": {
-      "title": "Gemini アカウントを追加"
+      "title": "Gemini Cli アカウントを追加"
     },
     "oauth": {
-      "desc": "下のボタンをクリックして、ブラウザで Gemini の認可を完了してください。"
+      "desc": "下のボタンをクリックして、ブラウザで Gemini Cli の認可を完了してください。"
     },
     "token": {
-      "desc": "Gemini アクセストークン（JWT）またはエクスポートされた JSON データを貼り付けてください。",
+      "desc": "Gemini Cli アクセストークン（JWT）またはエクスポートされた JSON データを貼り付けてください。",
       "formatHint": "必須フィールドと例（クリックで展開）",
       "formatRequired": "単一トークン：JWT を直接貼り付け；一括インポート：JSON 配列形式を使用",
       "singleExample": "単一の例（JWT）",
       "batchExample": "一括の例（JSON）"
     },
     "import": {
-      "localDesc": "ローカルの Gemini クライアントまたは JSON ファイルからアカウントデータをインポートします。",
-      "localClient": "ローカル Gemini からインポート"
+      "localDesc": "ローカルの Gemini Cli クライアントまたは JSON ファイルからアカウントデータをインポートします。",
+      "localClient": "ローカル Gemini Cli からインポート"
     },
     "flowNotice": {
-      "title": "Gemini アカウントガイド（クリックで展開/折りたたみ）",
-      "desc": "ローカルの Gemini インストールからのインポートまたは JWT トークンの貼り付けで Gemini アカウントを管理します。データはローカルでのみ処理されます。",
+      "title": "Gemini Cli アカウントガイド（クリックで展開/折りたたみ）",
+      "desc": "ローカルの Gemini Cli インストールからのインポートまたは JWT トークンの貼り付けで Gemini Cli アカウントを管理します。データはローカルでのみ処理されます。",
       "reason": "権限範囲: デフォルトの ~/.gemini またはインスタンスパス (GEMINI_CLI_HOME/.gemini) 配下の oauth_creds.json、google_accounts.json、settings.json を読み書きし、アカウントのインポートとローカル認証情報の注入（アカウント切り替え）を行います。",
       "storage": "ネットワーク範囲: OAuth とクォータ更新では Google/Gemini の公式 API（oauth2.googleapis.com、googleapis.com など）を呼び出します。送信されるのは必要な認証/クォータ項目のみで、ローカルのアカウントファイルは第三者サーバーへアップロードされません。"
     }
@@ -2120,6 +2146,84 @@
       "status": {
         "loginConfirm": "このページでサインインと認可を完了してください。"
       }
+    }
+  },
+  "qoder": {
+    "title": "Qoderアカウント管理",
+    "comingSoon": {
+      "title": "マルチインスタンス機能は近日公開",
+      "desc": "異なるアカウントで複数のQoder.appインスタンスを同時に実行できます。お楽しみに。"
+    },
+    "instances": {
+      "unsupported": {
+        "descPlatform": "Qoder のマルチインスタンスは macOS、Windows、Linux のみ対応しています。"
+      }
+    },
+    "oauth": {
+      "hint": "開いたブラウザページでログインを完了してください。ログインページが自動的に開かない場合は、「ログインリンクをコピー」をクリックし、リンクをコピーしてブラウザに貼り付けてログインを完了してください。",
+      "copyLoginUrl": "ログインリンクをコピー"
+    },
+    "usageOverview": {
+      "title": "利用状況の概要",
+      "viewDetails": "詳細を見る",
+      "includedCredits": "プラン内クレジット",
+      "usedOfTotal": "{{used}} / {{total}}",
+      "usedEmpty": "-- / --",
+      "upgradeHint": "プランをアップグレードして月間上限を増やす",
+      "upgradeAction": "アップグレード"
+    },
+    "flowNotice": {
+      "title": "Qoder アカウントガイド（クリックで展開/折りたたみ）",
+      "desc": "公式 OAuth ログイン（コールバック）、ローカルインポート、JSON インポート、アカウント切り替え注入、マルチインスタンス関連付け、クォータ概要に対応しています。ログインフローは Qoder クライアントの実際の保存データ形式に従います。",
+      "permission": "権限範囲: Qoder のローカル認証ストレージ（auth 資格情報とユーザー情報）を読み取り、アカウント切り替えとセッション注入に使用します。すべてのデータはローカル端末上で処理されます。",
+      "network": "ネットワーク範囲: OAuth ログインではコールバック処理のために Qoder 公式サービスへの接続が必要です。クォータ照会は Qoder API を使用します。ローカルの鍵や資格情報はアップロードされません。"
+    },
+    "addModal": {
+      "title": "Qoder アカウントを追加"
+    },
+    "import": {
+      "localDesc": "ローカルの Qoder クライアントから現在のログイン状態を読み込みます。ユーザー情報、プラン、クレジットの利用状況を含みます。"
+    }
+  },
+  "trae": {
+    "title": "Trae アカウント管理",
+    "empty": {
+      "description": "「アカウント追加」をクリックして Trae アカウント管理を開始するか、ローカル Trae データまたは JSON ファイルからインポートできます。"
+    },
+    "addModal": {
+      "title": "Trae アカウントを追加"
+    },
+    "oauth": {
+      "desc": "下のボタンをクリックし、ブラウザで Trae OAuth 認証を完了してください。"
+    },
+    "import": {
+      "localDesc": "ローカルの Trae 設定ディレクトリから、現在ログイン中のアカウント、プラン情報、キャッシュ済みクォーターデータを読み込みます。",
+      "jsonTab": "JSON ファイル"
+    },
+    "quota": {
+      "usedOfTotal": "使用済み $ {{used}} / $ {{total}}",
+      "usageUnknown": "利用量：--",
+      "resetAt": "リセット時刻: {{date}}",
+      "resetUnknown": "リセット時刻不明",
+      "statusUnknown": "状態：不明",
+      "statusNormal": "状態：正常",
+      "statusExhaustedFree": "状態：利用量上限に達しました。プランのアップグレードを推奨します",
+      "statusExhaustedPro": "状態：利用量上限に達しました。プランのアップグレードまたは従量課金の有効化を推奨します",
+      "bonusUsed": "ボーナス：+{{amount}}",
+      "bonusIncluded": "ボーナス：含まれる",
+      "bonusEmpty": "ボーナス：--",
+      "packageConsuming": "利用パック：消費中",
+      "packageAvailable": "利用パック：利用可能",
+      "packageEmpty": "利用パック：--",
+      "payAsYouGoConsuming": "従量課金：消費中",
+      "payAsYouGoEnabled": "従量課金：有効",
+      "payAsYouGoEmpty": "従量課金：--"
+    },
+    "flowNotice": {
+      "title": "Trae アカウントガイド（クリックで展開/折りたたみ）",
+      "desc": "公式 OAuth ログイン、ローカルインポート、JSON インポート、ローカル注入によるアカウント切り替えに対応しています。切り替え時は Trae クライアントの実際の保存ルールに従って書き戻します。",
+      "permission": "権限範囲: ローカルの Trae storage.json 内のログイン関連フィールドを読み書きし、アカウントのインポート、切り替え注入、プラン表示に使用します。すべてのデータはローカル端末上で処理されます。",
+      "network": "ネットワーク範囲: OAuth ログイン、トークン更新、プラン照会では Trae 公式 API を呼び出します。ローカルのアカウントファイルや生の保存内容を第三者サービスへアップロードすることはありません。"
     }
   }
 }

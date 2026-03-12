@@ -3,7 +3,7 @@ use std::{
     collections::HashSet,
     sync::{Arc, Mutex},
 };
-use tauri::{AppHandle, Emitter, Manager};
+use tauri::{AppHandle, Emitter, Manager, WindowEvent};
 
 use crate::models::codebuddy::{CodebuddyAccount, CodebuddyOAuthStartResponse};
 use crate::modules::{codebuddy_account, codebuddy_oauth, logger};
@@ -1329,9 +1329,10 @@ pub fn open_codebuddy_oauth_webview(
     let oauth_stage_ref = Arc::new(Mutex::new(String::new()));
     let oauth_stage_nav = oauth_stage_ref.clone();
     let app_nav = app.clone();
+    let app_close = app.clone();
     let debug_trace_id_for_nav = debug_trace_id.clone();
 
-    tauri::WebviewWindowBuilder::new(&app, CB_OAUTH_WEBVIEW_LABEL, url)
+    let oauth_window = tauri::WebviewWindowBuilder::new(&app, CB_OAUTH_WEBVIEW_LABEL, url)
         .title("CodeBuddy OAuth")
         .inner_size(980.0, 760.0)
         .center()
@@ -1441,6 +1442,17 @@ pub fn open_codebuddy_oauth_webview(
         })
         .build()
         .map_err(|e| format!("ERR_CODEBUDDY_OAUTH_WEBVIEW_OPEN_FAILED:{}", e))?;
+
+    oauth_window.on_window_event(move |event| {
+        if matches!(event, WindowEvent::Destroyed) {
+            logger::log_info("[CodeBuddy OAuth] OAuth WebView 已关闭，准备取消待处理会话");
+            let _ = codebuddy_oauth::cancel_login(None);
+            let _ = app_close.emit(
+                "codebuddy-oauth-webview-stage",
+                serde_json::json!({ "stage": "closed" }),
+            );
+        }
+    });
 
     Ok(())
 }

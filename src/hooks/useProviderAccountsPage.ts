@@ -624,12 +624,14 @@ export function useProviderAccountsPage<TAccount extends ProviderAccountBase>(
   const addTabRef = useRef(addTab);
   const addStatusRef = useRef(addStatus);
   const importFileInputRef = useRef<HTMLInputElement | null>(null);
+  const oauthServiceRef = useRef(oauthService);
 
   useEffect(() => {
     showAddModalRef.current = showAddModal;
     addTabRef.current = addTab;
     addStatusRef.current = addStatus;
-  }, [showAddModal, addTab, addStatus]);
+    oauthServiceRef.current = oauthService;
+  }, [showAddModal, addTab, addStatus, oauthService]);
 
   const resetAddModalState = useCallback(() => {
     oauthAttemptSeqRef.current += 1;
@@ -888,6 +890,7 @@ export function useProviderAccountsPage<TAccount extends ProviderAccountBase>(
         started = true;
 
         if (attemptSeq !== oauthAttemptSeqRef.current) {
+          oauthService.cancelLogin(resp.loginId).catch(() => {});
           oauthLog('忽略过期 OAuth start 响应', { attemptSeq, loginId: resp.loginId });
           return;
         }
@@ -968,10 +971,12 @@ export function useProviderAccountsPage<TAccount extends ProviderAccountBase>(
   useEffect(() => {
     if (showAddModal && oauthTabKeys.includes(addTab)) return;
     const loginId = oauthLoginIdRef.current ?? undefined;
-    if (!loginId) return;
-    oauthLog('弹框关闭或切换标签，准备取消授权流程', { loginId });
+    if (!loginId && !oauthActiveRef.current && !oauthCompletingRef.current) return;
     oauthAttemptSeqRef.current += 1;
-    oauthService?.cancelLogin(loginId).catch(() => {});
+    if (loginId) {
+      oauthLog('弹框关闭或切换标签，准备取消授权流程', { loginId });
+      oauthService?.cancelLogin(loginId).catch(() => {});
+    }
     oauthActiveRef.current = false;
     oauthLoginIdRef.current = null;
     oauthCompletingRef.current = false;
@@ -985,6 +990,21 @@ export function useProviderAccountsPage<TAccount extends ProviderAccountBase>(
     setOauthTimedOut(false);
     setOauthPolling(false);
   }, [showAddModal, addTab, oauthLog, oauthService, oauthTabKeys]);
+
+  useEffect(
+    () => () => {
+      oauthAttemptSeqRef.current += 1;
+      const loginId = oauthLoginIdRef.current ?? undefined;
+      if (loginId) {
+        oauthLog('页面卸载，准备取消授权流程', { loginId });
+        oauthServiceRef.current?.cancelLogin(loginId).catch(() => {});
+      }
+      oauthActiveRef.current = false;
+      oauthCompletingRef.current = false;
+      oauthLoginIdRef.current = null;
+    },
+    [oauthLog],
+  );
 
   const handleCopyOauthUrl = useCallback(async () => {
     if (!oauthUrl) return;

@@ -21,6 +21,9 @@ import { useWindsurfAccountStore } from './stores/useWindsurfAccountStore';
 import { useKiroAccountStore } from './stores/useKiroAccountStore';
 import { useCursorAccountStore } from './stores/useCursorAccountStore';
 import { useGeminiAccountStore } from './stores/useGeminiAccountStore';
+import { useCodebuddyAccountStore } from './stores/useCodebuddyAccountStore';
+import { useQoderAccountStore } from './stores/useQoderAccountStore';
+import { useTraeAccountStore } from './stores/useTraeAccountStore';
 import type { UpdateCheckResult } from './components/UpdateNotification';
 import type { Update as UpdaterUpdate } from '@tauri-apps/plugin-updater';
 import { parseUpdaterReleaseNotes } from './utils/updaterReleaseNotes';
@@ -62,6 +65,12 @@ const GeminiAccountsPage = lazy(() =>
 );
 const CodebuddyAccountsPage = lazy(() =>
   import('./pages/CodebuddyAccountsPage').then((module) => ({ default: module.CodebuddyAccountsPage })),
+);
+const QoderAccountsPage = lazy(() =>
+  import('./pages/QoderAccountsPage').then((module) => ({ default: module.QoderAccountsPage })),
+);
+const TraeAccountsPage = lazy(() =>
+  import('./pages/TraeAccountsPage').then((module) => ({ default: module.TraeAccountsPage })),
 );
 const FingerprintsPage = lazy(() =>
   import('./pages/FingerprintsPage').then((module) => ({ default: module.FingerprintsPage })),
@@ -114,10 +123,21 @@ interface GeneralConfig extends GeneralConfigTheme {
   kiro_app_path: string;
   cursor_app_path: string;
   codebuddy_app_path: string;
+  qoder_app_path: string;
+  trae_app_path: string;
 }
 
 type AppPathMissingDetail = {
-  app: 'antigravity' | 'codex' | 'vscode' | 'windsurf' | 'kiro' | 'cursor' | 'codebuddy';
+  app:
+    | 'antigravity'
+    | 'codex'
+    | 'vscode'
+    | 'windsurf'
+    | 'kiro'
+    | 'cursor'
+    | 'codebuddy'
+    | 'qoder'
+    | 'trae';
   retry?:
     | { kind: 'default' }
     | { kind: 'instance'; instanceId?: string }
@@ -160,7 +180,17 @@ type QuotaAlertPayload = {
   triggered_at: number;
 };
 
-type QuotaAlertPlatform = 'antigravity' | 'codex' | 'github_copilot' | 'windsurf' | 'kiro' | 'cursor' | 'gemini' | 'codebuddy';
+type QuotaAlertPlatform =
+  | 'antigravity'
+  | 'codex'
+  | 'github_copilot'
+  | 'windsurf'
+  | 'kiro'
+  | 'cursor'
+  | 'gemini'
+  | 'codebuddy'
+  | 'qoder'
+  | 'trae';
 type UpdateCheckSource = 'auto' | 'manual';
 type UpdateActionState = 'hidden' | 'available' | 'downloading' | 'installing' | 'ready';
 
@@ -168,6 +198,7 @@ type UpdateRuntimeInfo = {
   platform: string;
   linux_install_kind: string;
   linux_managed_install_supported: boolean;
+  updater_target?: string | null;
 };
 
 type LinuxUpdateProgressPhase =
@@ -207,6 +238,10 @@ function normalizeQuotaAlertPlatform(platform: string | undefined): QuotaAlertPl
       return 'gemini';
     case 'codebuddy':
       return 'codebuddy';
+    case 'qoder':
+      return 'qoder';
+    case 'trae':
+      return 'trae';
     default:
       return 'antigravity';
   }
@@ -228,9 +263,13 @@ function getQuotaAlertPlatformLabel(
     case 'cursor':
       return 'Cursor';
     case 'gemini':
-      return t('nav.gemini', 'Gemini');
+      return 'Gemini Cli';
     case 'codebuddy':
       return 'CodeBuddy';
+    case 'qoder':
+      return t('nav.qoder', 'Qoder');
+    case 'trae':
+      return t('nav.trae', 'Trae');
     default:
       return t('nav.overview', 'Antigravity');
   }
@@ -252,6 +291,10 @@ function getQuotaAlertTargetPage(platform: QuotaAlertPlatform): Page {
       return 'gemini';
     case 'codebuddy':
       return 'codebuddy';
+    case 'qoder':
+      return 'qoder';
+    case 'trae':
+      return 'trae';
     default:
       return 'overview';
   }
@@ -273,6 +316,10 @@ function getQuotaAlertQuickSettingsType(platform: QuotaAlertPlatform): QuickSett
       return 'gemini';
     case 'codebuddy':
       return 'codebuddy';
+    case 'qoder':
+      return 'qoder';
+    case 'trae':
+      return 'trae';
     default:
       return 'antigravity';
   }
@@ -397,6 +444,24 @@ function App() {
 
   const isLinuxManagedUpdate = updateRuntimeInfo?.platform === 'linux'
     && updateRuntimeInfo.linux_managed_install_supported;
+
+  const getUpdaterCheckTarget = useCallback((): string | undefined => {
+    if (updateRuntimeInfo?.platform !== 'windows') {
+      return undefined;
+    }
+    if (typeof updateRuntimeInfo.updater_target !== 'string') {
+      return undefined;
+    }
+
+    const target = updateRuntimeInfo.updater_target.trim();
+    return target.length > 0 ? target : undefined;
+  }, [updateRuntimeInfo]);
+
+  const runUpdaterCheck = useCallback(async () => {
+    const { check } = await import('@tauri-apps/plugin-updater');
+    const target = getUpdaterCheckTarget();
+    return target ? check({ target }) : check();
+  }, [getUpdaterCheckTarget]);
 
   const closeUpdaterHandle = useCallback(async (handle: UpdaterUpdate | null | undefined) => {
     if (!handle) {
@@ -528,7 +593,6 @@ function App() {
 
     let usedAttempts = 0;
     try {
-      const { check } = await import('@tauri-apps/plugin-updater');
       const downloadedUpdate = await retryWithBackoff(
         async (attempt) => {
           usedAttempts = attempt;
@@ -538,7 +602,7 @@ function App() {
 
           let candidate: UpdaterUpdate | null = null;
           try {
-            candidate = await check();
+            candidate = await runUpdaterCheck();
             if (!candidate) {
               throw new Error('No update available from updater plugin');
             }
@@ -692,7 +756,7 @@ function App() {
         updateDownloadOwnerRef.current = 'none';
       }
     }
-  }, [closeUpdaterHandle, t, writeUpdateLog]);
+  }, [closeUpdaterHandle, runUpdaterCheck, t, writeUpdateLog]);
 
   const cancelUpdateDownload = useCallback(async () => {
     if (updateAction.state !== 'downloading') {
@@ -909,9 +973,8 @@ function App() {
           console.log('[App] Auto-install enabled, attempting silent update...');
           writeUpdateLog('info', '后台自动更新已开启，尝试静默检查并下载');
           try {
-            const { check } = await import('@tauri-apps/plugin-updater');
             const update = await retryWithBackoff(
-              async () => check(),
+              async () => runUpdaterCheck(),
               {
                 delaysMs: UPDATE_CHECK_RETRY_DELAYS_MS,
                 shouldRetry: isRetryableUpdaterError,
@@ -966,7 +1029,7 @@ function App() {
                     if (attempt === 1) {
                       candidate = update;
                     } else {
-                      candidate = await check();
+                      candidate = await runUpdaterCheck();
                     }
 
                     if (!candidate) {
@@ -1127,6 +1190,7 @@ function App() {
   }, [
     isLinuxManagedUpdate,
     openUpdateNotification,
+    runUpdaterCheck,
     updateRuntimeInfo?.linux_install_kind,
     updateRuntimeInfoLoaded,
     writeUpdateLog,
@@ -1273,6 +1337,15 @@ function App() {
                     } else if (platform === 'gemini') {
                       await useGeminiAccountStore.getState().switchAccount(targetAccountId);
                       setPage('gemini');
+                    } else if (platform === 'codebuddy') {
+                      await useCodebuddyAccountStore.getState().switchAccount(targetAccountId);
+                      setPage('codebuddy');
+                    } else if (platform === 'qoder') {
+                      await useQoderAccountStore.getState().switchAccount(targetAccountId);
+                      setPage('qoder');
+                    } else if (platform === 'trae') {
+                      await useTraeAccountStore.getState().switchAccount(targetAccountId);
+                      setPage('trae');
                     } else {
                       await useAccountStore.getState().switchAccount(targetAccountId);
                       setPage('overview');
@@ -1520,6 +1593,14 @@ function App() {
         command: 'refresh_all_codebuddy_tokens',
         errorMessage: 'Failed to refresh CodeBuddy:',
       },
+      {
+        command: 'refresh_all_qoder_tokens',
+        errorMessage: 'Failed to refresh Qoder:',
+      },
+      {
+        command: 'refresh_all_trae_tokens',
+        errorMessage: 'Failed to refresh Trae:',
+      },
     ] as const;
 
     listen('tray:refresh_quota', async () => {
@@ -1559,7 +1640,10 @@ function App() {
         detail.app !== 'vscode' &&
         detail.app !== 'windsurf' &&
         detail.app !== 'kiro' &&
-        detail.app !== 'cursor'
+        detail.app !== 'cursor' &&
+        detail.app !== 'codebuddy' &&
+        detail.app !== 'qoder' &&
+        detail.app !== 'trae'
       ) {
         return;
       }
@@ -1611,6 +1695,10 @@ function App() {
                 ? config.cursor_app_path
               : appPathMissing.app === 'codebuddy'
                 ? config.codebuddy_app_path
+              : appPathMissing.app === 'qoder'
+                ? config.qoder_app_path
+              : appPathMissing.app === 'trae'
+                ? config.trae_app_path
               : config.antigravity_app_path;
         if (active) {
           setAppPathDraft(currentPath || '');
@@ -1670,6 +1758,10 @@ function App() {
           await invoke('cursor_start_instance', { instanceId: retry.instanceId });
         } else if (app === 'codebuddy') {
           await invoke('codebuddy_start_instance', { instanceId: retry.instanceId });
+        } else if (app === 'qoder') {
+          await invoke('qoder_start_instance', { instanceId: retry.instanceId });
+        } else if (app === 'trae') {
+          await invoke('trae_start_instance', { instanceId: retry.instanceId });
         } else {
           await invoke('start_instance', { instanceId: retry.instanceId });
         }
@@ -1686,6 +1778,10 @@ function App() {
           await invoke('cursor_start_instance', { instanceId: '__default__' });
         } else if (app === 'codebuddy') {
           await invoke('codebuddy_start_instance', { instanceId: '__default__' });
+        } else if (app === 'qoder') {
+          await invoke('qoder_start_instance', { instanceId: '__default__' });
+        } else if (app === 'trae') {
+          await invoke('trae_start_instance', { instanceId: '__default__' });
         } else {
           await invoke('start_instance', { instanceId: '__default__' });
         }
@@ -1745,6 +1841,8 @@ function App() {
             case 'cursor':
             case 'gemini':
             case 'codebuddy':
+            case 'qoder':
+            case 'trae':
             case 'manual':
             case 'settings':
               setPage(target as Page);
@@ -1794,9 +1892,13 @@ function App() {
           : appPathMissing.app === 'kiro'
             ? 'Kiro'
             : appPathMissing.app === 'cursor'
-              ? 'Cursor'
-              : appPathMissing.app === 'codebuddy'
-                ? 'CodeBuddy'
+            ? 'Cursor'
+            : appPathMissing.app === 'codebuddy'
+              ? 'CodeBuddy'
+              : appPathMissing.app === 'qoder'
+                ? 'Qoder'
+              : appPathMissing.app === 'trae'
+                ? 'Trae'
               : 'Antigravity'
     : '';
 
@@ -1810,9 +1912,13 @@ function App() {
           : appPathMissing.app === 'kiro'
             ? t('quickSettings.kiro.appPath', 'Kiro 路径')
             : appPathMissing.app === 'cursor'
-              ? t('quickSettings.cursor.appPath', 'Cursor 路径')
-              : appPathMissing.app === 'codebuddy'
-                ? t('quickSettings.codebuddy.appPath', 'CodeBuddy 路径')
+            ? t('quickSettings.cursor.appPath', 'Cursor 路径')
+            : appPathMissing.app === 'codebuddy'
+              ? t('quickSettings.codebuddy.appPath', 'CodeBuddy 路径')
+              : appPathMissing.app === 'qoder'
+                ? t('quickSettings.qoder.appPath', 'Qoder 路径')
+              : appPathMissing.app === 'trae'
+                ? t('quickSettings.trae.appPath', 'Trae 路径')
               : t('quickSettings.antigravity.appPath', '启动路径')
     : t('quickSettings.antigravity.appPath', '启动路径');
 
@@ -1825,6 +1931,8 @@ function App() {
           <UpdateNotification
             key={updateNotificationKey}
             source={updateCheckSource}
+            updaterTarget={getUpdaterCheckTarget() ?? null}
+            updaterCheckReady={updateRuntimeInfoLoaded}
             preparedUpdateVersion={updateAction.state === 'ready' ? updateAction.version : null}
             onRestartUpdate={handleApplyPendingUpdate}
             actionState={updateAction.state}
@@ -1974,9 +2082,13 @@ function App() {
                                 : appPathMissing.app === 'kiro'
                                   ? t('settings.general.kiroPathReset', '重置默认')
                                   : appPathMissing.app === 'cursor'
-                                    ? t('settings.general.cursorPathReset', '重置默认')
+                                  ? t('settings.general.cursorPathReset', '重置默认')
                                     : appPathMissing.app === 'codebuddy'
                                       ? t('settings.general.codebuddyPathReset', '重置默认')
+                                    : appPathMissing.app === 'qoder'
+                                      ? t('settings.general.qoderPathReset', '重置默认')
+                                    : appPathMissing.app === 'trae'
+                                      ? t('settings.general.traePathReset', '重置默认')
                                     : t('settings.general.codexPathReset', '重置默认')
                           )
                       }
@@ -2055,6 +2167,8 @@ function App() {
           {page === 'cursor' && <CursorAccountsPage />}
           {page === 'gemini' && <GeminiAccountsPage />}
           {page === 'codebuddy' && <CodebuddyAccountsPage />}
+          {page === 'qoder' && <QoderAccountsPage />}
+          {page === 'trae' && <TraeAccountsPage />}
           {page === 'instances' && <InstancesPage onNavigate={setPage} />}
           {page === 'fingerprints' && <FingerprintsPage onNavigate={setPage} />}
           {page === 'wakeup' && <WakeupTasksPage onNavigate={setPage} />}

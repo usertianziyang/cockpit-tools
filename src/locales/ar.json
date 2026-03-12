@@ -29,7 +29,11 @@
         "addOnPromptCredits": "أرصدة الأوامر الإضافية",
         "credits": "الأرصدة",
         "email": "البريد الإلكتروني",
-        "promptCredits": "أرصدة الأوامر"
+        "promptCredits": "أرصدة الأوامر",
+        "creditPackage": "حزمة الرصيد",
+        "sharedCreditPackage": "حزمة الرصيد المشتركة",
+        "account": "الحساب",
+        "createdAt": "وقت الإنشاء"
       },
       "empty": {
         "title": "لا توجد حسابات"
@@ -141,6 +145,9 @@
       "usage": {
         "resetLine": "تتم إعادة تعيين الحصة {{dateText}}.",
         "resetUnknown": "إعادة تعيين الحصة بعد -"
+      },
+      "updated": {
+        "label": "تم التحديث قبل {{relative}}"
       }
     }
   },
@@ -162,8 +169,10 @@
       "restart": "إعادة التشغيل",
       "installing": "جارٍ التثبيت"
     },
-    "gemini": "حسابات Gemini",
-    "codebuddy": "حسابات CodeBuddy"
+    "gemini": "حسابات Gemini Cli",
+    "codebuddy": "حسابات CodeBuddy",
+    "qoder": "حسابات Qoder",
+    "trae": "Trae"
   },
   "platformLayout": {
     "title": "تخطيط المنصات",
@@ -403,7 +412,6 @@
       "hideDockIconDesc": "تحكم مستقل في ظهور أيقونة Dock دون التأثر بسلوك تصغير النافذة",
       "hideDockIconOff": "لا (إظهار أيقونة Dock)",
       "hideDockIconOn": "نعم (إخفاء أيقونة Dock)",
-      "storageTitle": "المجلدات والتخزين",
       "dataDir": "مجلد البيانات",
       "dataDirDesc": "موقع تخزين الحسابات وملفات التكوين.",
       "fpDir": "مجلد تخزين Antigravity",
@@ -469,7 +477,15 @@
       "codebuddyAppPathDesc": "اتركه فارغًا لاستخدام المسار الافتراضي",
       "codebuddyAppPathPlaceholder": "المسار الافتراضي",
       "codebuddyPathSelect": "اختيار",
-      "codebuddyPathReset": "إعادة إلى الافتراضي"
+      "codebuddyPathReset": "إعادة إلى الافتراضي",
+      "qoderPathReset": "إعادة إلى الافتراضي",
+      "traeAutoRefresh": "التحديث التلقائي لحصة Trae",
+      "traeAutoRefreshDesc": "فاصل التحديث التلقائي في الخلفية",
+      "traeAppPath": "مسار تشغيل Trae",
+      "traeAppPathDesc": "اتركه فارغًا لاستخدام المسار الافتراضي",
+      "traeAppPathPlaceholder": "المسار الافتراضي",
+      "traePathSelect": "اختيار",
+      "traePathReset": "إعادة إلى الافتراضي"
     },
     "network": {
       "apiTitle": "واجهة برمجة تطبيقات قمرة القيادة المضادة للجاذبية",
@@ -581,7 +597,9 @@
       "byGroupReset": "حسب وقت إعادة ضبط {{group}}",
       "descTooltip": "تنازلي، انقر للتبديل إلى تصاعدي",
       "ascTooltip": "تصاعدي، انقر للتبديل إلى تنازلي",
-      "toggleDirection": "تبديل اتجاه الترتيب"
+      "toggleDirection": "تبديل اتجاه الترتيب",
+      "plan": "حسب الخطة",
+      "quota": "حسب الحصة"
     },
     "filterTags": "تصفية العلامات",
     "filterTagsCount": "العلامات",
@@ -1386,8 +1404,8 @@
     },
     "cursorRefreshInterval": "تحديث الحصة تلقائيًا",
     "gemini": {
-      "title": "إعدادات Gemini",
-      "appPath": "مسار Gemini"
+      "title": "إعدادات Gemini Cli",
+      "appPath": "مسار Gemini Cli"
     },
     "geminiRefreshInterval": "تحديث الحصة تلقائيًا",
     "codebuddy": {
@@ -1399,6 +1417,14 @@
       "saveFailed": "فشل حفظ الإعدادات: {{error}}",
       "pickPathFailed": "فشل اختيار المسار: {{error}}",
       "resetPathFailed": "فشل إعادة تعيين المسار: {{error}}"
+    },
+    "qoder": {
+      "title": "إعدادات Qoder",
+      "appPath": "مسار Qoder"
+    },
+    "trae": {
+      "title": "إعدادات Trae",
+      "appPath": "مسار Trae"
     }
   },
   "quotaAlert": {
@@ -1903,7 +1929,7 @@
     }
   },
   "gemini": {
-    "injectToGemini": "التبديل إلى Gemini",
+    "injectToGemini": "التبديل إلى Gemini Cli",
     "updated": {
       "label": "تم التحديث قبل {{relative}}"
     },
@@ -1916,10 +1942,10 @@
       "resetsUnknown": "وقت إعادة التعيين غير معروف",
       "onDemand": "عند الطلب"
     },
-    "title": "إدارة حسابات Gemini",
+    "title": "إدارة حسابات Gemini Cli",
     "instances": {
-      "unsupported": "إدارة تعدد مثيلات Gemini غير مدعومة حاليًا.",
-      "unsupportedDescPlatform": "تعدد مثيلات Gemini مدعوم فقط على macOS وWindows وLinux.",
+      "unsupported": "إدارة تعدد مثيلات Gemini Cli غير مدعومة حاليًا.",
+      "unsupportedDescPlatform": "تعدد مثيلات Gemini Cli مدعوم فقط على macOS وWindows وLinux.",
       "launchDialogTitle": "تشغيل المثيل",
       "launchHint": "انسخ الأمر وشغّله يدويًا، أو نفّذه مباشرة في الطرفية.",
       "runInTerminal": "تشغيل في الطرفية"
@@ -1928,28 +1954,28 @@
       "success": "تم تبديل الحساب بنجاح"
     },
     "empty": {
-      "description": "انقر على \"إضافة حساب\" لبدء إدارة حسابات Gemini الخاصة بك"
+      "description": "انقر على \"إضافة حساب\" لبدء إدارة حسابات Gemini Cli الخاصة بك"
     },
     "addModal": {
-      "title": "إضافة حساب Gemini"
+      "title": "إضافة حساب Gemini Cli"
     },
     "oauth": {
-      "desc": "انقر الزر أدناه لإكمال تفويض Gemini في المتصفح."
+      "desc": "انقر الزر أدناه لإكمال تفويض Gemini Cli في المتصفح."
     },
     "token": {
-      "desc": "الصق رمز الوصول الخاص بك من Gemini (JWT) أو بيانات JSON المصدّرة.",
+      "desc": "الصق رمز الوصول الخاص بك من Gemini Cli (JWT) أو بيانات JSON المصدّرة.",
       "formatHint": "الحقول المطلوبة والأمثلة (انقر للتوسيع)",
       "formatRequired": "رمز مفرد: الصق JWT مباشرة؛ استيراد دفعي: استخدم تنسيق مصفوفة JSON",
       "singleExample": "مثال مفرد (JWT)",
       "batchExample": "مثال دفعي (JSON)"
     },
     "import": {
-      "localDesc": "استيراد بيانات الحساب من عميل Gemini المحلي أو ملف JSON.",
-      "localClient": "الاستيراد من Gemini المحلي"
+      "localDesc": "استيراد بيانات الحساب من عميل Gemini Cli المحلي أو ملف JSON.",
+      "localClient": "الاستيراد من Gemini Cli المحلي"
     },
     "flowNotice": {
-      "title": "دليل حساب Gemini (انقر للتوسيع/الطي)",
-      "desc": "إدارة حسابات Gemini عن طريق الاستيراد من تثبيت Gemini المحلي أو لصق رموز JWT. تتم معالجة البيانات محليًا فقط.",
+      "title": "دليل حساب Gemini Cli (انقر للتوسيع/الطي)",
+      "desc": "إدارة حسابات Gemini Cli عن طريق الاستيراد من تثبيت Gemini Cli المحلي أو لصق رموز JWT. تتم معالجة البيانات محليًا فقط.",
       "reason": "نطاق الأذونات: قراءة وكتابة oauth_creds.json وgoogle_accounts.json وsettings.json ضمن ~/.gemini الافتراضي أو مسار المثيل (GEMINI_CLI_HOME/.gemini) لاستيراد الحسابات وحقن بيانات الاعتماد محليًا (تبديل الحساب).",
       "storage": "نطاق الشبكة: عمليات OAuth وتحديث الحصة تستدعي واجهات Google/Gemini الرسمية (مثل oauth2.googleapis.com وgoogleapis.com). يتم إرسال حقول المصادقة/الحصة الضرورية فقط؛ ولا تُرفع الملفات المحلية إلى خوادم طرف ثالث."
     }
@@ -2120,6 +2146,84 @@
       "status": {
         "loginConfirm": "يرجى إكمال تسجيل الدخول والتفويض في هذه الصفحة."
       }
+    }
+  },
+  "qoder": {
+    "title": "إدارة حسابات Qoder",
+    "comingSoon": {
+      "title": "ميزة المثيلات المتعددة قادمة قريبًا",
+      "desc": "تشغيل عدة مثيلات Qoder.app بحسابات مختلفة في وقت واحد، ترقبوا."
+    },
+    "instances": {
+      "unsupported": {
+        "descPlatform": "تعدد مثيلات Qoder مدعوم فقط على macOS وWindows وLinux."
+      }
+    },
+    "oauth": {
+      "hint": "يرجى إكمال تسجيل الدخول في صفحة المتصفح المفتوحة: إذا لم تُفتح صفحة تسجيل الدخول تلقائيًا، فانقر على \"نسخ رابط تسجيل الدخول\" ثم الصق الرابط في المتصفح لإكمال تسجيل الدخول.",
+      "copyLoginUrl": "نسخ رابط تسجيل الدخول"
+    },
+    "usageOverview": {
+      "title": "نظرة عامة على الاستخدام",
+      "viewDetails": "عرض التفاصيل",
+      "includedCredits": "الأرصدة ضمن الخطة",
+      "usedOfTotal": "{{used}} / {{total}}",
+      "usedEmpty": "-- / --",
+      "upgradeHint": "قم بترقية الخطة لزيادة الحصة الشهرية",
+      "upgradeAction": "ترقية"
+    },
+    "flowNotice": {
+      "title": "دليل حساب Qoder (انقر للتوسيع أو الطي)",
+      "desc": "يدعم تسجيل الدخول الرسمي عبر OAuth (مع الاستدعاء الراجع) والاستيراد المحلي واستيراد JSON وحقن تبديل الحساب وربط النوافذ المتعددة وعرض الحصة. يتبع تدفق تسجيل الدخول بيانات التخزين الفعلية لعميل Qoder.",
+      "permission": "نطاق الصلاحيات: يقرأ مخزن المصادقة المحلي الخاص بـ Qoder (بيانات اعتماد auth ومعلومات المستخدم) لاستخدامه في تبديل الحساب وحقن الجلسة؛ تتم معالجة جميع البيانات محليا على جهازك.",
+      "network": "نطاق الشبكة: يتطلب تسجيل الدخول عبر OAuth الاتصال بخدمات Qoder الرسمية لاكمال الاستدعاء الراجع؛ وتستعلم الحصة من واجهة Qoder API. لا يتم رفع المفاتيح او بيانات الاعتماد المحلية."
+    },
+    "addModal": {
+      "title": "إضافة حساب Qoder"
+    },
+    "import": {
+      "localDesc": "يقرأ حالة تسجيل الدخول الحالية من عميل Qoder المحلي، بما في ذلك معلومات المستخدم والخطة واستخدام الرصيد."
+    }
+  },
+  "trae": {
+    "title": "إدارة حسابات Trae",
+    "empty": {
+      "description": "انقر على \"إضافة حساب\" لبدء إدارة حسابات Trae، أو استيرادها من بيانات Trae المحلية أو من ملف JSON."
+    },
+    "addModal": {
+      "title": "إضافة حساب Trae"
+    },
+    "oauth": {
+      "desc": "انقر الزر أدناه وأكمل تفويض Trae OAuth في المتصفح."
+    },
+    "import": {
+      "localDesc": "استورد الحساب المسجل حاليا ومعلومات الخطة وبيانات الحصة المخزنة مؤقتا من دليل إعدادات Trae المحلي.",
+      "jsonTab": "ملف JSON"
+    },
+    "quota": {
+      "usedOfTotal": "المستخدم $ {{used}} من $ {{total}}",
+      "usageUnknown": "الاستخدام: --",
+      "resetAt": "وقت إعادة التعيين: {{date}}",
+      "resetUnknown": "وقت إعادة التعيين غير معروف",
+      "statusUnknown": "الحالة: غير معروفة",
+      "statusNormal": "الحالة: طبيعي",
+      "statusExhaustedFree": "الحالة: تم استنفاد الاستخدام، نوصي بالترقية",
+      "statusExhaustedPro": "الحالة: تم استنفاد الاستخدام، قم بالترقية أو فعّل الاستخدام حسب الطلب",
+      "bonusUsed": "الرصيد الإضافي: +{{amount}}",
+      "bonusIncluded": "الرصيد الإضافي: متضمن",
+      "bonusEmpty": "الرصيد الإضافي: --",
+      "packageConsuming": "حزمة الاستخدام: قيد الاستهلاك",
+      "packageAvailable": "حزمة الاستخدام: متاحة",
+      "packageEmpty": "حزمة الاستخدام: --",
+      "payAsYouGoConsuming": "الاستخدام حسب الطلب: قيد الاستهلاك",
+      "payAsYouGoEnabled": "الاستخدام حسب الطلب: مفعل",
+      "payAsYouGoEmpty": "الاستخدام حسب الطلب: --"
+    },
+    "flowNotice": {
+      "title": "دليل حساب Trae (انقر للتوسيع أو الطي)",
+      "desc": "يدعم تسجيل الدخول الرسمي عبر OAuth والاستيراد المحلي واستيراد JSON وتبديل الحساب عبر الحقن المحلي. تتم إعادة الكتابة وفقا لقواعد التخزين الفعلية لعميل Trae.",
+      "permission": "نطاق الصلاحيات: قراءة وكتابة الحقول المرتبطة بتسجيل الدخول في ملف storage.json المحلي الخاص بـ Trae لاستخدامها في استيراد الحساب وحقن تبديل الحساب وعرض الخطة. تتم معالجة جميع البيانات محليا على جهازك.",
+      "network": "نطاق الشبكة: تسجيل الدخول عبر OAuth وتحديث الرمز المميز واستعلامات الخطة تستدعي واجهات Trae الرسمية. لا يتم رفع ملفات الحساب المحلية أو محتوى التخزين الخام إلى خدمات خارجية."
     }
   }
 }
