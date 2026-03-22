@@ -2410,7 +2410,7 @@
     },
     "flowNotice": {
       "title": "Informacje o integracji konta Zed (kliknij, aby rozwinąć/zwinąć)",
-      "desc": "Obsługuje oficjalne logowanie OAuth, import JSON, import bieżącego lokalnego stanu logowania oraz zastosowanie zapisanego konta do oficjalnego klienta Zed zgodnie z jego rzeczywistymi regułami zapisu. Ta strona pokazuje tylko pola stanu, które klient desktopowy może odczytać bezpośrednio, i nie utrzymuje już dodatkowego stanu paska menu.",
+      "desc": "Obsługuje oficjalne logowanie OAuth, import JSON, import bieżącego lokalnego stanu logowania oraz zastosowanie zapisanego konta do oficjalnego klienta Zed zgodnie z jego rzeczywistymi regułami zapisu. Ta strona pokazuje tylko pola stanu, które klient desktopowy może odczytać bezpośrednio.",
       "reason": "Zakres uprawnień: otwiera oficjalne logowanie same-origin Zed w przeglądarce; odczytuje bieżące lokalne dane logowania Zed do importu; podczas stosowania konta zapisuje je z powrotem do tego samego systemowego slotu poświadczeń; i w razie potrzeby może uruchomić lub ponownie uruchomić Zed.",
       "storage": "Zakres danych: lokalnie zapisywane są tylko zaimportowane lub autoryzowane rekordy kont, tagi i wyeksportowana zawartość. Zawartość lokalnego Keychainu ani poświadczeń nie jest wysyłana, sesje webowe przeglądarki nie są skanowane, a niezwiązane poświadczenia systemowe nie są modyfikowane."
     },

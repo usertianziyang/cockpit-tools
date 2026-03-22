@@ -2410,7 +2410,7 @@
     },
     "flowNotice": {
       "title": "Zed hesap entegrasyonu notları (genişletmek/daraltmak için tıklayın)",
-      "desc": "Resmî OAuth oturum açmayı, JSON içe aktarmayı, mevcut yerel oturum durumunu içe aktarmayı ve kaydedilmiş bir hesabı istemcinin gerçek kalıcılık kurallarına göre resmî Zed istemcisine uygulamayı destekler. Bu sayfa yalnızca masaüstü istemcisinin doğrudan okuyabildiği durum alanlarını gösterir ve artık ek bir menü çubuğu durumu tutmaz.",
+      "desc": "Resmî OAuth oturum açmayı, JSON içe aktarmayı, mevcut yerel oturum durumunu içe aktarmayı ve kaydedilmiş bir hesabı istemcinin gerçek kalıcılık kurallarına göre resmî Zed istemcisine uygulamayı destekler. Bu sayfa yalnızca masaüstü istemcisinin doğrudan okuyabildiği durum alanlarını gösterir.",
       "reason": "Yetki kapsamı: tarayıcıda Zed'in resmî same-origin girişini açar; içe aktarma için mevcut yerel Zed kimlik bilgilerini okur; bir hesabı uygularken aynı sistem kimlik bilgisi yuvasına geri yazar; ve gerektiğinde Zed'i başlatabilir veya yeniden başlatabilir.",
       "storage": "Veri kapsamı: yalnızca içe aktarılan veya yetkilendirilmiş hesap kayıtları, etiketler ve dışa aktarılan içerik yerel olarak saklanır. Yerel Keychain ya da kimlik bilgisi içerikleri yüklenmez, tarayıcı web oturumları taranmaz ve ilgisiz sistem kimlik bilgileri değiştirilmez."
     },

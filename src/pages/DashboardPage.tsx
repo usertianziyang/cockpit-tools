@@ -1841,7 +1841,7 @@ export function DashboardPage({ onNavigate, onOpenPlatformLayout, onEasterEggTri
               {maskAccountText(presentation.displayName)}
             </span>
             {shouldShowPlan && (
-              <span className={`tier-tag ${presentation.planClass}`}>{presentation.planLabel}</span>
+              <span className={`tier-badge ${presentation.planClass}`}>{presentation.planLabel}</span>
             )}
           </div>
         </div>
@@ -1894,7 +1894,7 @@ export function DashboardPage({ onNavigate, onOpenPlatformLayout, onEasterEggTri
              <span className="account-email" title={maskAccountText(presentation.displayName)}>
                {maskAccountText(presentation.displayName)}
              </span>
-             <span className={`tier-tag ${presentation.planClass}`}>{presentation.planLabel}</span>
+             <span className={`tier-badge ${presentation.planClass}`}>{presentation.planLabel}</span>
            </div>
         </div>
         

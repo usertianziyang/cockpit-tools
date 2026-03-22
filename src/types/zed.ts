@@ -85,7 +85,10 @@ export function getZedAccountDisplayEmail(account: ZedAccount): string {
 
 export function getZedPlanBadge(account: ZedAccount): string {
   const raw = account.plan_raw?.trim();
-  return raw ? raw : 'UNKNOWN';
+  if (!raw) return 'UNKNOWN';
+
+  const normalized = raw.replace(/^zed_/i, '').trim();
+  return normalized ? normalized.toUpperCase() : 'UNKNOWN';
 }
 
 export function getZedUsage(account: ZedAccount): ProviderUsage {

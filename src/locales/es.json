@@ -2410,7 +2410,7 @@
     },
     "flowNotice": {
       "title": "Notas de integración de la cuenta de Zed (haz clic para expandir/contraer)",
-      "desc": "Admite el inicio de sesión oficial por OAuth, la importación de JSON, la importación del estado de inicio de sesión local actual y la aplicación de una cuenta guardada al cliente oficial de Zed siguiendo sus reglas reales de persistencia. Esta página solo muestra campos de estado que el cliente de escritorio puede leer directamente y ya no mantiene un estado adicional de la barra de menú.",
+      "desc": "Admite el inicio de sesión oficial por OAuth, la importación de JSON, la importación del estado de inicio de sesión local actual y la aplicación de una cuenta guardada al cliente oficial de Zed siguiendo sus reglas reales de persistencia. Esta página solo muestra campos de estado que el cliente de escritorio puede leer directamente.",
       "reason": "Permisos: abre el inicio de sesión oficial same-origin de Zed en el navegador; lee las credenciales locales actuales de Zed para importar; vuelve a escribir en el mismo slot de credenciales del sistema al aplicar una cuenta; y puede iniciar o reiniciar Zed cuando sea necesario.",
       "storage": "Alcance de datos: solo se guardan localmente los registros de cuenta importados o autorizados, las etiquetas y el contenido exportado. No se sube el contenido del Keychain o de las credenciales locales, no se analizan las sesiones web del navegador y no se modifican credenciales del sistema no relacionadas."
     },

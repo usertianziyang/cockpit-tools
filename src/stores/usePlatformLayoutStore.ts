@@ -279,13 +279,17 @@ function normalizeSidebar(sidebar: PlatformId[], hidden: PlatformId[]): Platform
   return normalized.slice(0, 2);
 }
 
-function normalizeTray(tray: PlatformId[], rawOrder: PlatformId[] = []): PlatformId[] {
+function normalizeTray(
+  tray: PlatformId[],
+  rawOrder: PlatformId[] = [],
+  allowLegacyMigration = false,
+): PlatformId[] {
   const normalized = sanitizePlatformIds(tray);
   const rawOrderSet = new Set(sanitizePlatformIds(rawOrder));
   const hasLegacyDefault = LEGACY_TRAY_CORE_IDS.every((id) => normalized.includes(id))
     && normalized.length <= ALL_PLATFORM_IDS.length - 1;
 
-  if (!hasLegacyDefault) {
+  if (!allowLegacyMigration || !hasLegacyDefault) {
     return normalized;
   }
 
@@ -870,6 +874,9 @@ function normalizeStateData(
     hiddenEntryIds: PlatformLayoutEntryId[];
     sidebarEntryIds: PlatformLayoutEntryId[];
   },
+  options: {
+    allowLegacyTrayMigration?: boolean;
+  } = {},
 ): NormalizedLayoutStateData {
   const orderedPlatformIds = normalizeOrder(raw.orderedPlatformIds);
   const platformGroups = normalizePlatformGroups(raw.platformGroups, false)
@@ -896,7 +903,11 @@ function normalizeStateData(
     orderedPlatformIds,
     hiddenPlatformIds,
     sidebarPlatformIds,
-    trayPlatformIds: normalizeTray(raw.trayPlatformIds, orderedPlatformIds),
+    trayPlatformIds: normalizeTray(
+      raw.trayPlatformIds,
+      orderedPlatformIds,
+      options.allowLegacyTrayMigration === true,
+    ),
     traySortMode: normalizeTraySortMode(raw.traySortMode),
     platformGroups,
     orderedEntryIds,
@@ -959,6 +970,7 @@ function loadPersistedState(): NormalizedLayoutStateData {
       trayPlatformIds: normalizeTray(
         parsed.trayPlatformIds ?? ALL_PLATFORM_IDS,
         sanitizePlatformIds(parsed.orderedPlatformIds ?? []),
+        true,
       ),
       traySortMode: normalizeTraySortMode(parsed.traySortMode),
       platformGroups,

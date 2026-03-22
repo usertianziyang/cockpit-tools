@@ -7,6 +7,13 @@ All notable changes to Cockpit Tools will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
+## [0.18.1] - 2026-03-22
+
+### Changed
+- **Zed account presentation is now unified across the account page, dashboard, and tray**: Zed plan labels now strip the `zed_` prefix and display the remaining raw identifier in uppercase, dashboard badges reuse the same visual treatment as the main account page, and `Edit Predictions` summaries keep single-line `used / total` output in compact cards.
+- **Zed menu-bar behavior now follows the saved platform layout and desktop-derived status fields consistently**: disabling Zed in the tray layout no longer gets reverted by legacy migration, the side-menu/platform-layout entry is available again, and tray summaries now match the main page by showing `Edit Predictions` plus overdue status instead of stale token-spend rows.
+
+---
 ## [0.18.0] - 2026-03-22
 
 ### Added

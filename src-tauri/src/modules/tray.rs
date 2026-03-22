@@ -1200,33 +1200,63 @@ fn build_zed_display_info(lang: &str) -> AccountDisplayInfo {
         .map(str::trim)
         .filter(|value| !value.is_empty())
     {
-        quota_lines.push(format!("{}: {}", get_text("plan", lang), plan));
+        quota_lines.push(format!(
+            "{}: {}",
+            get_text("plan", lang),
+            format_zed_plan_label(plan)
+        ));
     }
 
     quota_lines.push(format!(
         "{}: {} / {}",
-        get_text("token_spend", lang),
-        format_cents_currency(account.token_spend_used_cents),
-        format_cents_currency(account.token_spend_limit_cents),
-    ));
-    quota_lines.push(format!(
-        "{}: {} / {}",
         get_text("edit_predictions", lang),
-        account
-            .edit_predictions_used
-            .map(|value| value.to_string())
-            .unwrap_or_else(|| "--".to_string()),
-        account
-            .edit_predictions_limit_raw
-            .as_deref()
-            .map(str::trim)
-            .filter(|value| !value.is_empty())
-            .unwrap_or("--"),
+        format_zed_edit_predictions_used(account.edit_predictions_used),
+        format_zed_edit_predictions_total(account.edit_predictions_limit_raw.as_deref()),
+    ));
+
+    quota_lines.push(format!(
+        "{}: {}",
+        get_text("overdue_field", lang),
+        if account.has_overdue_invoices.unwrap_or(false) {
+            get_text("overdue_yes", lang)
+        } else {
+            get_text("overdue_no", lang)
+        },
     ));
 
     AccountDisplayInfo {
         account: format!("📧 {}", display_value),
         quota_lines,
+    }
+}
+
+fn format_zed_edit_predictions_used(value: Option<i64>) -> String {
+    value
+        .map(|used| format_quota_number((used.max(0)) as f64))
+        .unwrap_or_else(|| "0".to_string())
+}
+
+fn format_zed_plan_label(plan_raw: &str) -> String {
+    let normalized = plan_raw.trim().trim_start_matches("zed_").trim();
+    if normalized.is_empty() {
+        "UNKNOWN".to_string()
+    } else {
+        normalized.to_uppercase()
+    }
+}
+
+fn format_zed_edit_predictions_total(limit_raw: Option<&str>) -> String {
+    let Some(limit_raw) = limit_raw.map(str::trim).filter(|value| !value.is_empty()) else {
+        return "0".to_string();
+    };
+
+    if limit_raw.eq_ignore_ascii_case("unlimited") {
+        return "0".to_string();
+    }
+
+    match limit_raw.parse::<f64>() {
+        Ok(value) if value.is_finite() => format_quota_number(value.max(0.0)),
+        _ => "0".to_string(),
     }
 }
 
@@ -2444,12 +2474,6 @@ fn format_micros_usd(value: f64) -> String {
     format!("${:.2}", normalized / 1_000_000.0)
 }
 
-fn format_cents_currency(value: Option<i64>) -> String {
-    value
-        .map(|amount| format!("${:.2}", (amount as f64) / 100.0))
-        .unwrap_or_else(|| "--".to_string())
-}
-
 fn compute_copilot_usage(
     token: &str,
     plan: Option<&str>,
@@ -3224,6 +3248,9 @@ fn get_text(key: &str, lang: &str) -> String {
         ("plan", "zh-cn") => "订阅".to_string(),
         ("token_spend", "zh-cn") => "Token 消耗".to_string(),
         ("edit_predictions", "zh-cn") => "编辑预测".to_string(),
+        ("overdue_field", "zh-cn") => "是否欠费".to_string(),
+        ("overdue_yes", "zh-cn") => "是".to_string(),
+        ("overdue_no", "zh-cn") => "否".to_string(),
         ("status_normal_short", "zh-cn") => "正常".to_string(),
         ("included", "zh-cn") => "包含".to_string(),
         ("ghcp_inline", "zh-cn") => "Inline".to_string(),
@@ -3254,6 +3281,9 @@ fn get_text(key: &str, lang: &str) -> String {
         ("plan", "zh-tw") => "訂閱".to_string(),
         ("token_spend", "zh-tw") => "Token 消耗".to_string(),
         ("edit_predictions", "zh-tw") => "編輯預測".to_string(),
+        ("overdue_field", "zh-tw") => "是否欠費".to_string(),
+        ("overdue_yes", "zh-tw") => "是".to_string(),
+        ("overdue_no", "zh-tw") => "否".to_string(),
         ("status_normal_short", "zh-tw") => "正常".to_string(),
         ("included", "zh-tw") => "已包含".to_string(),
         ("ghcp_inline", "zh-tw") => "Inline".to_string(),
@@ -3284,6 +3314,9 @@ fn get_text(key: &str, lang: &str) -> String {
         ("plan", "en") => "Plan".to_string(),
         ("token_spend", "en") => "Token Spend".to_string(),
         ("edit_predictions", "en") => "Edit Predictions".to_string(),
+        ("overdue_field", "en") => "Overdue".to_string(),
+        ("overdue_yes", "en") => "Yes".to_string(),
+        ("overdue_no", "en") => "No".to_string(),
         ("status_normal_short", "en") => "Normal".to_string(),
         ("included", "en") => "Included".to_string(),
         ("ghcp_inline", "en") => "Inline".to_string(),
@@ -3314,6 +3347,9 @@ fn get_text(key: &str, lang: &str) -> String {
         ("plan", "ja") => "プラン".to_string(),
         ("token_spend", "ja") => "Token Spend".to_string(),
         ("edit_predictions", "ja") => "Edit Predictions".to_string(),
+        ("overdue_field", "ja") => "延滞有無".to_string(),
+        ("overdue_yes", "ja") => "はい".to_string(),
+        ("overdue_no", "ja") => "いいえ".to_string(),
         ("status_normal_short", "ja") => "正常".to_string(),
         ("included", "ja") => "含まれる".to_string(),
         ("ghcp_inline", "ja") => "Inline".to_string(),
@@ -3346,6 +3382,9 @@ fn get_text(key: &str, lang: &str) -> String {
         ("plan", "ru") => "План".to_string(),
         ("token_spend", "ru") => "Token Spend".to_string(),
         ("edit_predictions", "ru") => "Edit Predictions".to_string(),
+        ("overdue_field", "ru") => "Есть задолженность".to_string(),
+        ("overdue_yes", "ru") => "Да".to_string(),
+        ("overdue_no", "ru") => "Нет".to_string(),
         ("status_normal_short", "ru") => "Норма".to_string(),
         ("included", "ru") => "Включено".to_string(),
         ("ghcp_inline", "ru") => "Inline".to_string(),
@@ -3376,6 +3415,9 @@ fn get_text(key: &str, lang: &str) -> String {
         ("plan", _) => "Plan".to_string(),
         ("token_spend", _) => "Token Spend".to_string(),
         ("edit_predictions", _) => "Edit Predictions".to_string(),
+        ("overdue_field", _) => "Overdue".to_string(),
+        ("overdue_yes", _) => "Yes".to_string(),
+        ("overdue_no", _) => "No".to_string(),
         ("status_normal_short", _) => "Normal".to_string(),
         ("included", _) => "Included".to_string(),
         ("ghcp_inline", _) => "Inline".to_string(),

@@ -2410,7 +2410,7 @@
     },
     "flowNotice": {
       "title": "Ghi chú tích hợp tài khoản Zed (nhấp để mở rộng/thu gọn)",
-      "desc": "Hỗ trợ đăng nhập OAuth chính thức, nhập JSON, nhập trạng thái đăng nhập cục bộ hiện tại và áp dụng một tài khoản đã lưu trở lại ứng dụng Zed chính thức theo đúng quy tắc lưu trữ thực tế của ứng dụng. Trang này chỉ hiển thị các trường trạng thái mà ứng dụng desktop có thể đọc trực tiếp và không còn duy trì thêm trạng thái thanh menu.",
+      "desc": "Hỗ trợ đăng nhập OAuth chính thức, nhập JSON, nhập trạng thái đăng nhập cục bộ hiện tại và áp dụng một tài khoản đã lưu trở lại ứng dụng Zed chính thức theo đúng quy tắc lưu trữ thực tế của ứng dụng. Trang này chỉ hiển thị các trường trạng thái mà ứng dụng desktop có thể đọc trực tiếp.",
       "reason": "Phạm vi quyền: mở đăng nhập same-origin chính thức của Zed trong trình duyệt; đọc thông tin xác thực Zed cục bộ hiện tại để nhập; ghi lại vào đúng vị trí thông tin xác thực hệ thống khi áp dụng tài khoản; và có thể khởi động hoặc khởi động lại Zed khi cần.",
       "storage": "Phạm vi dữ liệu: chỉ lưu cục bộ các bản ghi tài khoản được nhập hoặc cấp quyền, thẻ và nội dung xuất ra. Nội dung Keychain hoặc thông tin xác thực cục bộ không bị tải lên, các phiên web của trình duyệt không bị quét và các thông tin xác thực hệ thống không liên quan không bị sửa đổi."
     },

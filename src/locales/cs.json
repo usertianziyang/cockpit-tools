@@ -2410,7 +2410,7 @@
     },
     "flowNotice": {
       "title": "Poznámky k integraci účtu Zed (kliknutím rozbalit/sbalit)",
-      "desc": "Podporuje oficiální OAuth přihlášení, import JSON, import aktuálního místního přihlášení a zapsání uloženého účtu zpět do oficiálního klienta Zed podle skutečných pravidel jeho ukládání. Tato stránka zobrazuje jen stavová pole, která desktopový klient umí číst přímo, a už neudržuje žádný dodatečný stav menu.",
+      "desc": "Podporuje oficiální OAuth přihlášení, import JSON, import aktuálního místního přihlášení a zapsání uloženého účtu zpět do oficiálního klienta Zed podle skutečných pravidel jeho ukládání. Tato stránka zobrazuje jen stavová pole, která desktopový klient umí číst přímo.",
       "reason": "Rozsah oprávnění: otevře oficiální same-origin přihlášení Zed v prohlížeči; čte aktuální místní přihlašovací údaje Zed pro import; při použití účtu zapisuje zpět do stejného systémového úložiště přihlašovacích údajů; a podle potřeby může Zed spustit nebo restartovat.",
       "storage": "Rozsah dat: lokálně se ukládají jen importované nebo autorizované záznamy účtů, štítky a exportovaný obsah. Obsah místního Keychainu nebo přihlašovacích údajů se neodesílá, webové relace prohlížeče se neskenují a nesouvisející systémové přihlašovací údaje se nemění."
     },

@@ -2241,7 +2241,7 @@
     },
     "flowNotice": {
       "title": "Zed Account Integration Notes (click to expand/collapse)",
-      "desc": "Supports official OAuth sign-in, JSON import, importing the current local sign-in state, and applying a saved account back to the official Zed client using the client's real persistence rules. This page only shows status fields that the desktop client can read directly and no longer maintains extra menu-bar state.",
+      "desc": "Supports official OAuth sign-in, JSON import, importing the current local sign-in state, and applying a saved account back to the official Zed client using the client's real persistence rules. This page only shows status fields that the desktop client can read directly.",
       "reason": "Permissions: opens the official same-origin Zed sign-in in your browser; reads the current local Zed credentials for import; writes back to the same system credential slot when applying an account; and can start or restart Zed when needed.",
       "storage": "Data handling: only imported or authorized account records, tags, and exported content are stored locally. Local Keychain or credential contents are not uploaded, browser web sessions are not scanned, and unrelated system credentials are not modified."
     },

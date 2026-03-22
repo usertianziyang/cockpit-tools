@@ -2410,7 +2410,7 @@
     },
     "flowNotice": {
       "title": "Hinweise zur Zed-Kontointegration (zum Auf- und Zuklappen klicken)",
-      "desc": "Unterstützt offizielles OAuth-Login, JSON-Import, Import des aktuellen lokalen Anmeldestatus sowie das Anwenden eines gespeicherten Kontos auf den offiziellen Zed-Client nach dessen echten Persistenzregeln. Diese Seite zeigt nur Statusfelder an, die der Desktop-Client direkt lesen kann, und pflegt keinen zusätzlichen Menüleistenstatus mehr.",
+      "desc": "Unterstützt offizielles OAuth-Login, JSON-Import, Import des aktuellen lokalen Anmeldestatus sowie das Anwenden eines gespeicherten Kontos auf den offiziellen Zed-Client nach dessen echten Persistenzregeln. Diese Seite zeigt nur Statusfelder an, die der Desktop-Client direkt lesen kann.",
       "reason": "Berechtigungsumfang: öffnet das offizielle Same-Origin-Login von Zed im Browser; liest die aktuellen lokalen Zed-Zugangsdaten für den Import; schreibt beim Anwenden eines Kontos in denselben System-Zugangsdaten-Slot zurück; und kann Zed bei Bedarf starten oder neu starten.",
       "storage": "Datenumfang: lokal werden nur importierte oder autorisierte Kontodatensätze, Tags und Exportinhalte gespeichert. Inhalte aus Keychain oder Zugangsdaten werden nicht hochgeladen, Browser-Websitzungen werden nicht gescannt und nicht verwandte System-Zugangsdaten werden nicht verändert."
     },

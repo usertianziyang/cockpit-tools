@@ -149,8 +149,16 @@ fn contains_platform(ids: &[String], target: &str) -> bool {
     ids.iter().any(|id| id == target)
 }
 
-fn normalize_tray_platforms(ids: &[String], raw_order_has_new: &[&str]) -> Vec<String> {
+fn normalize_tray_platforms(
+    ids: &[String],
+    raw_order_has_new: &[&str],
+    allow_legacy_migration: bool,
+) -> Vec<String> {
     let mut sanitized = sanitize_platform_ids(ids);
+
+    if !allow_legacy_migration {
+        return sanitized;
+    }
 
     let has_legacy_all = contains_platform(&sanitized, PLATFORM_ANTIGRAVITY)
         && contains_platform(&sanitized, PLATFORM_CODEX)
@@ -359,7 +367,7 @@ fn normalize_ordered_entries(
     result
 }
 
-fn normalize_config(config: TrayLayoutConfig) -> TrayLayoutConfig {
+fn normalize_config(config: TrayLayoutConfig, allow_legacy_tray_migration: bool) -> TrayLayoutConfig {
     let ordered_platform_ids = normalize_order(&config.ordered_platform_ids);
 
     let raw_order_new_platforms: Vec<&str> = [
@@ -390,6 +398,7 @@ fn normalize_config(config: TrayLayoutConfig) -> TrayLayoutConfig {
         tray_platform_ids: normalize_tray_platforms(
             &config.tray_platform_ids,
             &raw_order_new_platforms,
+            allow_legacy_tray_migration,
         ),
         ordered_entry_ids,
         platform_groups,
@@ -412,7 +421,7 @@ pub fn load_tray_layout() -> TrayLayoutConfig {
     };
 
     match serde_json::from_str::<TrayLayoutConfig>(&content) {
-        Ok(config) => normalize_config(config),
+        Ok(config) => normalize_config(config, true),
         Err(_) => TrayLayoutConfig::default(),
     }
 }
@@ -430,7 +439,7 @@ pub fn save_tray_layout(
         tray_platform_ids,
         ordered_entry_ids: ordered_entry_ids.unwrap_or_default(),
         platform_groups: platform_groups.unwrap_or_else(default_platform_groups),
-    });
+    }, false);
 
     let path = get_tray_layout_path()?;
     let content = serde_json::to_string_pretty(&normalized)

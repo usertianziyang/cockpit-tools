@@ -681,7 +681,7 @@ export function ZedAccountsPage() {
               {maskAccountText(emailText)}
             </span>
             {isCurrent && <span className="current-tag">{t('accounts.status.current')}</span>}
-            <span className={`tier-badge ${getZedPlanTone(account.plan_raw)} raw-value`}>
+            <span className={`tier-badge ${getZedPlanTone(account.plan_raw)}`}>
               {getZedPlanBadge(account)}
             </span>
           </div>
@@ -811,7 +811,7 @@ export function ZedAccountsPage() {
             </div>
           </td>
           <td>
-            <span className={`tier-badge ${getZedPlanTone(account.plan_raw)} raw-value`}>
+            <span className={`tier-badge ${getZedPlanTone(account.plan_raw)}`}>
               {getZedPlanBadge(account)}
             </span>
           </td>
@@ -892,7 +892,7 @@ export function ZedAccountsPage() {
             <div className="ghcp-flow-notice-desc">
               {t(
                 'zed.flowNotice.desc',
-                '支持官方 OAuth 登录、JSON 导入、本机当前登录状态导入，以及按 Zed 客户端真实落盘规则应用账号并重启官方客户端。页面仅展示桌面端可直接读取的状态字段，不再额外维护菜单栏状态。',
+                '支持官方 OAuth 登录、JSON 导入、本机当前登录状态导入，以及按 Zed 客户端真实落盘规则应用账号并重启官方客户端。页面仅展示桌面端可直接读取的状态字段。',
               )}
             </div>
             <ul className="ghcp-flow-notice-list">
