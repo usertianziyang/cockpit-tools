@@ -815,7 +815,9 @@
       "editTitle": "編輯分組",
       "ungrouped": "未分組",
       "currentGroupLabel": "目前分組",
-      "accountPickerEmpty": "沒有符合條件的帳號"
+      "accountPickerEmpty": "沒有符合條件的帳號",
+      "filterHint": "已勾選 {{count}} 個分組做篩選",
+      "filterToggle": "勾選以篩選此分組"
     }
   },
   "overview": {

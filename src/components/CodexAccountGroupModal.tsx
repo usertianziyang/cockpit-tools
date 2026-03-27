@@ -1,26 +1,27 @@
 /**
- * 账号分组管理弹窗
+ * Codex 账号分组管理弹窗
  * - 创建 / 重命名 / 删除分组
  * - 显示分组列表及账号数量
+ * - 支持勾选分组作为筛选条件
+ * - 专用于 Codex 账号系统
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, FolderOpen, Plus, Pencil, Trash2, FolderPlus, AlertCircle } from 'lucide-react';
 import {
-  AccountGroup,
-  getAccountGroups,
-  createGroup,
-  deleteGroup,
-  renameGroup,
-  addAccountsToGroup,
-  moveAccountsBetweenGroups,
-} from '../services/accountGroupService';
+  type CodexAccountGroup,
+  getCodexAccountGroups,
+  createCodexGroup,
+  deleteCodexGroup,
+  renameCodexGroup,
+  assignAccountsToCodexGroup,
+} from '../services/codexAccountGroupService';
 import './AccountGroupModal.css';
 
-// ─── 分组管理弹窗 ──────────────────────────────────────────
+// ─── Codex 分组管理弹窗 ──────────────────────────────────────────
 
-interface AccountGroupModalProps {
+interface CodexAccountGroupModalProps {
   isOpen: boolean;
   onClose: () => void;
   onGroupsChanged: () => Promise<void> | void;
@@ -32,12 +33,12 @@ interface AccountGroupModalProps {
   onClearGroupFilter?: () => void;
 }
 
-export const AccountGroupModal = ({
+export const CodexAccountGroupModal = ({
   isOpen, onClose, onGroupsChanged,
   groupFilter = [], onToggleGroupFilter, onClearGroupFilter,
-}: AccountGroupModalProps) => {
+}: CodexAccountGroupModalProps) => {
   const { t } = useTranslation();
-  const [groups, setGroups] = useState<AccountGroup[]>([]);
+  const [groups, setGroups] = useState<CodexAccountGroup[]>([]);
   const [newName, setNewName] = useState('');
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
@@ -45,7 +46,7 @@ export const AccountGroupModal = ({
   const [error, setError] = useState<string | null>(null);
 
   const reload = useCallback(async () => {
-    setGroups(await getAccountGroups());
+    setGroups(await getCodexAccountGroups());
   }, []);
 
   useEffect(() => {
@@ -63,61 +64,65 @@ export const AccountGroupModal = ({
     if (!name) return;
     setError(null);
     try {
-      // 重名检查
       if (groups.some((g) => g.name === name)) {
-        setError(t('accounts.groups.error.duplicate'));
+        setError(t('accounts.groups.error.duplicate', '分组名称已存在'));
         return;
       }
-      await createGroup(name);
+      await createCodexGroup(name);
       setNewName('');
       await reload();
       await onGroupsChanged();
     } catch (err) {
-      console.error('Failed to create group:', err);
+      console.error('Failed to create codex group:', err);
       setError(t('accounts.groups.error.createFailed', {
         error: String(err),
+        defaultValue: '创建分组失败: {{error}}',
       }));
     }
   };
 
-  const handleRename = async (groupId: string) => {
+  const handleRename = async (id: string) => {
     const name = renameValue.trim();
     if (!name) return;
     setError(null);
     try {
-      // 重名检查（排除自己）
-      if (groups.some((g) => g.id !== groupId && g.name === name)) {
-        setError(t('accounts.groups.error.duplicate'));
+      if (groups.some((g) => g.id !== id && g.name === name)) {
+        setError(t('accounts.groups.error.duplicate', '分组名称已存在'));
         return;
       }
-      await renameGroup(groupId, name);
+      await renameCodexGroup(id, name);
       setRenamingId(null);
+      setRenameValue('');
       await reload();
       await onGroupsChanged();
     } catch (err) {
-      console.error('Failed to rename group:', err);
+      console.error('Failed to rename codex group:', err);
       setError(t('accounts.groups.error.renameFailed', {
         error: String(err),
+        defaultValue: '重命名失败: {{error}}',
       }));
     }
   };
 
-  const handleDelete = async (groupId: string) => {
+  const handleDelete = async (id: string) => {
     setError(null);
     try {
-      await deleteGroup(groupId);
+      await deleteCodexGroup(id);
       setDeleteConfirmId(null);
       await reload();
       await onGroupsChanged();
     } catch (err) {
-      console.error('Failed to delete group:', err);
+      console.error('Failed to delete codex group:', err);
       setError(t('accounts.groups.error.deleteFailed', {
         error: String(err),
+        defaultValue: '删除分组失败: {{error}}',
       }));
     }
   };
 
   if (!isOpen) return null;
+
+  const hasFilter = groupFilter.length > 0;
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -125,7 +130,7 @@ export const AccountGroupModal = ({
         <div className="modal-header">
           <h2>
             <FolderOpen size={18} />
-            {t('accounts.groups.manageTitle')}
+            {t('accounts.groups.manageTitle', '分组管理')}
           </h2>
           <button className="modal-close" onClick={onClose}>
             <X size={18} />
@@ -140,7 +145,7 @@ export const AccountGroupModal = ({
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') handleCreate(); }}
-              placeholder={t('accounts.groups.newPlaceholder')}
+              placeholder={t('accounts.groups.newPlaceholder', '输入分组名称...')}
               maxLength={30}
             />
             <button
@@ -149,7 +154,7 @@ export const AccountGroupModal = ({
               disabled={!newName.trim()}
             >
               <Plus size={14} />
-              {t('accounts.groups.create')}
+              {t('accounts.groups.create', '创建')}
             </button>
           </div>
 
@@ -162,9 +167,9 @@ export const AccountGroupModal = ({
           )}
 
           {/* 筛选提示 */}
-          {groupFilter.length > 0 && onClearGroupFilter && (
+          {hasFilter && onClearGroupFilter && (
             <div className="group-filter-hint">
-              <span>{t('accounts.groups.filterHint', { count: groupFilter.length })}</span>
+              <span>{t('accounts.groups.filterHint', '已勾选 {{count}} 个分组做筛选', { count: groupFilter.length })}</span>
               <button type="button" className="group-filter-clear-btn" onClick={onClearGroupFilter}>
                 {t('accounts.clearFilter', '清空筛选')}
               </button>
@@ -175,7 +180,7 @@ export const AccountGroupModal = ({
           {groups.length === 0 ? (
             <div className="group-modal-empty">
               <FolderPlus size={36} />
-              <div>{t('accounts.groups.empty')}</div>
+              <div>{t('accounts.groups.empty', '暂无分组，创建一个开始使用吧')}</div>
             </div>
           ) : (
             <div className="group-modal-list">
@@ -212,6 +217,7 @@ export const AccountGroupModal = ({
                         <span className="group-count">
                           {t('accounts.groups.accountCount', {
                             count: group.accountIds.length,
+                            defaultValue: '{{count}} 个账号',
                           })}
                         </span>
                       </>
@@ -223,14 +229,14 @@ export const AccountGroupModal = ({
                         <button
                           className="group-action-btn danger"
                           onClick={() => handleDelete(group.id)}
-                          title={t('common.confirm')}
+                          title={t('common.confirm', '确认')}
                         >
                           ✓
                         </button>
                         <button
                           className="group-action-btn"
                           onClick={() => setDeleteConfirmId(null)}
-                          title={t('common.cancel')}
+                          title={t('common.cancel', '取消')}
                         >
                           ✗
                         </button>
@@ -243,14 +249,14 @@ export const AccountGroupModal = ({
                             setRenamingId(group.id);
                             setRenameValue(group.name);
                           }}
-                          title={t('accounts.groups.rename')}
+                          title={t('accounts.groups.rename', '重命名')}
                         >
                           <Pencil size={14} />
                         </button>
                         <button
                           className="group-action-btn danger"
                           onClick={() => setDeleteConfirmId(group.id)}
-                          title={t('common.delete')}
+                          title={t('common.delete', '删除')}
                         >
                           <Trash2 size={14} />
                         </button>
@@ -265,7 +271,7 @@ export const AccountGroupModal = ({
 
         <div className="modal-footer">
           <button className="btn btn-secondary" onClick={onClose}>
-            {t('common.close')}
+            {t('common.close', '关闭')}
           </button>
         </div>
       </div>
@@ -273,25 +279,24 @@ export const AccountGroupModal = ({
   );
 };
 
-// ─── 添加到分组弹窗 ──────────────────────────────────────────
+// ─── Codex 添加到分组弹窗 ──────────────────────────────────────────
 
-interface AddToGroupModalProps {
+interface CodexAddToGroupModalProps {
   isOpen: boolean;
   onClose: () => void;
   accountIds: string[];
-  sourceGroupId?: string;
   onAdded: () => Promise<void> | void;
 }
 
-export const AddToGroupModal = ({ isOpen, onClose, accountIds, sourceGroupId, onAdded }: AddToGroupModalProps) => {
+export const CodexAddToGroupModal = ({ isOpen, onClose, accountIds, onAdded }: CodexAddToGroupModalProps) => {
   const { t } = useTranslation();
-  const [groups, setGroups] = useState<AccountGroup[]>([]);
+  const [groups, setGroups] = useState<CodexAccountGroup[]>([]);
   const [newName, setNewName] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
-      (async () => setGroups(await getAccountGroups()))();
+      (async () => setGroups(await getCodexAccountGroups()))();
       setNewName('');
       setError(null);
     }
@@ -300,17 +305,14 @@ export const AddToGroupModal = ({ isOpen, onClose, accountIds, sourceGroupId, on
   const handleSelect = async (groupId: string) => {
     setError(null);
     try {
-      if (sourceGroupId) {
-        await moveAccountsBetweenGroups(sourceGroupId, groupId, accountIds);
-      } else {
-        await addAccountsToGroup(groupId, accountIds);
-      }
+      await assignAccountsToCodexGroup(groupId, accountIds);
       await onAdded();
       onClose();
     } catch (err) {
-      console.error('Failed to add accounts to group:', err);
+      console.error('Failed to add accounts to codex group:', err);
       setError(t('accounts.groups.error.addFailed', {
         error: String(err),
+        defaultValue: '添加失败: {{error}}',
       }));
     }
   };
@@ -320,18 +322,15 @@ export const AddToGroupModal = ({ isOpen, onClose, accountIds, sourceGroupId, on
     if (!name) return;
     setError(null);
     try {
-      const group = await createGroup(name);
-      if (sourceGroupId) {
-        await moveAccountsBetweenGroups(sourceGroupId, group.id, accountIds);
-      } else {
-        await addAccountsToGroup(group.id, accountIds);
-      }
+      const group = await createCodexGroup(name);
+      await assignAccountsToCodexGroup(group.id, accountIds);
       await onAdded();
       onClose();
     } catch (err) {
-      console.error('Failed to create group and add accounts:', err);
+      console.error('Failed to create codex group and add accounts:', err);
       setError(t('accounts.groups.error.createAndAddFailed', {
         error: String(err),
+        defaultValue: '创建并添加失败: {{error}}',
       }));
     }
   };
@@ -344,7 +343,7 @@ export const AddToGroupModal = ({ isOpen, onClose, accountIds, sourceGroupId, on
         <div className="modal-header">
           <h2>
             <FolderPlus size={18} />
-            {sourceGroupId ? t('accounts.groups.moveToGroup') : t('accounts.groups.addToGroup')}
+            {t('accounts.groups.addToGroup', '添加至分组')}
           </h2>
           <button className="modal-close" onClick={onClose}>
             <X size={18} />
@@ -358,7 +357,7 @@ export const AddToGroupModal = ({ isOpen, onClose, accountIds, sourceGroupId, on
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') handleCreateAndAdd(); }}
-              placeholder={t('accounts.groups.createAndAdd')}
+              placeholder={t('accounts.groups.createAndAdd', '新建分组并添加...')}
               maxLength={30}
             />
             <button
@@ -372,7 +371,7 @@ export const AddToGroupModal = ({ isOpen, onClose, accountIds, sourceGroupId, on
 
           {groups.length > 0 && (
             <div className="add-to-group-list">
-              {groups.filter((g) => g.id !== sourceGroupId).map((group) => (
+              {groups.map((group) => (
                 <div
                   key={group.id}
                   className="add-to-group-item"
@@ -401,4 +400,4 @@ export const AddToGroupModal = ({ isOpen, onClose, accountIds, sourceGroupId, on
   );
 };
 
-export default AccountGroupModal;
+export default CodexAccountGroupModal;

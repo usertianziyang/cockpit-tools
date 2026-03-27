@@ -499,3 +499,28 @@ pub async fn codex_wakeup_run_task(
 ) -> Result<codex_wakeup::CodexWakeupBatchResult, String> {
     codex_wakeup_scheduler::run_task_now(Some(&app), &task_id, "manual_task", run_id).await
 }
+
+// ─── Codex 账号分组持久化 ────────────────────────────────────────────
+
+const CODEX_GROUPS_FILE: &str = "codex_account_groups.json";
+
+#[tauri::command]
+pub async fn load_codex_account_groups() -> Result<String, String> {
+    let home = dirs::home_dir().ok_or("Cannot find home directory")?;
+    let path = home.join(".antigravity_cockpit").join(CODEX_GROUPS_FILE);
+    if !path.exists() {
+        return Ok("[]".to_string());
+    }
+    std::fs::read_to_string(&path).map_err(|e| format!("Failed to read codex groups: {}", e))
+}
+
+#[tauri::command]
+pub async fn save_codex_account_groups(data: String) -> Result<(), String> {
+    let home = dirs::home_dir().ok_or("Cannot find home directory")?;
+    let dir = home.join(".antigravity_cockpit");
+    if !dir.exists() {
+        std::fs::create_dir_all(&dir).map_err(|e| format!("Failed to create dir: {}", e))?;
+    }
+    let path = dir.join(CODEX_GROUPS_FILE);
+    std::fs::write(&path, data).map_err(|e| format!("Failed to write codex groups: {}", e))
+}

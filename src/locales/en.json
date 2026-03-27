@@ -861,7 +861,9 @@
       "editTitle": "Edit Group",
       "ungrouped": "Ungrouped",
       "currentGroupLabel": "Current Group",
-      "accountPickerEmpty": "No matching accounts"
+      "accountPickerEmpty": "No matching accounts",
+      "filterHint": "{{count}} group(s) selected for filtering",
+      "filterToggle": "Check to filter by this group"
     }
   },
   "overview": {

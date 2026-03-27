@@ -344,6 +344,8 @@ pub fn run() {
             commands::codex::codex_wakeup_release_scope,
             commands::codex::codex_wakeup_test,
             commands::codex::codex_wakeup_run_task,
+            commands::codex::load_codex_account_groups,
+            commands::codex::save_codex_account_groups,
             // GitHub Copilot Commands
             commands::github_copilot::list_github_copilot_accounts,
             commands::github_copilot::delete_github_copilot_account,

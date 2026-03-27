@@ -861,7 +861,9 @@
       "editTitle": "编辑分组",
       "ungrouped": "未分组",
       "currentGroupLabel": "当前分组",
-      "accountPickerEmpty": "没有符合条件的账号"
+      "accountPickerEmpty": "没有符合条件的账号",
+      "filterHint": "已勾选 {{count}} 个分组做筛选",
+      "filterToggle": "勾选以筛选此分组"
     }
   },
   "overview": {
