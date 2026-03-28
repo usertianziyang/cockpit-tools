@@ -2672,7 +2672,14 @@
       "streakDays": "{{days}} 天",
       "streakRewardCountdown": "再签 {{days}} 天获大礼包",
       "streakRewardToday": "今日可获得大礼包!",
-      "recentDates": "近期签到："
+      "recentDates": "近期签到：",
+      "quotaCategory": {
+        "base": "基础体验包",
+        "activity": "活动赠送包",
+        "extra": "加量包",
+        "other": "其他",
+        "empty": "暂无配额数据"
+      }
     }
   },
   "workbuddy": {

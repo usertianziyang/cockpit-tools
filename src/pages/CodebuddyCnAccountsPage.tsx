@@ -10,13 +10,12 @@ import { TagEditModal } from '../components/TagEditModal';
 import { ExportJsonModal } from '../components/ExportJsonModal';
 import { ModalErrorMessage } from '../components/ModalErrorMessage';
 import {
-  CB_PACKAGE_CODE,
   CodebuddyAccount,
-  CodebuddyOfficialQuotaResource,
   getCodebuddyAccountDisplayEmail,
   getCodebuddyOfficialQuotaModel,
   getCodebuddyPlanBadge,
   getCodebuddyUsage,
+  getCodebuddyQuotaCategoryGroups,
 } from '../types/codebuddy';
 import { QuickSettingsPopover } from '../components/QuickSettingsPopover';
 import { useProviderAccountsPage } from '../hooks/useProviderAccountsPage';
@@ -24,6 +23,7 @@ import { PlatformOverviewTabsHeader, PlatformOverviewTab } from '../components/p
 import { CodebuddyCnInstancesContent } from './CodebuddyCnInstancesPage';
 import { DosageNotifyUsageStatus } from '../components/platform/DosageNotifyUsageStatus';
 import { CodeBuddyCNCheckinModal } from '../components/codebuddy/CodeBuddyCNCheckinModal';
+import { CodeBuddyQuotaCategoryList } from '../components/codebuddy/CodeBuddyQuotaCategoryList';
 import { MultiSelectFilterDropdown, type MultiSelectFilterOption } from '../components/MultiSelectFilterDropdown';
 
 const CB_FLOW_NOTICE_COLLAPSED_KEY = 'agtools.codebuddycn.flow_notice_collapsed';
@@ -37,19 +37,6 @@ const QUOTA_NUMBER_FORMATTER = new Intl.NumberFormat('en-US', {
 function formatQuotaNumber(value: number): string {
   if (!Number.isFinite(value)) return '0';
   return QUOTA_NUMBER_FORMATTER.format(Math.max(0, value));
-}
-
-function clampPercent(value: number | null | undefined): number {
-  if (typeof value !== 'number' || !Number.isFinite(value)) return 0;
-  return Math.max(0, Math.min(100, value));
-}
-
-function getQuotaClassByRemainPercent(remainPercent: number | null): string {
-  if (remainPercent == null || !Number.isFinite(remainPercent)) return 'high';
-  if (remainPercent <= 10) return 'critical';
-  if (remainPercent <= 30) return 'low';
-  if (remainPercent <= 60) return 'medium';
-  return 'high';
 }
 
 export function CodebuddyCnAccountsPage() {
@@ -260,8 +247,8 @@ export function CodebuddyCnAccountsPage() {
   const resolveGroupLabel = (groupKey: string) =>
     groupKey === untaggedKey ? t('accounts.defaultGroup', '默认分组') : groupKey;
 
-  const formatQuotaDateTime = useCallback((timeMs: number | null) => {
-    if (timeMs == null || !Number.isFinite(timeMs)) return null;
+  const formatQuotaDateTime = useCallback((timeMs: number | null): string => {
+    if (timeMs == null || !Number.isFinite(timeMs)) return '';
     const date = new Date(timeMs);
     if (locale.startsWith('zh')) {
       const year = date.getFullYear();
@@ -283,91 +270,16 @@ export function CodebuddyCnAccountsPage() {
     });
   }, [locale]);
 
-  const resolveResourceTimeText = useCallback((resource: CodebuddyOfficialQuotaResource, isExtra: boolean) => {
-    if (isExtra) return null;
-    const isBase = resource.isBasePackage;
-    const primaryTimeText = formatQuotaDateTime(isBase ? resource.refreshAt : resource.expireAt);
-    if (primaryTimeText) {
-      return isBase
-        ? t('codebuddy.quotaQuery.updatedAt', '下次刷新时间：{{time}}', { time: primaryTimeText })
-        : t('codebuddy.quotaQuery.expireAt', '到期时间：{{time}}', { time: primaryTimeText });
-    }
-    const fallbackTimeText = formatQuotaDateTime(isBase ? resource.expireAt : resource.refreshAt);
-    if (fallbackTimeText) {
-      return isBase
-        ? t('codebuddy.quotaQuery.expireAt', '到期时间：{{time}}', { time: fallbackTimeText })
-        : t('codebuddy.quotaQuery.updatedAt', '下次刷新时间：{{time}}', { time: fallbackTimeText });
-    }
-    return null;
-  }, [formatQuotaDateTime, t]);
-
-  const resolveResourcePackageTitle = useCallback((resource: CodebuddyOfficialQuotaResource, isExtra: boolean) => {
-    if (isExtra || resource.packageCode === CB_PACKAGE_CODE.extra) {
-      return t('codebuddy.extraCredit.title', '加量包');
-    }
-    if (resource.packageCode === CB_PACKAGE_CODE.activity) {
-      return t('codebuddy.quotaQuery.packageTitle.activity', '活动赠送包');
-    }
-    if (
-      resource.packageCode === CB_PACKAGE_CODE.free ||
-      resource.packageCode === CB_PACKAGE_CODE.gift ||
-      resource.packageCode === CB_PACKAGE_CODE.freeMon
-    ) {
-      return t('codebuddy.quotaQuery.packageTitle.base', '基础体验包');
-    }
-    if (
-      resource.packageCode === CB_PACKAGE_CODE.proMon ||
-      resource.packageCode === CB_PACKAGE_CODE.proYear
-    ) {
-      return t('codebuddy.quotaQuery.packageTitle.pro', '专业版订阅');
-    }
-    return resource.packageName || t('codebuddy.quotaQuery.packageUnknown', '套餐信息未知');
-  }, [t]);
-
-  const renderResourceQuotaItems = useCallback((account: CodebuddyAccount, variant: 'card' | 'table') => {
-    const model = getCodebuddyOfficialQuotaModel(account);
-    const extraResource: CodebuddyOfficialQuotaResource = {
-      ...model.extra,
-      packageName: t('codebuddy.extraCredit.title', '加量包'),
-    };
-    const allResources = [...model.resources, extraResource];
-
+  const renderResourceQuotaItems = useCallback((account: CodebuddyAccount, _variant: 'card' | 'table') => {
+    const groups = getCodebuddyQuotaCategoryGroups(account, t as (key: string, defaultValue?: string) => string);
     return (
-      <div className="codebuddy-official-quota-list">
-        {allResources.map((resource, idx) => {
-          const isExtra = idx === allResources.length - 1;
-          const quotaClass = getQuotaClassByRemainPercent(resource.remainPercent);
-          const usedPercent = clampPercent(resource.usedPercent);
-          const quotaValueText = `${formatQuotaNumber(resource.used)} / ${formatQuotaNumber(resource.total)}`;
-          const timeText = resolveResourceTimeText(resource, isExtra);
-          const packageName = resolveResourcePackageTitle(resource, isExtra);
-
-          return (
-            <div key={`${account.id}-${resource.packageCode || 'pkg'}-${idx}`} className="codebuddy-official-quota-row">
-              <div className="quota-header">
-                <span className="quota-label" title={packageName}>{packageName}</span>
-                <span className={`quota-pct ${quotaClass}`}>{quotaValueText}</span>
-              </div>
-              {variant === 'card' ? (
-                <div className="quota-bar-track">
-                  <div className={`quota-bar ${quotaClass}`} style={{ width: `${usedPercent}%` }} />
-                </div>
-              ) : (
-                <div className="quota-progress-track">
-                  <div className={`quota-progress-bar ${quotaClass}`} style={{ width: `${usedPercent}%` }} />
-                </div>
-              )}
-              {timeText ? (
-                <div className="codebuddy-official-quota-meta-wrap">
-                  <span className="codebuddy-official-quota-meta">{timeText}</span>
-                </div>
-              ) : null}
-            </div>
-          );
-        })}
-      </div>
+      <CodeBuddyQuotaCategoryList
+        groups={groups}
+        formatNumber={formatQuotaNumber}
+        formatDateTime={formatQuotaDateTime}
+      />
     );
-  }, [resolveResourcePackageTitle, resolveResourceTimeText, t]);
+  }, [t]);
 
   const renderUsageInfo = useCallback((account: CodebuddyAccount) => {
     const usage = getCodebuddyUsage(account);

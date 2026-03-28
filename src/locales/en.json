@@ -2672,7 +2672,14 @@
       "streakDays": "{{days}} days",
       "streakRewardCountdown": "{{days}} more days for bonus reward",
       "streakRewardToday": "Bonus reward available today!",
-      "recentDates": "Recent: "
+      "recentDates": "Recent: ",
+      "quotaCategory": {
+        "base": "Base Package",
+        "activity": "Activity Bonus",
+        "extra": "Extra Credits",
+        "other": "Other",
+        "empty": "No quota data"
+      }
     }
   },
   "workbuddy": {

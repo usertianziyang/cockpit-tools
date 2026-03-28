@@ -604,3 +604,108 @@ export function getCodebuddyQuotaDisplayItems(account: CodebuddyAccount, _t: (ke
 
   return items; // 返回所有项，由 UI 层决定如何展示
 }
+
+// ==================== 4 类分组聚合展示 ====================
+
+/** 配额分组类型 */
+export type QuotaCategory = 'base' | 'activity' | 'extra' | 'other';
+
+/** 配额分组聚合项 */
+export interface QuotaCategoryGroup {
+  key: QuotaCategory;
+  label: string;
+  used: number;
+  total: number;
+  remain: number;
+  usedPercent: number;
+  remainPercent: number | null;
+  quotaClass: string;
+  items: CodebuddyOfficialQuotaResource[];
+  visible: boolean; // 总额度 > 0 才展示
+}
+
+/** 获取 4 类分组聚合的配额数据 */
+export function getCodebuddyQuotaCategoryGroups(
+  account: CodebuddyAccount,
+  t: (key: string, defaultValue?: string, options?: Record<string, unknown>) => string
+): QuotaCategoryGroup[] {
+  const model = getCodebuddyOfficialQuotaModel(account);
+
+  // 分类资源
+  const baseItems: CodebuddyOfficialQuotaResource[] = [];
+  const activityItems: CodebuddyOfficialQuotaResource[] = [];
+  const extraItems: CodebuddyOfficialQuotaResource[] = [];
+  const otherItems: CodebuddyOfficialQuotaResource[] = [];
+
+  // 处理基础资源
+  for (const resource of model.resources) {
+    const code = resource.packageCode;
+    if (
+      code === CB_PACKAGE_CODE.free ||
+      code === CB_PACKAGE_CODE.gift ||
+      code === CB_PACKAGE_CODE.freeMon ||
+      code === CB_PACKAGE_CODE.proMon ||
+      code === CB_PACKAGE_CODE.proYear
+    ) {
+      baseItems.push(resource);
+    } else if (code === CB_PACKAGE_CODE.activity) {
+      activityItems.push(resource);
+    } else {
+      otherItems.push(resource);
+    }
+  }
+
+  // 加量包
+  if (model.extra.total > 0 || model.extra.remain > 0 || model.extra.used > 0) {
+    extraItems.push(model.extra);
+  }
+
+  // 聚合计算函数
+  const aggregate = (items: CodebuddyOfficialQuotaResource[]): Omit<QuotaCategoryGroup, 'key' | 'label' | 'items' | 'visible'> => {
+    const total = items.reduce((sum, r) => sum + r.total, 0);
+    const remain = items.reduce((sum, r) => sum + r.remain, 0);
+    const used = items.reduce((sum, r) => sum + r.used, 0);
+    const usedPercent = total > 0 ? Math.max(0, Math.min(100, (used / total) * 100)) : 0;
+    const remainPercent = total > 0 ? Math.max(0, Math.min(100, (remain / total) * 100)) : null;
+    const quotaClass = remainPercent != null
+      ? remainPercent <= 10 ? 'critical' : remainPercent <= 30 ? 'low' : remainPercent <= 60 ? 'medium' : 'high'
+      : 'high';
+    return { total, remain, used, usedPercent, remainPercent, quotaClass };
+  };
+
+  const baseAgg = aggregate(baseItems);
+  const activityAgg = aggregate(activityItems);
+  const extraAgg = aggregate(extraItems);
+  const otherAgg = aggregate(otherItems);
+
+  return [
+    {
+      key: 'base',
+      label: t('codebuddy.quotaCategory.base', '基础体验包'),
+      ...baseAgg,
+      items: baseItems,
+      visible: baseAgg.total > 0,
+    },
+    {
+      key: 'activity',
+      label: t('codebuddy.quotaCategory.activity', '活动赠送包'),
+      ...activityAgg,
+      items: activityItems,
+      visible: activityAgg.total > 0,
+    },
+    {
+      key: 'extra',
+      label: t('codebuddy.quotaCategory.extra', '加量包'),
+      ...extraAgg,
+      items: extraItems,
+      visible: extraAgg.total > 0,
+    },
+    {
+      key: 'other',
+      label: t('codebuddy.quotaCategory.other', '其他'),
+      ...otherAgg,
+      items: otherItems,
+      visible: otherAgg.total > 0,
+    },
+  ];
+}
