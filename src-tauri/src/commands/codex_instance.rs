@@ -80,6 +80,63 @@ fn resolve_local_account_id() -> Option<String> {
     Some(account.id)
 }
 
+async fn inject_bound_account_to_profile(
+    profile_dir: &Path,
+    bind_account_id: &str,
+) -> Result<(), String> {
+    if modules::codex_instance::is_api_service_bind_account_id(bind_account_id) {
+        let provider_before =
+            modules::codex_session_visibility::read_history_visibility_provider_for_dir(profile_dir)
+                .map(Some)
+                .unwrap_or_else(|error| {
+                    modules::logger::log_warn(&format!(
+                        "实例切换 API 服务前读取 provider 失败，跳过自动修复预判: {}",
+                        error
+                    ));
+                    None
+                });
+
+        modules::codex_local_access::activate_local_access_for_dir(profile_dir).await?;
+
+        let provider_after =
+            modules::codex_session_visibility::read_history_visibility_provider_for_dir(profile_dir)
+                .map(Some)
+                .unwrap_or_else(|error| {
+                    modules::logger::log_warn(&format!(
+                        "实例切换 API 服务后读取 provider 失败，跳过自动修复可见性: {}",
+                        error
+                    ));
+                    None
+                });
+        let should_repair_visibility =
+            match (provider_before.as_deref(), provider_after.as_deref()) {
+                (Some(before), Some(after)) => before != after,
+                (None, Some(_)) => true,
+                _ => false,
+            };
+        if should_repair_visibility {
+            match modules::codex_session_visibility::repair_session_visibility_across_instances() {
+                Ok(summary) => {
+                    modules::logger::log_info(&format!(
+                        "实例切换 API 服务后已自动执行历史会话可见性修复: {}",
+                        summary.message
+                    ));
+                }
+                Err(error) => {
+                    modules::logger::log_warn(&format!(
+                        "实例 API 服务切换成功，但自动修复历史会话可见性失败，请稍后在会话管理中手动补跑: {}",
+                        error
+                    ));
+                }
+            }
+        }
+
+        return Ok(());
+    }
+
+    modules::codex_instance::inject_account_to_profile(profile_dir, bind_account_id).await
+}
+
 fn default_instance_view(
     default_dir: &Path,
     default_settings: &DefaultInstanceSettings,
@@ -406,7 +463,7 @@ pub async fn codex_start_instance(instance_id: String) -> Result<CodexInstancePr
             let _ = modules::codex_instance::update_default_pid(None)?;
         }
         if let Some(ref account_id) = default_bind_account_id {
-            modules::codex_instance::inject_account_to_profile(&default_dir, account_id).await?;
+            inject_bound_account_to_profile(&default_dir, account_id).await?;
         }
 
         if default_settings.launch_mode == InstanceLaunchMode::Cli {
@@ -453,11 +510,7 @@ pub async fn codex_start_instance(instance_id: String) -> Result<CodexInstancePr
     }
 
     if let Some(ref account_id) = instance.bind_account_id {
-        modules::codex_instance::inject_account_to_profile(
-            Path::new(&instance.user_data_dir),
-            account_id,
-        )
-        .await?;
+        inject_bound_account_to_profile(Path::new(&instance.user_data_dir), account_id).await?;
     }
 
     if instance.launch_mode == InstanceLaunchMode::Cli {

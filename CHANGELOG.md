@@ -7,6 +7,23 @@ All notable changes to Cockpit Tools will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
+## [0.22.0] - 2026-04-18
+
+### Added
+- **Merged upstream workspace/CLI changes from PR #490 (`dcdeda2`, based on `ca5aade`)**: the repository is migrated to a Cargo Workspace, introduces `cockpit-core` as shared Rust logic, and initializes `cockpit-cli` with the first account list/switch flow for Cursor and Gemini.
+- **Codex now includes full local API Service management on the account pages**: an inline service card plus a dedicated panel can manage collection members, API key visibility/reset, service port, direct activate/test actions, and account collection edits in one workflow.
+- **API Service now records and displays usage metrics for totals and per-account views**: request counts, token usage (input/output/cache/reasoning), average latency, and success rate are all visible in the service panel.
+
+### Changed
+- **Integrated Codex account/export adjustments from `5a2d970`**: Codex import now preserves `auth_file_plan_type` (`prolite`/`promax`) from file metadata and uses it in plan badges (`PRO 5x` / `PRO 20x`); `sub2api` export payload now includes `exported_at`, `type/version`, `proxies`, and per-account `concurrency/priority`.
+- **Codex instance binding now supports a dedicated API Service target (`__api_service__`)**: account pickers, instance search, and Codex instance labels now recognize and display API Service mode consistently.
+- **Starting a Codex instance in API Service mode now applies the switch on the real profile directory**: startup uses the same persisted on-disk path as normal instance switching, and triggers history-visibility repair when the effective provider changes.
+- **Activating API Service from Codex accounts now syncs default runtime pointers**: Cockpit clears the default current-account pointer and updates the default Codex instance binding to API Service mode.
+- **Cockpit startup now auto-restores saved local API gateway runtime state**: previously enabled API Service settings are resumed without manual reactivation.
+- **Codex quota error messaging for network failures is now normalized**: manual-refresh hints no longer expose raw backend error details.
+- **New API Service locale keys are now fully synchronized across all supported locales**: `zh-CN`, `en-US`, `en`, and the remaining non-English locale packs all ship with matching keys.
+
+---
 ## [0.21.4] - 2026-04-16
 
 ### Added

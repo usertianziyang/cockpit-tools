@@ -186,7 +186,7 @@ export interface UseProviderAccountsPageReturn {
 
   // Selection
   selected: Set<string>;
-  setSelected: (s: Set<string>) => void;
+  setSelected: Dispatch<SetStateAction<Set<string>>>;
   toggleSelect: (id: string) => void;
   toggleSelectAll: (filteredIds: string[]) => void;
 
@@ -232,8 +232,15 @@ export interface UseProviderAccountsPageReturn {
   confirmDelete: () => Promise<void>;
 
   // Messages
-  message: { text: string; tone?: 'error' } | null;
-  setMessage: (msg: { text: string; tone?: 'error' } | null) => void;
+  message: { text: string; tone?: 'error' | 'success' } | null;
+  setMessage: (
+    msg:
+      | {
+          text: string;
+          tone?: 'error' | 'success';
+        }
+      | null
+  ) => void;
 
   // Export
   exporting: boolean;
@@ -594,7 +601,7 @@ export function useProviderAccountsPage<TAccount extends ProviderAccountBase>(
     set: setDeleteConfirmError,
   } = useModalErrorState();
   const [deleting, setDeleting] = useState(false);
-  const [message, setMessage] = useState<{ text: string; tone?: 'error' } | null>(null);
+  const [message, setMessage] = useState<{ text: string; tone?: 'error' | 'success' } | null>(null);
   const setDeleteConfirm = useCallback((value: { ids: string[]; message: string } | null) => {
     setDeleteConfirmError(null);
     rawSetDeleteConfirm(value);

@@ -130,6 +130,10 @@ pub fn run() {
                 modules::web_report::start_server().await;
             });
 
+            tauri::async_runtime::spawn(async {
+                modules::codex_local_access::restore_local_access_gateway().await;
+            });
+
             {
                 let app_handle = app.handle().clone();
                 tauri::async_runtime::spawn(async move {
@@ -392,6 +396,15 @@ pub fn run() {
             commands::codex::save_codex_account_groups,
             commands::codex::load_codex_model_providers,
             commands::codex::save_codex_model_providers,
+            commands::codex::codex_local_access_get_state,
+            commands::codex::codex_local_access_save_accounts,
+            commands::codex::codex_local_access_remove_account,
+            commands::codex::codex_local_access_rotate_api_key,
+            commands::codex::codex_local_access_clear_stats,
+            commands::codex::codex_local_access_update_port,
+            commands::codex::codex_local_access_update_routing_strategy,
+            commands::codex::codex_local_access_set_enabled,
+            commands::codex::codex_local_access_activate,
             // GitHub Copilot Commands
             commands::github_copilot::list_github_copilot_accounts,
             commands::github_copilot::delete_github_copilot_account,

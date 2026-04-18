@@ -7,6 +7,23 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)。
 
 ---
+## [0.22.0] - 2026-04-18
+
+### 新增
+- **已合入上游工作区/CLI 改造（PR #490，`dcdeda2`，基于 `ca5aade`）**：仓库已迁移为 Cargo Workspace，新增 `cockpit-core` 共享 Rust 逻辑层，并初始化 `cockpit-cli`（首版支持 Cursor / Gemini 账号列出与切换）。
+- **Codex 账号页现已补齐本地 API 服务全量管理能力**：提供内联服务卡片与独立服务面板，可在同一流程完成集合成员维护、密钥显示/重置、服务端口设置、直接启动/测试，以及成员集合编辑。
+- **API 服务现已记录并展示总量与按账号统计**：服务面板可直接查看请求数、Token 使用（输入/输出/缓存/思考）、平均延迟与成功率。
+
+### 变更
+- **已并入 `5a2d970` 的 Codex 调整**：导入时会保留 `auth_file_plan_type`（`prolite`/`promax`）并用于套餐徽标展示（`PRO 5x` / `PRO 20x`）；`sub2api` 导出结构新增 `exported_at`、`type/version`、`proxies` 及账号级 `concurrency/priority` 字段。
+- **Codex 实例绑定现已支持独立 API 服务目标（`__api_service__`）**：账号选择器、实例搜索与实例列表标签现已统一识别并展示 API 服务模式。
+- **API 服务模式下启动 Codex 实例现已写入真实实例目录配置**：启动链路与普通实例切换一致走真实落盘路径，并在 provider 实际变化时自动触发历史可见性修复。
+- **从 Codex 账号页激活 API 服务时，默认运行态指针现已同步**：会清空默认 current account 指针，并把默认 Codex 实例绑定更新为 API 服务模式。
+- **Cockpit 启动时现会自动恢复已保存的本地 API 网关运行态**：已启用的 API 服务配置无需每次手动重新激活。
+- **Codex 配额网络失败提示现已统一收敛**：手动刷新提示不再直接回显后端原始错误详情。
+- **API 服务新增文案现已覆盖全部支持语言并保持 key 对齐**：`zh-CN`、`en-US`、`en` 以及其余非英语语言包均已同步补齐。
+
+---
 ## [0.21.4] - 2026-04-16
 
 ### 新增

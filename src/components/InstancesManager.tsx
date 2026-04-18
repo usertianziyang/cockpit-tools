@@ -27,6 +27,7 @@ import {
 import { confirm as confirmDialog, open } from "@tauri-apps/plugin-dialog";
 import md5 from "blueimp-md5";
 import {
+  CODEX_API_SERVICE_BIND_ID,
   InstanceInitMode,
   InstanceLaunchMode,
   InstanceProfile,
@@ -313,6 +314,29 @@ export function InstancesManager<TAccount extends AccountLike>({
     () => resolveFloatingCardPlatformId(appType),
     [appType],
   );
+  const resolveApiServiceLabel = useCallback(
+    () => t("codex.localAccess.title", "API 服务"),
+    [t],
+  );
+  const isApiServiceBindId = useCallback(
+    (value?: string | null) =>
+      isCodexApp && value === CODEX_API_SERVICE_BIND_ID,
+    [isCodexApp],
+  );
+  const resolveBoundAccount = useCallback(
+    (bindAccountId?: string | null) => {
+      if (!bindAccountId) {
+        return { account: null, missing: false, isApiService: false };
+      }
+      if (isApiServiceBindId(bindAccountId)) {
+        return { account: null, missing: false, isApiService: true };
+      }
+      const account =
+        accounts.find((item) => item.id === bindAccountId) || null;
+      return { account, missing: !account, isApiService: false };
+    },
+    [accounts, isApiServiceBindId],
+  );
 
   const markInstanceStarting = useCallback((instanceId: string) => {
     setStartingInstanceIds((prev) =>
@@ -436,20 +460,29 @@ export function InstancesManager<TAccount extends AccountLike>({
       const displayName = instance.isDefault
         ? t("instances.defaultName", "默认实例")
         : instance.name || "";
-      const account = instance.bindAccountId
-        ? accounts.find((item) => item.id === instance.bindAccountId) || null
-        : null;
-      const accountText = account
-        ? getAccountSearchText
-          ? getAccountSearchText(account)
-          : account.email
-        : "";
+      const { account, isApiService } = resolveBoundAccount(
+        instance.bindAccountId,
+      );
+      const accountText = isApiService
+        ? resolveApiServiceLabel()
+        : account
+          ? getAccountSearchText
+            ? getAccountSearchText(account)
+            : account.email
+          : "";
       const haystack = [displayName, accountText, instance.userDataDir || ""]
         .join(" ")
         .toLowerCase();
       return haystack.includes(query);
     });
-  }, [accounts, getAccountSearchText, searchQuery, sortedInstances, t]);
+  }, [
+    getAccountSearchText,
+    resolveApiServiceLabel,
+    resolveBoundAccount,
+    searchQuery,
+    sortedInstances,
+    t,
+  ]);
 
   const defaultRoot = defaults?.rootDir ?? "";
 
@@ -1004,12 +1037,7 @@ export function InstancesManager<TAccount extends AccountLike>({
   };
 
   const resolveAccount = (instance: InstanceProfile) => {
-    if (!instance.bindAccountId) {
-      return { account: null, missing: false };
-    }
-    const account =
-      accounts.find((item) => item.id === instance.bindAccountId) || null;
-    return { account, missing: !account };
+    return resolveBoundAccount(instance.bindAccountId);
   };
 
   const selectedCopySourceInstance = useMemo(() => {
@@ -1148,6 +1176,25 @@ export function InstancesManager<TAccount extends AccountLike>({
           </span>
         </button>
       )}
+      {isCodexApp && (
+        <button
+          type="button"
+          className={`account-select-item ${value === CODEX_API_SERVICE_BIND_ID && !isFollowingCurrent ? "active" : ""}`}
+          data-account-select-active={
+            value === CODEX_API_SERVICE_BIND_ID && !isFollowingCurrent
+              ? "true"
+              : undefined
+          }
+          onClick={() => {
+            onChange(CODEX_API_SERVICE_BIND_ID);
+            onClose();
+          }}
+        >
+          <span className="account-select-email">
+            {resolveApiServiceLabel()}
+          </span>
+        </button>
+      )}
       {visibleAccounts.map((account) => (
         <button
           type="button"
@@ -1173,7 +1220,10 @@ export function InstancesManager<TAccount extends AccountLike>({
           {renderAccountQuotaPreview(account)}
         </button>
       ))}
-      {visibleAccounts.length === 0 ? (
+      {visibleAccounts.length === 0 &&
+      !isCodexApp &&
+      !allowUnbound &&
+      !allowFollowCurrent ? (
         <div className="account-select-empty">
           {t("common.noData", "暂无数据")}
         </div>
@@ -1314,7 +1364,8 @@ export function InstancesManager<TAccount extends AccountLike>({
       }
     }, [disabled, isOpen, onOpenChange]);
 
-    const selectedAccount = accounts.find((item) => item.id === value) || null;
+    const isApiServiceSelected = isApiServiceBindId(value);
+    const selectedAccount = resolveBoundAccount(value).account;
     const basePlaceholder =
       placeholder ||
       (allowUnbound
@@ -1325,6 +1376,8 @@ export function InstancesManager<TAccount extends AccountLike>({
       : isFollowingCurrent
         ? maskAccountText(selectedAccount?.email) ||
           t("instances.form.followCurrent", "跟随当前账号")
+        : isApiServiceSelected
+          ? resolveApiServiceLabel()
         : maskAccountText(selectedAccount?.email) || basePlaceholder;
     const selectedBadge =
       !missing && selectedAccount
@@ -1522,7 +1575,8 @@ export function InstancesManager<TAccount extends AccountLike>({
       setTagFilter([]);
     }, [open]);
 
-    const selectedAccount = accounts.find((item) => item.id === value) || null;
+    const isApiServiceSelected = isApiServiceBindId(value);
+    const selectedAccount = resolveBoundAccount(value).account;
     const basePlaceholder =
       placeholder ||
       (allowUnbound
@@ -1533,6 +1587,8 @@ export function InstancesManager<TAccount extends AccountLike>({
       : isFollowingCurrent
         ? maskAccountText(selectedAccount?.email) ||
           t("instances.form.followCurrent", "跟随当前账号")
+        : isApiServiceSelected
+          ? resolveApiServiceLabel()
         : maskAccountText(selectedAccount?.email) || basePlaceholder;
     const selectedBadge =
       !missing && selectedAccount
@@ -1911,7 +1967,10 @@ export function InstancesManager<TAccount extends AccountLike>({
             <div>{t("instances.columns.actions", "操作")}</div>
           </div>
           {filteredInstances.map((instance) => {
-            const { missing: accountMissing } = resolveAccount(instance);
+            const {
+              missing: accountMissing,
+              isApiService: accountIsApiService,
+            } = resolveAccount(instance);
             const accountDisabledByInit =
               !instance.isDefault && instance.initialized === false;
             const isInstanceStarting = startingInstanceIdSet.has(instance.id);
@@ -1941,7 +2000,9 @@ export function InstancesManager<TAccount extends AccountLike>({
                     ? t("instances.status.ready", "已准备")
                     : t("instances.status.stopped", "未运行");
             const canShowFloatingCard =
-              Boolean(instance.bindAccountId) && !accountMissing;
+              Boolean(instance.bindAccountId) &&
+              !accountMissing &&
+              !accountIsApiService;
             const floatingCardActionTitle = canShowFloatingCard
               ? t("instances.actions.showFloatingCard", "显示悬浮框")
               : accountMissing
@@ -2559,6 +2620,7 @@ export function InstancesManager<TAccount extends AccountLike>({
                       onChange={handleFormAccountChange}
                       missing={Boolean(
                         formBindAccountId &&
+                        !isApiServiceBindId(formBindAccountId) &&
                         !accounts.find((item) => item.id === formBindAccountId),
                       )}
                     />

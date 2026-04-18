@@ -3657,6 +3657,9 @@ pub(crate) fn resolve_current_account_id(accounts: &[CodexAccount]) -> Option<St
     if let Ok(settings) = crate::modules::codex_instance::load_default_settings() {
         if let Some(bind_id) = settings.bind_account_id {
             let trimmed = bind_id.trim();
+            if crate::modules::codex_instance::is_api_service_bind_account_id(trimmed) {
+                return None;
+            }
             if !trimmed.is_empty() {
                 return Some(trimmed.to_string());
             }
