@@ -7,6 +7,17 @@ All notable changes to Cockpit Tools will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
+## [0.22.3] - 2026-04-19
+
+### Added
+- **Codex Session Manager now supports per-session Token usage stats on demand**: expanding a session group fetches input/output/total token counts from rollout `token_count` events, shows loading states in-row, and avoids full-file rescans via backend chunked tail parsing plus metadata cache.
+- **Codex local API Service actions now show a risk notice before first start/switch**: starting the service or switching into service mode now requires explicit acknowledgement, with an optional local `don't show again` choice.
+
+### Changed
+- **Codex quick config now uses unified presets across entry points**: Quick Settings, the Model Providers quick-config modal, and the instance editor all support `Default / 516K / 1M / Custom`, write `model_context_window` and `model_auto_compact_token_limit` directly, and validate both fields as positive integers.
+- **Codex instance quick-config now writes to the target instance's real `config.toml`**: backend commands can read/save/open the effective profile path for each instance instead of only targeting the default home.
+
+---
 ## [0.22.2] - 2026-04-18
 
 ### Changed

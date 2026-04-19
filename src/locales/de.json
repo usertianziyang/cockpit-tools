@@ -1683,6 +1683,14 @@
       "hideEntryEffectHide": "API-Service-Eintrag in der Übersicht ausblenden",
       "hideEntryEffectDisable": "Aktuellen API-Service deaktivieren",
       "hideEntryEffectRestore": "Später in den Codex-Einstellungen oder Schnelleinstellungen wieder einschalten",
+      "riskNotice": {
+        "title": "Risikohinweis",
+        "message": "Die aktuellen Codex-API-Funktionen basieren im Kern auf einer Proxy-/Weiterleitungsnutzung. Der offizielle Dienst unterbindet dieses Verhalten derzeit nicht ausdrücklich, aber künftige Richtlinien, Regeln oder die Verfügbarkeit können sich ändern. Wenn du diese Funktion weiter nutzt, bestätigst du, dass du dies zur Kenntnis genommen hast und die damit verbundenen Risiken selbst trägst.",
+        "remember": "Verstanden, nicht erneut anzeigen",
+        "acknowledge": "Verstanden",
+        "continueStart": "Weiter",
+        "continueSwitch": "Weiter"
+      },
       "statsRange": {
         "label": "Zeitraum",
         "daily": "Tag",
@@ -1968,7 +1976,8 @@
       "groupCount": "{{count}} Sitzungen",
     "updatedAt": "Aktualisiert",
     "labels": {
-      "sessionId": "Sitzungs-ID"
+      "sessionId": "Sitzungs-ID",
+      "tokenUsage": "Token-Nutzung"
     },
       "locationRunning": " (wird ausgeführt)",
       "untitled": "Unbenannte Sitzung",

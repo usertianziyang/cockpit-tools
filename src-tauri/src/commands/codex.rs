@@ -50,10 +50,10 @@ pub fn get_codex_quick_config() -> Result<CodexQuickConfig, String> {
 
 #[tauri::command]
 pub fn save_codex_quick_config(
-    context_window_1m: bool,
+    model_context_window: Option<i64>,
     auto_compact_token_limit: Option<i64>,
 ) -> Result<CodexQuickConfig, String> {
-    codex_account::save_current_quick_config(context_window_1m, auto_compact_token_limit)
+    codex_account::save_current_quick_config(model_context_window, auto_compact_token_limit)
 }
 
 /// 刷新账号资料（团队名/结构）

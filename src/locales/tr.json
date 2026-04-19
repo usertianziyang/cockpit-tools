@@ -1683,6 +1683,14 @@
       "hideEntryEffectHide": "API Hizmeti girişini genel görünümden gizle",
       "hideEntryEffectDisable": "Mevcut API hizmetini devre dışı bırak",
       "hideEntryEffectRestore": "Codex Ayarları veya Hızlı Ayarlar'dan yeniden açabilirsiniz",
+      "riskNotice": {
+        "title": "Risk Uyarısı",
+        "message": "Mevcut Codex API hizmetiyle ilgili özellikler, özünde ters proxy kullanımına dayanır. Şu anda resmi taraf bu davranışı açıkça kısıtlamıyor, ancak ileride politika, kurallar veya kullanılabilirlik değişebilir. Bu özelliği kullanmaya devam ederek durumu anladığınızı ve ilgili riskleri kendiniz üstlendiğinizi kabul etmiş olursunuz.",
+        "remember": "Anladım, bir daha gösterme",
+        "acknowledge": "Anladım",
+        "continueStart": "Devam",
+        "continueSwitch": "Devam"
+      },
       "statsRange": {
         "label": "İstatistik aralığı",
         "daily": "Gün",
@@ -1968,7 +1976,8 @@
       "groupCount": "{{count}} oturum",
     "updatedAt": "Güncellendi",
     "labels": {
-      "sessionId": "Oturum kimliği"
+      "sessionId": "Oturum kimliği",
+      "tokenUsage": "Token kullanımı"
     },
       "locationRunning": " (çalışıyor)",
       "untitled": "Adsız oturum",

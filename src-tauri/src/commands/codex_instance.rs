@@ -1,8 +1,10 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 #[cfg(target_os = "macos")]
 use std::process::Command;
 
 use serde::Serialize;
+use tauri::AppHandle;
+use tauri_plugin_opener::OpenerExt;
 
 use crate::models::{DefaultInstanceSettings, InstanceLaunchMode, InstanceProfile};
 use crate::modules;
@@ -166,6 +168,20 @@ fn default_instance_view(
     }
 }
 
+fn resolve_instance_base_dir(instance_id: &str) -> Result<PathBuf, String> {
+    if instance_id == DEFAULT_INSTANCE_ID {
+        return modules::codex_instance::get_default_codex_home();
+    }
+
+    let store = modules::codex_instance::load_instance_store()?;
+    let instance = store
+        .instances
+        .into_iter()
+        .find(|item| item.id == instance_id)
+        .ok_or("实例不存在")?;
+    Ok(PathBuf::from(instance.user_data_dir))
+}
+
 fn resolve_instance_launch_context(instance_id: &str) -> Result<CodexLaunchContext, String> {
     if instance_id == DEFAULT_INSTANCE_ID {
         let default_settings = modules::codex_instance::load_default_settings()?;
@@ -309,6 +325,43 @@ pub async fn codex_list_instances() -> Result<Vec<CodexInstanceProfileView>, Str
 }
 
 #[tauri::command]
+pub async fn codex_get_instance_quick_config(
+    instance_id: String,
+) -> Result<crate::models::codex::CodexQuickConfig, String> {
+    let base_dir = resolve_instance_base_dir(instance_id.as_str())?;
+    modules::codex_account::read_quick_config_from_config_toml(&base_dir)
+}
+
+#[tauri::command]
+pub async fn codex_save_instance_quick_config(
+    instance_id: String,
+    model_context_window: Option<i64>,
+    auto_compact_token_limit: Option<i64>,
+) -> Result<crate::models::codex::CodexQuickConfig, String> {
+    let base_dir = resolve_instance_base_dir(instance_id.as_str())?;
+    modules::codex_account::save_quick_config_for_base_dir(
+        &base_dir,
+        model_context_window,
+        auto_compact_token_limit,
+    )
+}
+
+#[tauri::command]
+pub async fn codex_open_instance_config_toml(
+    app: AppHandle,
+    instance_id: String,
+) -> Result<(), String> {
+    let base_dir = resolve_instance_base_dir(instance_id.as_str())?;
+    let path = base_dir.join("config.toml");
+    if !path.exists() {
+        return Err(format!("未找到实例 config.toml 文件: {}", path.display()));
+    }
+    app.opener()
+        .open_path(path.to_string_lossy().to_string(), None::<String>)
+        .map_err(|e| format!("打开实例 config.toml 失败: {}", e))
+}
+
+#[tauri::command]
 pub async fn codex_sync_threads_across_instances(
 ) -> Result<modules::codex_thread_sync::CodexInstanceThreadSyncSummary, String> {
     modules::codex_thread_sync::sync_threads_across_instances()
@@ -324,6 +377,13 @@ pub async fn codex_repair_session_visibility_across_instances(
 pub async fn codex_list_sessions_across_instances(
 ) -> Result<Vec<modules::codex_session_manager::CodexSessionRecord>, String> {
     modules::codex_session_manager::list_sessions_across_instances()
+}
+
+#[tauri::command]
+pub async fn codex_get_session_token_stats_across_instances(
+    session_ids: Vec<String>,
+) -> Result<Vec<modules::codex_session_manager::CodexSessionTokenStats>, String> {
+    modules::codex_session_manager::get_session_token_stats_across_instances(session_ids)
 }
 
 #[tauri::command]

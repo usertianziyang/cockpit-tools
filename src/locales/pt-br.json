@@ -1683,6 +1683,14 @@
       "hideEntryEffectHide": "Ocultar a entrada do serviço de API na visão geral",
       "hideEntryEffectDisable": "Desativar o serviço de API atual",
       "hideEntryEffectRestore": "Você poderá ativá-la novamente nas Configurações do Codex ou nas Configurações rápidas",
+      "riskNotice": {
+        "title": "Aviso de risco",
+        "message": "Os recursos atuais relacionados ao serviço Codex API são, em essência, um uso por proxy reverso. No momento, o serviço oficial não restringe esse comportamento de forma explícita, mas políticas, regras ou disponibilidade podem mudar no futuro. Ao continuar usando esse recurso, você declara que está ciente disso e assume por conta própria os riscos envolvidos.",
+        "remember": "Estou ciente, não mostrar novamente",
+        "acknowledge": "Estou ciente",
+        "continueStart": "Continuar",
+        "continueSwitch": "Continuar"
+      },
       "statsRange": {
         "label": "Período",
         "daily": "Dia",
@@ -1968,7 +1976,8 @@
       "groupCount": "{{count}} sessões",
     "updatedAt": "Atualizado",
     "labels": {
-      "sessionId": "ID da sessão"
+      "sessionId": "ID da sessão",
+      "tokenUsage": "Uso de tokens"
     },
       "locationRunning": " (em execução)",
       "untitled": "Sessão sem título",

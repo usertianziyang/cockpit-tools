@@ -1683,6 +1683,14 @@
       "hideEntryEffectHide": "隱藏總覽中的 API 服務入口",
       "hideEntryEffectDisable": "停用目前的 API 服務",
       "hideEntryEffectRestore": "可在 Codex 設定或快速設定中重新開啟",
+      "riskNotice": {
+        "title": "使用風險提示",
+        "message": "目前 Codex API 服務相關功能，本質上屬於代理轉發使用方式。就目前情況看，官方暫未對此類行為進行明確管控，但後續政策、規則或可用性是否發生變化，仍存在不確定性。繼續使用該功能，即表示您已知悉相關情況，並願意自行承擔可能產生的風險。",
+        "remember": "我已知悉，不再提示",
+        "acknowledge": "我已知悉",
+        "continueStart": "繼續啟動",
+        "continueSwitch": "繼續切號"
+      },
       "statsRange": {
         "label": "統計範圍",
         "daily": "日",
@@ -2051,7 +2059,8 @@
       "groupCount": "{{count}} 條會話",
     "updatedAt": "最近更新",
     "labels": {
-      "sessionId": "會話 ID"
+      "sessionId": "會話 ID",
+      "tokenUsage": "Token 使用"
     },
       "locationRunning": "（執行中）",
       "untitled": "未命名會話",

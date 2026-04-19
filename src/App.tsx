@@ -510,6 +510,7 @@ function MainApp() {
     if (!hasBreakoutSession) return;
     setShowBreakout(true);
   }, [hasBreakoutSession]);
+
   const {
     count: easterEggClickCount,
     registerClick: handleEasterEggTriggerClick,

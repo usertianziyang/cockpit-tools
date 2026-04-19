@@ -1683,6 +1683,14 @@
       "hideEntryEffectHide": "Skrýt položku služby API z přehledu",
       "hideEntryEffectDisable": "Vypnout aktuální službu API",
       "hideEntryEffectRestore": "Později ji lze znovu zapnout v nastavení Codex nebo v rychlém nastavení",
+      "riskNotice": {
+        "title": "Upozornění na riziko",
+        "message": "Současné funkce služby Codex API jsou v podstatě řešením s reverzní proxy. V tuto chvíli proti tomuto chování oficiální služba výslovně nezasahuje, ale budoucí pravidla, zásady nebo dostupnost se mohou změnit. Pokud budete tuto funkci dál používat, potvrzujete, že tomu rozumíte a přijímáte související rizika na vlastní odpovědnost.",
+        "remember": "Rozumím a příště už nezobrazovat",
+        "acknowledge": "Rozumím",
+        "continueStart": "Pokračovat",
+        "continueSwitch": "Pokračovat"
+      },
       "statsRange": {
         "label": "Rozsah statistik",
         "daily": "Den",
@@ -1968,7 +1976,8 @@
       "groupCount": "{{count}} relací",
     "updatedAt": "Aktualizováno",
     "labels": {
-      "sessionId": "ID relace"
+      "sessionId": "ID relace",
+      "tokenUsage": "Využití tokenů"
     },
       "locationRunning": " (spuštěno)",
       "untitled": "Nepojmenovaná relace",

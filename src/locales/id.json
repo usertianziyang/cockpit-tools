@@ -1732,6 +1732,14 @@
       "hideEntryEffectHide": "Sembunyikan entri Layanan API dari ringkasan",
       "hideEntryEffectDisable": "Nonaktifkan layanan API saat ini",
       "hideEntryEffectRestore": "Anda bisa menyalakannya lagi di Pengaturan Codex atau Pengaturan Cepat",
+      "riskNotice": {
+        "title": "Pemberitahuan Risiko",
+        "message": "Fitur terkait layanan Codex API saat ini pada dasarnya menggunakan pola proxy terbalik. Untuk saat ini, pihak resmi belum secara tegas membatasi perilaku ini, tetapi kebijakan, aturan, atau ketersediaannya dapat berubah di masa mendatang. Dengan tetap menggunakan fitur ini, Anda menyatakan telah memahami kondisi tersebut dan bersedia menanggung risikonya sendiri.",
+        "remember": "Saya paham, jangan tampilkan lagi",
+        "acknowledge": "Saya paham",
+        "continueStart": "Lanjutkan",
+        "continueSwitch": "Lanjutkan"
+      },
       "statsRange": {
         "label": "Rentang statistik",
         "daily": "Hari",
@@ -2097,7 +2105,8 @@
       "groupCount": "{{count}} sesi",
     "updatedAt": "Diperbarui",
     "labels": {
-      "sessionId": "ID sesi"
+      "sessionId": "ID sesi",
+      "tokenUsage": "Penggunaan token"
     },
       "locationRunning": " (berjalan)",
       "untitled": "Sesi tanpa judul",

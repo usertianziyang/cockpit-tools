@@ -583,13 +583,16 @@ pub fn load_current_quick_config() -> Result<CodexQuickConfig, String> {
 
 fn write_quick_config_to_config_toml(
     base_dir: &Path,
-    context_window_1m: bool,
+    model_context_window: Option<i64>,
     auto_compact_token_limit: Option<i64>,
 ) -> Result<CodexQuickConfig, String> {
     let config_path = get_config_toml_path(base_dir);
     let existing = fs::read_to_string(&config_path).unwrap_or_default();
 
-    if existing.trim().is_empty() && !context_window_1m {
+    if existing.trim().is_empty()
+        && model_context_window.is_none()
+        && auto_compact_token_limit.is_none()
+    {
         return read_quick_config_from_config_toml(base_dir);
     }
 
@@ -601,15 +604,21 @@ fn write_quick_config_to_config_toml(
             .map_err(|e| format!("解析 config.toml 失败: {}", e))?
     };
 
-    if context_window_1m {
-        let compact_limit = auto_compact_token_limit.unwrap_or(CODEX_AUTO_COMPACT_DEFAULT_LIMIT);
+    if let Some(context_window) = model_context_window {
+        if context_window <= 0 {
+            return Err("上下文窗口必须大于 0".to_string());
+        }
+        doc[CODEX_CONFIG_MODEL_CONTEXT_WINDOW_KEY] = value(context_window);
+    } else {
+        let _ = doc.remove(CODEX_CONFIG_MODEL_CONTEXT_WINDOW_KEY);
+    }
+
+    if let Some(compact_limit) = auto_compact_token_limit {
         if compact_limit <= 0 {
             return Err("自动压缩阈值必须大于 0".to_string());
         }
-        doc[CODEX_CONFIG_MODEL_CONTEXT_WINDOW_KEY] = value(CODEX_CONTEXT_WINDOW_1M_VALUE);
         doc[CODEX_CONFIG_MODEL_AUTO_COMPACT_TOKEN_LIMIT_KEY] = value(compact_limit);
     } else {
-        let _ = doc.remove(CODEX_CONFIG_MODEL_CONTEXT_WINDOW_KEY);
         let _ = doc.remove(CODEX_CONFIG_MODEL_AUTO_COMPACT_TOKEN_LIMIT_KEY);
     }
 
@@ -623,14 +632,22 @@ fn write_quick_config_to_config_toml(
 }
 
 pub fn save_current_quick_config(
-    context_window_1m: bool,
+    model_context_window: Option<i64>,
     auto_compact_token_limit: Option<i64>,
 ) -> Result<CodexQuickConfig, String> {
-    write_quick_config_to_config_toml(
+    save_quick_config_for_base_dir(
         &get_codex_home(),
-        context_window_1m,
+        model_context_window,
         auto_compact_token_limit,
     )
+}
+
+pub fn save_quick_config_for_base_dir(
+    base_dir: &Path,
+    model_context_window: Option<i64>,
+    auto_compact_token_limit: Option<i64>,
+) -> Result<CodexQuickConfig, String> {
+    write_quick_config_to_config_toml(base_dir, model_context_window, auto_compact_token_limit)
 }
 
 fn read_api_provider_from_config_toml(base_dir: &Path) -> ApiProviderConfig {
@@ -2987,8 +3004,9 @@ mod tests {
         let config_path = base_dir.join("config.toml");
         fs::write(&config_path, "model = \"gpt-5\"\n").expect("write config");
 
-        let result = write_quick_config_to_config_toml(&base_dir, true, Some(880000))
-            .expect("save quick config");
+        let result =
+            write_quick_config_to_config_toml(&base_dir, Some(1_000_000), Some(880000))
+                .expect("save quick config");
 
         let content = fs::read_to_string(&config_path).expect("read config");
         assert!(content.contains("model_context_window = 1000000"));
@@ -3015,7 +3033,7 @@ mod tests {
         .expect("write config");
 
         let result =
-            write_quick_config_to_config_toml(&base_dir, false, None).expect("save quick config");
+            write_quick_config_to_config_toml(&base_dir, None, None).expect("save quick config");
 
         let content = fs::read_to_string(&config_path).expect("read config");
         assert!(!content.contains("model_context_window"));
@@ -3028,6 +3046,40 @@ mod tests {
         );
         assert_eq!(result.detected_model_context_window, None);
         assert_eq!(result.detected_auto_compact_token_limit, None);
+
+        fs::remove_dir_all(&base_dir).expect("cleanup temp dir");
+    }
+
+    #[test]
+    fn quick_config_can_write_custom_context_window_and_compact_limit() {
+        let base_dir = make_temp_dir("codex-quick-config-custom-write-test");
+        let config_path = base_dir.join("config.toml");
+        fs::write(&config_path, "model = \"gpt-5\"\n").expect("write config");
+
+        let result =
+            write_quick_config_to_config_toml(&base_dir, Some(516_000), Some(460_000))
+                .expect("save quick config");
+
+        let content = fs::read_to_string(&config_path).expect("read config");
+        assert!(content.contains("model_context_window = 516000"));
+        assert!(content.contains("model_auto_compact_token_limit = 460000"));
+        assert!(!result.context_window_1m);
+        assert_eq!(result.auto_compact_token_limit, 460_000);
+        assert_eq!(result.detected_model_context_window, Some(516_000));
+        assert_eq!(result.detected_auto_compact_token_limit, Some(460_000));
+
+        fs::remove_dir_all(&base_dir).expect("cleanup temp dir");
+    }
+
+    #[test]
+    fn quick_config_rejects_non_positive_context_window() {
+        let base_dir = make_temp_dir("codex-quick-config-invalid-context-test");
+        let config_path = base_dir.join("config.toml");
+        fs::write(&config_path, "model = \"gpt-5\"\n").expect("write config");
+
+        let err = write_quick_config_to_config_toml(&base_dir, Some(0), Some(100_000))
+            .expect_err("context window should be rejected");
+        assert!(err.contains("上下文窗口必须大于 0"));
 
         fs::remove_dir_all(&base_dir).expect("cleanup temp dir");
     }

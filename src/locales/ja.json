@@ -1683,6 +1683,14 @@
       "hideEntryEffectHide": "概要から API サービス入口を非表示",
       "hideEntryEffectDisable": "現在の API サービスを無効化",
       "hideEntryEffectRestore": "Codex 設定またはクイック設定から再度有効化できます",
+      "riskNotice": {
+        "title": "リスクに関する注意",
+        "message": "現在の Codex API サービス関連機能は、本質的にはリバースプロキシ型の利用です。現時点では公式がこの挙動を明確に制限していませんが、今後の方針、ルール、提供状況が変わる可能性があります。この機能を引き続き利用する場合は、その点を理解し、関連するリスクを自己責任で負うことに同意したものとみなされます。",
+        "remember": "理解しました。今後は表示しない",
+        "acknowledge": "理解しました",
+        "continueStart": "続行",
+        "continueSwitch": "切り替える"
+      },
       "statsRange": {
         "label": "統計範囲",
         "daily": "日",
@@ -1968,7 +1976,8 @@
       "groupCount": "{{count}} 件のセッション",
     "updatedAt": "更新済み",
     "labels": {
-      "sessionId": "セッション ID"
+      "sessionId": "セッション ID",
+      "tokenUsage": "Token 使用量"
     },
       "locationRunning": "（実行中）",
       "untitled": "無題のセッション",

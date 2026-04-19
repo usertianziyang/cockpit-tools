@@ -1683,6 +1683,14 @@
       "hideEntryEffectHide": "Ẩn mục Dịch vụ API khỏi phần tổng quan",
       "hideEntryEffectDisable": "Tắt dịch vụ API hiện tại",
       "hideEntryEffectRestore": "Bạn có thể bật lại trong Cài đặt Codex hoặc Cài đặt nhanh",
+      "riskNotice": {
+        "title": "Lưu ý rủi ro",
+        "message": "Các tính năng liên quan đến dịch vụ Codex API hiện tại về bản chất là cách dùng thông qua reverse proxy. Ở thời điểm hiện tại, phía chính thức chưa hạn chế rõ ràng hành vi này, nhưng chính sách, quy định hoặc khả năng sử dụng có thể thay đổi trong tương lai. Khi tiếp tục sử dụng tính năng này, bạn xác nhận đã hiểu tình huống này và tự chịu các rủi ro liên quan.",
+        "remember": "Tôi đã hiểu, đừng nhắc lại",
+        "acknowledge": "Tôi đã hiểu",
+        "continueStart": "Tiếp tục",
+        "continueSwitch": "Tiếp tục"
+      },
       "statsRange": {
         "label": "Khoảng thống kê",
         "daily": "Ngày",
@@ -1968,7 +1976,8 @@
       "groupCount": "{{count}} phiên",
     "updatedAt": "Đã cập nhật",
     "labels": {
-      "sessionId": "ID phiên"
+      "sessionId": "ID phiên",
+      "tokenUsage": "Mức dùng token"
     },
       "locationRunning": " (đang chạy)",
       "untitled": "Phiên chưa đặt tên",

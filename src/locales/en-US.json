@@ -435,6 +435,33 @@
       "extraArgs": "Custom launch args",
       "extraArgsPlaceholder": "e.g. --disable-gpu --log-level=2",
       "extraArgsDesc": "Separate args with spaces, quotes supported",
+      "codexQuickConfig": {
+        "title": "Context & Compact Limits",
+        "presetLabel": "Config Preset",
+        "presetHint": "Choose a preset (Default / 516K / 1M), or switch to Custom and fill both fields manually.",
+        "presetDefaultShort": "Default",
+        "presetDefaultDesc": "Remove both fields and use official defaults",
+        "preset516kShort": "516K",
+        "preset516kDesc": "context=516000 / compact=460000",
+        "preset1mShort": "1M",
+        "preset1mDesc": "context=1000000 / compact=900000",
+        "presetCustomShort": "Custom",
+        "presetCustomDesc": "Manually set context and compact values",
+        "contextWindow": "Context Window",
+        "contextWindowHint": "Writes model_context_window. Editable only in Custom mode.",
+        "autoCompactLimit": "Auto-Compact Limit",
+        "autoCompactLimitHint": "Writes model_auto_compact_token_limit. Editable only in Custom mode.",
+        "customDetected": "Custom values were detected in config.toml: model_context_window={{context}}, model_auto_compact_token_limit={{compact}}. Saving will overwrite them with your selected preset.",
+        "partialDetected": "Only one managed field is currently set: model_context_window={{context}}, model_auto_compact_token_limit={{compact}}. Saving will rewrite both fields using the current scheme.",
+        "notSet": "Not set",
+        "loadFailed": "Failed to load the current Codex config: {{error}}",
+        "openConfig": "Open config.toml",
+        "openFailed": "Failed to open config.toml: {{error}}",
+        "validation": {
+          "contextWindowInvalid": "Context window must be an integer greater than 0.",
+          "autoCompactInvalid": "Auto-compact limit must be an integer greater than 0."
+        }
+      },
       "nameRequired": "Please enter an instance name",
       "pathRequired": "Please select an instance directory",
       "bindRequired": "Please select an account to bind"
@@ -1702,6 +1729,14 @@
       "hideEntryEffectHide": "Hide the API service entry from the overview",
       "hideEntryEffectDisable": "Disable the current API service",
       "hideEntryEffectRestore": "You can turn it back on in Codex Settings or Quick Settings",
+      "riskNotice": {
+        "title": "Risk Notice",
+        "message": "The current Codex API service related features are, in essence, a proxy forwarding setup. At the moment, the official service does not explicitly restrict this behavior, but future policy, rules, or availability may change without notice. If you continue to use this feature, you acknowledge the situation and accept the related risks yourself.",
+        "remember": "I understand and do not show this again",
+        "acknowledge": "I Understand",
+        "continueStart": "Continue",
+        "continueSwitch": "Continue Switch"
+      },
       "statsRange": {
         "label": "Stats Range",
         "daily": "Day",
@@ -1885,16 +1920,35 @@
         "openFailed": "Failed to open config.toml: {{error}}",
         "saveSuccess": "Current Codex config saved.",
         "saveFailed": "Failed to save the current Codex config: {{error}}",
+        "presetLabel": "Config Preset",
+        "presetHint": "Choose a preset (Default / 516K / 1M), or switch to Custom and fill both fields manually.",
+        "presetDefaultShort": "Default",
+        "presetDefaultDesc": "Remove both fields and use official defaults",
+        "preset516kShort": "516K",
+        "preset516kDesc": "context=516000 / compact=460000",
+        "preset1mShort": "1M",
+        "preset1mDesc": "context=1000000 / compact=900000",
+        "presetCustomShort": "Custom",
+        "presetCustomDesc": "Manually set context and compact values",
+        "presetDefault": "Default (remove model_context_window / model_auto_compact_token_limit)",
+        "preset516k": "516K (model_context_window = 516000, auto_compact = 460000)",
+        "preset1m": "1M (model_context_window = 1000000, auto_compact = 900000)",
+        "presetCustom": "Custom",
+        "contextWindow": "Context Window",
+        "contextWindowHint": "Writes model_context_window. Editable only in Custom mode.",
         "contextWindow1m": "1M Context Window",
         "contextWindow1mHint": "When enabled, writes model_context_window = 1000000 and manages the auto-compact limit together.",
         "autoCompactLimit": "Auto-Compact Limit",
-        "autoCompactLimitHint": "Writes model_auto_compact_token_limit. Turning off the 1M toggle removes this field together.",
+        "autoCompactLimitHint": "Writes model_auto_compact_token_limit. Editable only in Custom mode.",
         "preview": "Write Preview",
         "previewApply": "Will Write",
         "previewRemove": "Will Remove",
-        "customDetected": "A custom model_context_window = {{context}} was detected in config.toml. Saving will rewrite it using the quick setting below.",
+        "customDetected": "Custom values were detected in config.toml: model_context_window={{context}}, model_auto_compact_token_limit={{compact}}. Saving will overwrite them with your selected preset.",
+        "partialDetected": "Only one managed field is currently set: model_context_window={{context}}, model_auto_compact_token_limit={{compact}}. Saving will rewrite both fields using the current scheme.",
+        "notSet": "Not set",
         "compactMissingDetected": "1M context is already enabled, but the auto-compact limit is missing. Saving will write the default value {{limit}}.",
         "validation": {
+          "contextWindowInvalid": "Context window must be an integer greater than 0.",
           "autoCompactInvalid": "Auto-compact limit must be an integer greater than 0."
         }
       }
@@ -2191,7 +2245,8 @@
     "groupCount": "{{count}} sessions",
     "updatedAt": "Updated",
     "labels": {
-      "sessionId": "Session ID"
+      "sessionId": "Session ID",
+      "tokenUsage": "Token Usage"
     },
     "locationRunning": " (running)",
     "untitled": "Untitled session",
@@ -2428,7 +2483,34 @@
       "configToml": "Codex Config File",
       "openConfigToml": "Open File",
       "openConfigHint": "Quickly open the active Codex config.toml file.",
-      "localAccessEntryVisible": "Show API Service Entry"
+      "localAccessEntryVisible": "Show API Service Entry",
+      "quickConfig": {
+        "title": "Context & Compact Limits",
+        "presetLabel": "Config Preset",
+        "presetHint": "Choose a preset (Default / 516K / 1M), or switch to Custom and fill both fields manually.",
+        "presetDefaultShort": "Default",
+        "presetDefaultDesc": "Remove both fields and use official defaults",
+        "preset516kShort": "516K",
+        "preset516kDesc": "context=516000 / compact=460000",
+        "preset1mShort": "1M",
+        "preset1mDesc": "context=1000000 / compact=900000",
+        "presetCustomShort": "Custom",
+        "presetCustomDesc": "Manually set context and compact values",
+        "contextWindow": "Context Window",
+        "contextWindowHint": "Writes model_context_window. Editable only in Custom mode.",
+        "autoCompactLimit": "Auto-Compact Limit",
+        "autoCompactLimitHint": "Writes model_auto_compact_token_limit. Editable only in Custom mode.",
+        "customDetected": "Custom values were detected in config.toml: model_context_window={{context}}, model_auto_compact_token_limit={{compact}}. Saving will overwrite them with your selected preset.",
+        "partialDetected": "Only one managed field is currently set: model_context_window={{context}}, model_auto_compact_token_limit={{compact}}. Saving will rewrite both fields using the current scheme.",
+        "notSet": "Not set",
+        "loadFailed": "Failed to load the current Codex config: {{error}}",
+        "saveSuccess": "Current Codex config saved.",
+        "saveFailed": "Failed to save the current Codex config: {{error}}",
+        "validation": {
+          "contextWindowInvalid": "Context window must be an integer greater than 0.",
+          "autoCompactInvalid": "Auto-compact limit must be an integer greater than 0."
+        }
+      }
     },
     "githubCopilot": {
       "title": "GitHub Copilot Settings",

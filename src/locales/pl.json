@@ -1683,6 +1683,14 @@
       "hideEntryEffectHide": "Ukryj wpis usługi API w przeglądzie",
       "hideEntryEffectDisable": "Wyłącz bieżącą usługę API",
       "hideEntryEffectRestore": "Możesz go ponownie włączyć w ustawieniach Codex lub w szybkich ustawieniach",
+      "riskNotice": {
+        "title": "Informacja o ryzyku",
+        "message": "Obecne funkcje związane z usługą Codex API opierają się w praktyce na użyciu reverse proxy. Na tę chwilę oficjalna usługa nie ogranicza tego zachowania wprost, ale przyszłe zasady, reguły lub dostępność mogą się zmienić. Kontynuując korzystanie z tej funkcji, potwierdzasz, że rozumiesz tę sytuację i samodzielnie bierzesz na siebie związane z nią ryzyko.",
+        "remember": "Rozumiem, nie pokazuj ponownie",
+        "acknowledge": "Rozumiem",
+        "continueStart": "Dalej",
+        "continueSwitch": "Przełącz"
+      },
       "statsRange": {
         "label": "Zakres statystyk",
         "daily": "Dzień",
@@ -1968,7 +1976,8 @@
       "groupCount": "{{count}} sesji",
     "updatedAt": "Zaktualizowano",
     "labels": {
-      "sessionId": "ID sesji"
+      "sessionId": "ID sesji",
+      "tokenUsage": "Zużycie tokenów"
     },
       "locationRunning": " (uruchomiona)",
       "untitled": "Sesja bez tytułu",
