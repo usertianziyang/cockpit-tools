@@ -761,6 +761,12 @@
       "antigravityStartupWakeupDesc": "Run enabled Antigravity wakeup tasks once after app startup",
       "codexLaunchOnSwitch": "Launch Codex App when switching Codex",
       "codexLaunchOnSwitchDesc": "Start or restart Codex App after switching accounts",
+      "codexRestartSpecifiedAppOnSwitch": "Restart specified app when switching Codex",
+      "codexRestartSpecifiedAppOnSwitchDesc": "When enabled, restart the app at the path below (for plugin-host workflows).",
+      "codexSpecifiedAppPath": "Specified app path",
+      "codexSpecifiedAppPathDesc": "Path of the app to restart together with Codex switching.",
+      "codexSpecifiedAppPathPlaceholder": "For example /Applications/Host.app",
+      "codexSpecifiedAppPathClear": "Clear",
       "codexLocalAccessEntryVisible": "Show API Service Entry",
       "codexLocalAccessEntryVisibleDesc": "Only controls whether the API service entry is shown in the Codex overview. It does not stop the local API service; you can turn it back on here or in Quick Settings.",
       "codexLocalAccessEnabled": "Enable API Service",
@@ -1722,6 +1728,7 @@
       "portSaveSuccess": "API service port updated",
       "routingLabel": "Routing",
       "routingSaveSuccess": "API service routing updated",
+      "serviceTierSaveSuccess": "API service speed updated",
       "routingDescriptionAuto": "Prefer higher-tier accounts with more remaining quota, then rotate within the same tier.",
       "routingDescriptionQuotaHighFirst": "Prefer accounts with more remaining quota.",
       "routingDescriptionQuotaLowFirst": "Prefer accounts with less remaining quota.",
@@ -1766,6 +1773,14 @@
         "quotaLowFirst": "Low Quota First",
         "planHighFirst": "High Plan First",
         "planLowFirst": "Low Plan First"
+      },
+      "serviceTier": {
+        "label": "Speed",
+        "placeholder": "Select speed",
+        "standard": "Standard",
+        "standardHint": "Default speed",
+        "fast": "Fast",
+        "fastHint": "1.5x speed, 2x plan usage"
       },
       "stats": {
         "requests": "Requests",

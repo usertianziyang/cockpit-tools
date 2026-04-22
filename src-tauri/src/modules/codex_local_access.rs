@@ -31,9 +31,11 @@ const MAX_REQUEST_RETRY_ATTEMPTS: usize = 1;
 const UPSTREAM_SEND_RETRY_ATTEMPTS: usize = 3;
 const UPSTREAM_SEND_RETRY_BASE_DELAY: Duration = Duration::from_millis(200);
 const UPSTREAM_SEND_RETRY_MAX_DELAY: Duration = Duration::from_millis(1200);
-const SINGLE_ACCOUNT_STATUS_RETRY_ATTEMPTS: usize = 2;
-const SINGLE_ACCOUNT_STATUS_RETRY_BASE_DELAY: Duration = Duration::from_millis(300);
-const SINGLE_ACCOUNT_STATUS_RETRY_MAX_DELAY: Duration = Duration::from_millis(1500);
+const UPSTREAM_STATUS_RETRY_ATTEMPTS: usize = 4;
+const UPSTREAM_STATUS_RETRY_BASE_DELAY: Duration = Duration::from_secs(1);
+const UPSTREAM_STATUS_RETRY_MAX_DELAY: Duration = Duration::from_secs(8);
+const UPSTREAM_STATUS_RETRY_BUDGET: Duration = Duration::from_secs(24);
+const UPSTREAM_STATUS_RETRY_JITTER_MAX_MS: u64 = 250;
 const MAX_RETRY_CREDENTIALS_PER_REQUEST: usize = 8;
 const RESPONSE_AFFINITY_TTL_MS: i64 = 24 * 60 * 60 * 1000;
 const MAX_RESPONSE_AFFINITY_BINDINGS: usize = 4096;
@@ -60,6 +62,8 @@ const DEFAULT_CODEX_MODELS: &[&str] = &[
 ];
 const CHAT_COMPLETIONS_PATH: &str = "/v1/chat/completions";
 const RESPONSES_PATH: &str = "/v1/responses";
+const SERVICE_TIER_KEY: &str = "service_tier";
+const SERVICE_TIER_FAST: &str = "fast";
 static GATEWAY_RUNTIME: OnceLock<TokioMutex<GatewayRuntime>> = OnceLock::new();
 static GATEWAY_ROUND_ROBIN_CURSOR: AtomicUsize = AtomicUsize::new(0);
 
@@ -183,6 +187,17 @@ fn normalize_model_key(model: &str) -> String {
     model.trim().to_ascii_lowercase()
 }
 
+fn normalize_service_tier_value(value: Option<&str>) -> Option<String> {
+    let Some(value) = value else {
+        return None;
+    };
+    let normalized = value.trim().to_ascii_lowercase();
+    if normalized == SERVICE_TIER_FAST {
+        return Some(SERVICE_TIER_FAST.to_string());
+    }
+    None
+}
+
 fn has_date_snapshot_suffix(value: &str) -> bool {
     let bytes = value.as_bytes();
     bytes.len() == 11
@@ -242,6 +257,40 @@ fn parse_request_body_json(body: &[u8]) -> Option<Value> {
         return None;
     }
     serde_json::from_slice::<Value>(body).ok()
+}
+
+fn apply_service_tier_field(body_obj: &mut Map<String, Value>, service_tier: Option<&str>) {
+    let normalized = normalize_service_tier_value(service_tier);
+    if let Some(value) = normalized {
+        body_obj.insert(SERVICE_TIER_KEY.to_string(), Value::String(value));
+    } else {
+        body_obj.remove(SERVICE_TIER_KEY);
+    }
+}
+
+fn rewrite_passthrough_service_tier(
+    request: &mut ParsedRequest,
+    service_tier: Option<&str>,
+) -> Result<(), String> {
+    let path = request.target.split('?').next().unwrap_or(request.target.as_str()).trim();
+    if !request.method.eq_ignore_ascii_case("POST") {
+        return Ok(());
+    }
+    if path != RESPONSES_PATH && !path.ends_with("/responses") {
+        return Ok(());
+    }
+
+    let Some(mut body_value) = parse_request_body_json(&request.body) else {
+        return Ok(());
+    };
+    let Some(body_obj) = body_value.as_object_mut() else {
+        return Ok(());
+    };
+
+    apply_service_tier_field(body_obj, service_tier);
+    request.body = serde_json::to_vec(&body_value)
+        .map_err(|e| format!("序列化 responses 请求体失败: {}", e))?;
+    Ok(())
 }
 
 fn build_request_routing_hint(request: &ParsedRequest) -> RequestRoutingHint {
@@ -700,6 +749,7 @@ fn extract_message_content_text(content: &Value) -> String {
 
 fn build_responses_body_from_chat_completions(
     body: &Value,
+    service_tier: Option<&str>,
 ) -> Result<(Value, bool, String), String> {
     let request_obj = body
         .as_object()
@@ -728,6 +778,7 @@ fn build_responses_body_from_chat_completions(
     responses_obj.insert("model".to_string(), Value::String(model.clone()));
     responses_obj.insert("input".to_string(), input);
     responses_obj.insert("parallel_tool_calls".to_string(), Value::Bool(true));
+    apply_service_tier_field(&mut responses_obj, service_tier);
     responses_obj.insert(
         "reasoning".to_string(),
         json!({
@@ -807,11 +858,13 @@ fn build_responses_body_from_chat_completions(
 
 fn prepare_gateway_request(
     mut request: ParsedRequest,
+    service_tier: Option<&str>,
 ) -> Result<(ParsedRequest, GatewayResponseAdapter), String> {
     if !is_chat_completions_request(&request.target) {
         if let Some(rewritten_body) = rewrite_request_model_alias(&request.body)? {
             request.body = rewritten_body;
         }
+        rewrite_passthrough_service_tier(&mut request, service_tier)?;
         let request_is_stream = is_stream_request(&request.headers, &request.body);
         return Ok((
             request,
@@ -827,7 +880,7 @@ fn prepare_gateway_request(
         .ok_or("chat/completions 请求体必须是合法 JSON".to_string())?;
     let original_request_body = request.body.clone();
     let (responses_body, stream, requested_model) =
-        build_responses_body_from_chat_completions(&body_value)?;
+        build_responses_body_from_chat_completions(&body_value, service_tier)?;
     request.target = RESPONSES_PATH.to_string();
     request.body = serde_json::to_vec(&responses_body)
         .map_err(|e| format!("序列化 responses 请求体失败: {}", e))?;
@@ -2032,6 +2085,12 @@ fn sanitize_collection(
         collection.updated_at = now_ms();
         changed = true;
     }
+    let normalized_service_tier =
+        normalize_service_tier_value(collection.default_service_tier.as_deref());
+    if collection.default_service_tier != normalized_service_tier {
+        collection.default_service_tier = normalized_service_tier;
+        changed = true;
+    }
 
     let valid_account_ids: HashSet<String> = codex_account::list_accounts_checked()?
         .into_iter()
@@ -2081,6 +2140,7 @@ async fn ensure_runtime_loaded() -> Result<(), String> {
             port: allocate_random_local_port()?,
             api_key: generate_local_api_key(),
             routing_strategy: CodexLocalAccessRoutingStrategy::default(),
+            default_service_tier: None,
             restrict_free_accounts: true,
             account_ids: Vec::new(),
             created_at: now_ms(),
@@ -2413,6 +2473,7 @@ pub async fn save_local_access_accounts(
                 port: allocate_random_local_port()?,
                 api_key: generate_local_api_key(),
                 routing_strategy: CodexLocalAccessRoutingStrategy::default(),
+                default_service_tier: None,
                 restrict_free_accounts: true,
                 account_ids: Vec::new(),
                 created_at: now_ms(),
@@ -2476,6 +2537,55 @@ pub async fn update_local_access_routing_strategy(
     }
 
     collection.routing_strategy = strategy;
+    collection.updated_at = now_ms();
+    save_collection_to_disk(&collection)?;
+
+    {
+        let mut runtime = gateway_runtime().lock().await;
+        runtime.collection = Some(collection);
+        runtime.loaded = true;
+        runtime.last_error = None;
+    }
+
+    snapshot_state().await
+}
+
+pub async fn update_local_access_service_tier(
+    service_tier: Option<String>,
+) -> Result<CodexLocalAccessState, String> {
+    ensure_runtime_loaded().await?;
+
+    let maybe_collection = {
+        let runtime = gateway_runtime().lock().await;
+        runtime.collection.clone()
+    };
+
+    let Some(mut collection) = maybe_collection else {
+        return Err("本地接入集合尚未创建".to_string());
+    };
+
+    let previous_service_tier = collection.default_service_tier.clone();
+    let normalized_service_tier = normalize_service_tier_value(service_tier.as_deref());
+    if let Some(raw_service_tier) = service_tier.as_deref() {
+        let trimmed = raw_service_tier.trim();
+        if !trimmed.is_empty() && normalized_service_tier.is_none() {
+            logger::log_warn(&format!(
+                "[CodexLocalAccess] 收到未支持的 service_tier='{}'，按 standard 处理",
+                trimmed
+            ));
+        }
+    }
+    if collection.default_service_tier == normalized_service_tier {
+        return snapshot_state().await;
+    }
+
+    collection.default_service_tier = normalized_service_tier;
+    let previous_label = previous_service_tier.as_deref().unwrap_or("standard");
+    let next_label = collection.default_service_tier.as_deref().unwrap_or("standard");
+    logger::log_info(&format!(
+        "[CodexLocalAccess] API 服务速度切换: {} -> {}",
+        previous_label, next_label
+    ));
     collection.updated_at = now_ms();
     save_collection_to_disk(&collection)?;
 
@@ -3508,10 +3618,11 @@ fn upstream_send_retry_delay(retry_attempt: usize) -> Duration {
     }
 }
 
-fn should_retry_single_account_upstream_status(status: StatusCode) -> bool {
+fn should_retry_upstream_status(status: StatusCode) -> bool {
     matches!(
         status,
         StatusCode::REQUEST_TIMEOUT
+            | StatusCode::TOO_MANY_REQUESTS
             | StatusCode::INTERNAL_SERVER_ERROR
             | StatusCode::BAD_GATEWAY
             | StatusCode::SERVICE_UNAVAILABLE
@@ -3519,18 +3630,64 @@ fn should_retry_single_account_upstream_status(status: StatusCode) -> bool {
     )
 }
 
-fn single_account_status_retry_delay(retry_attempt: usize) -> Duration {
+fn upstream_status_retry_delay(retry_attempt: usize) -> Duration {
     let multiplier = match retry_attempt {
         0 | 1 => 1u32,
         2 => 2u32,
         _ => 4u32,
     };
-    let delay = SINGLE_ACCOUNT_STATUS_RETRY_BASE_DELAY.saturating_mul(multiplier);
-    if delay > SINGLE_ACCOUNT_STATUS_RETRY_MAX_DELAY {
-        SINGLE_ACCOUNT_STATUS_RETRY_MAX_DELAY
+    let delay = UPSTREAM_STATUS_RETRY_BASE_DELAY.saturating_mul(multiplier);
+    let capped = if delay > UPSTREAM_STATUS_RETRY_MAX_DELAY {
+        UPSTREAM_STATUS_RETRY_MAX_DELAY
     } else {
         delay
+    };
+    let jitter_ms = if UPSTREAM_STATUS_RETRY_JITTER_MAX_MS == 0 {
+        0
+    } else {
+        rand::thread_rng().gen_range(0..=UPSTREAM_STATUS_RETRY_JITTER_MAX_MS)
+    };
+    capped.saturating_add(Duration::from_millis(jitter_ms))
+}
+
+fn parse_http_retry_after(
+    headers: &reqwest::header::HeaderMap,
+    now_seconds: i64,
+) -> Option<Duration> {
+    let raw = headers.get("retry-after")?.to_str().ok()?.trim();
+    if raw.is_empty() {
+        return None;
     }
+
+    if let Ok(seconds) = raw.parse::<u64>() {
+        if seconds > 0 {
+            return Some(Duration::from_secs(seconds));
+        }
+    }
+
+    let at = chrono::DateTime::parse_from_rfc2822(raw)
+        .ok()
+        .map(|value| value.timestamp())?;
+    if at <= now_seconds {
+        return None;
+    }
+    Some(Duration::from_secs(at.saturating_sub(now_seconds) as u64))
+}
+
+fn resolve_upstream_status_retry_wait(
+    retry_attempt: usize,
+    status: StatusCode,
+    body: &str,
+    headers: &reqwest::header::HeaderMap,
+) -> Option<Duration> {
+    if !should_retry_upstream_status(status) {
+        return None;
+    }
+
+    let now_seconds = chrono::Utc::now().timestamp();
+    parse_http_retry_after(headers, now_seconds)
+        .or_else(|| parse_codex_retry_after(status, body))
+        .or_else(|| Some(upstream_status_retry_delay(retry_attempt)))
 }
 
 async fn send_upstream_request(
@@ -3679,7 +3836,7 @@ async fn proxy_request_with_account_pool(
             attempted_in_round = true;
             attempts += 1;
 
-            let account = match codex_account::prepare_account_for_injection(&account_id).await {
+            let mut account = match codex_account::prepare_account_for_injection(&account_id).await {
                 Ok(account) => account,
                 Err(err) => {
                     last_error = err;
@@ -3701,7 +3858,8 @@ async fn proxy_request_with_account_pool(
             last_account_id = Some(account.id.clone());
             last_account_email = Some(account.email.clone());
 
-            let mut single_account_status_retry_attempt = 0usize;
+            let mut upstream_status_retry_attempt = 0usize;
+            let mut upstream_status_retry_elapsed = Duration::ZERO;
             loop {
                 let first_response = send_upstream_request(
                     &request.method,
@@ -3752,6 +3910,8 @@ async fn proxy_request_with_account_pool(
                                 last_error = format!("账号 {} 鉴权失败", refreshed_account.email);
                                 break;
                             }
+
+                            account = refreshed_account;
                         }
                         Err(err) => {
                             last_error = err;
@@ -3770,6 +3930,7 @@ async fn proxy_request_with_account_pool(
                 }
 
                 let status = response.status();
+                let headers = response.headers().clone();
                 let body = response.text().await.unwrap_or_default();
                 let message = summarize_upstream_error(status, &body);
 
@@ -3781,16 +3942,21 @@ async fn proxy_request_with_account_pool(
                     });
                 }
 
-                let can_retry_single_account = total == 1
-                    && single_account_status_retry_attempt < SINGLE_ACCOUNT_STATUS_RETRY_ATTEMPTS
-                    && should_retry_single_account_upstream_status(status);
-                if can_retry_single_account {
-                    single_account_status_retry_attempt += 1;
-                    tokio::time::sleep(single_account_status_retry_delay(
-                        single_account_status_retry_attempt,
-                    ))
-                    .await;
-                    continue;
+                if upstream_status_retry_attempt < UPSTREAM_STATUS_RETRY_ATTEMPTS {
+                    if let Some(wait) = resolve_upstream_status_retry_wait(
+                        upstream_status_retry_attempt + 1,
+                        status,
+                        &body,
+                        &headers,
+                    ) {
+                        let next_elapsed = upstream_status_retry_elapsed.saturating_add(wait);
+                        if next_elapsed <= UPSTREAM_STATUS_RETRY_BUDGET {
+                            upstream_status_retry_attempt += 1;
+                            upstream_status_retry_elapsed = next_elapsed;
+                            tokio::time::sleep(wait).await;
+                            continue;
+                        }
+                    }
                 }
 
                 if should_try_next_account(status, &body) {
@@ -3961,7 +4127,10 @@ async fn handle_connection(mut stream: TcpStream) -> Result<(), String> {
     }
 
     let started_at = Instant::now();
-    let (prepared_request, response_adapter) = match prepare_gateway_request(parsed) {
+    let (prepared_request, response_adapter) = match prepare_gateway_request(
+        parsed,
+        collection.default_service_tier.as_deref(),
+    ) {
         Ok(prepared) => prepared,
         Err(err) => {
             let response = json_response(400, "Bad Request", &json!({ "error": err }));
@@ -4037,11 +4206,13 @@ mod tests {
     use super::{
         build_chat_completion_payload, build_chat_completion_stream_body, build_ordered_account_ids,
         build_request_routing_hint, extract_usage_capture, parse_codex_retry_after,
+        parse_http_retry_after,
         parse_responses_payload_from_upstream, prepare_gateway_request,
         resolve_supported_model_alias,
-        should_retry_single_account_upstream_status, should_treat_response_as_stream,
+        should_retry_upstream_status, should_treat_response_as_stream,
         should_try_next_account, GatewayResponseAdapter, ParsedRequest, ResponseUsageCollector,
     };
+    use reqwest::header::{HeaderMap, HeaderValue};
     use reqwest::StatusCode;
     use serde_json::{json, Value};
     use std::collections::HashMap;
@@ -4144,19 +4315,19 @@ data: {"type":"response.completed","response":{"id":"resp_123","usage":{"input_t
     }
 
     #[test]
-    fn retries_single_account_for_transient_upstream_status() {
-        assert!(should_retry_single_account_upstream_status(
-            StatusCode::SERVICE_UNAVAILABLE
-        ));
-        assert!(should_retry_single_account_upstream_status(
-            StatusCode::GATEWAY_TIMEOUT
-        ));
-        assert!(!should_retry_single_account_upstream_status(
-            StatusCode::TOO_MANY_REQUESTS
-        ));
-        assert!(!should_retry_single_account_upstream_status(
-            StatusCode::FORBIDDEN
-        ));
+    fn retries_upstream_status_for_transient_status() {
+        assert!(should_retry_upstream_status(StatusCode::SERVICE_UNAVAILABLE));
+        assert!(should_retry_upstream_status(StatusCode::GATEWAY_TIMEOUT));
+        assert!(should_retry_upstream_status(StatusCode::TOO_MANY_REQUESTS));
+        assert!(!should_retry_upstream_status(StatusCode::FORBIDDEN));
+    }
+
+    #[test]
+    fn parses_http_retry_after_seconds_header() {
+        let mut headers = HeaderMap::new();
+        headers.insert("retry-after", HeaderValue::from_static("7"));
+        let wait = parse_http_retry_after(&headers, 0).expect("retry after should be parsed");
+        assert_eq!(wait, Duration::from_secs(7));
     }
 
     #[test]
@@ -4222,7 +4393,8 @@ data: {"type":"response.completed","response":{"id":"resp_123","usage":{"input_t
                 .to_vec(),
         };
 
-        let (prepared, adapter) = prepare_gateway_request(request).expect("request should map");
+        let (prepared, adapter) =
+            prepare_gateway_request(request, None).expect("request should map");
         assert_eq!(prepared.target, "/v1/responses");
         let mapped_body: Value =
             serde_json::from_slice(&prepared.body).expect("mapped body should be json");
@@ -4247,6 +4419,7 @@ data: {"type":"response.completed","response":{"id":"resp_123","usage":{"input_t
                 .and_then(Value::as_str),
             Some("medium")
         );
+        assert!(mapped_body.get("service_tier").is_none());
 
         match adapter {
             GatewayResponseAdapter::ChatCompletions {
@@ -4270,10 +4443,12 @@ data: {"type":"response.completed","response":{"id":"resp_123","usage":{"input_t
             body: br#"{"model":"gpt-5.4-2026-03-05","input":"hello"}"#.to_vec(),
         };
 
-        let (prepared, adapter) = prepare_gateway_request(request).expect("request should map");
+        let (prepared, adapter) =
+            prepare_gateway_request(request, None).expect("request should map");
         let mapped_body: Value =
             serde_json::from_slice(&prepared.body).expect("mapped body should be json");
         assert_eq!(mapped_body.get("model").and_then(Value::as_str), Some("gpt-5.4"));
+        assert!(mapped_body.get("service_tier").is_none());
 
         match adapter {
             GatewayResponseAdapter::Passthrough { request_is_stream } => {
@@ -4293,10 +4468,12 @@ data: {"type":"response.completed","response":{"id":"resp_123","usage":{"input_t
                 .to_vec(),
         };
 
-        let (prepared, adapter) = prepare_gateway_request(request).expect("request should map");
+        let (prepared, adapter) =
+            prepare_gateway_request(request, None).expect("request should map");
         let mapped_body: Value =
             serde_json::from_slice(&prepared.body).expect("mapped body should be json");
         assert_eq!(mapped_body.get("model").and_then(Value::as_str), Some("gpt-5.4"));
+        assert!(mapped_body.get("service_tier").is_none());
 
         match adapter {
             GatewayResponseAdapter::ChatCompletions {
@@ -4309,6 +4486,40 @@ data: {"type":"response.completed","response":{"id":"resp_123","usage":{"input_t
     }
 
     #[test]
+    fn injects_fast_service_tier_into_responses_requests() {
+        let request = ParsedRequest {
+            method: "POST".to_string(),
+            target: "/v1/responses".to_string(),
+            headers: HashMap::new(),
+            body: br#"{"model":"gpt-5.4","input":"hello","service_tier":"flex"}"#.to_vec(),
+        };
+
+        let (prepared, _) =
+            prepare_gateway_request(request, Some("fast")).expect("request should map");
+        let mapped_body: Value =
+            serde_json::from_slice(&prepared.body).expect("mapped body should be json");
+        assert_eq!(
+            mapped_body.get("service_tier").and_then(Value::as_str),
+            Some("fast")
+        );
+    }
+
+    #[test]
+    fn removes_service_tier_when_standard_mode() {
+        let request = ParsedRequest {
+            method: "POST".to_string(),
+            target: "/v1/responses".to_string(),
+            headers: HashMap::new(),
+            body: br#"{"model":"gpt-5.4","input":"hello","service_tier":"fast"}"#.to_vec(),
+        };
+
+        let (prepared, _) = prepare_gateway_request(request, None).expect("request should map");
+        let mapped_body: Value =
+            serde_json::from_slice(&prepared.body).expect("mapped body should be json");
+        assert!(mapped_body.get("service_tier").is_none());
+    }
+
+    #[test]
     fn drops_unsupported_sampling_params_for_responses_proxy() {
         let request = ParsedRequest {
             method: "POST".to_string(),
@@ -4318,7 +4529,7 @@ data: {"type":"response.completed","response":{"id":"resp_123","usage":{"input_t
                 .to_vec(),
         };
 
-        let (prepared, _) = prepare_gateway_request(request).expect("request should map");
+        let (prepared, _) = prepare_gateway_request(request, None).expect("request should map");
         let mapped_body: Value =
             serde_json::from_slice(&prepared.body).expect("mapped body should be json");
         assert!(mapped_body.get("temperature").is_none());
@@ -4335,7 +4546,7 @@ data: {"type":"response.completed","response":{"id":"resp_123","usage":{"input_t
                 .to_vec(),
         };
 
-        let (prepared, _) = prepare_gateway_request(request).expect("request should map");
+        let (prepared, _) = prepare_gateway_request(request, None).expect("request should map");
         let mapped_body: Value =
             serde_json::from_slice(&prepared.body).expect("mapped body should be json");
         let first_type = mapped_body
@@ -4360,7 +4571,7 @@ data: {"type":"response.completed","response":{"id":"resp_123","usage":{"input_t
                 .to_vec(),
         };
 
-        let (prepared, _) = prepare_gateway_request(request).expect("request should map");
+        let (prepared, _) = prepare_gateway_request(request, None).expect("request should map");
         let mapped_body: Value =
             serde_json::from_slice(&prepared.body).expect("mapped body should be json");
         assert_eq!(
@@ -4400,7 +4611,7 @@ data: {"type":"response.completed","response":{"id":"resp_123","usage":{"input_t
                 .to_vec(),
         };
 
-        let (prepared, _) = prepare_gateway_request(request).expect("request should map");
+        let (prepared, _) = prepare_gateway_request(request, None).expect("request should map");
         let mapped_body: Value =
             serde_json::from_slice(&prepared.body).expect("mapped body should be json");
         let input = mapped_body
@@ -4433,7 +4644,7 @@ data: {"type":"response.completed","response":{"id":"resp_123","usage":{"input_t
                 .to_vec(),
         };
 
-        let (prepared, _) = prepare_gateway_request(request).expect("request should map");
+        let (prepared, _) = prepare_gateway_request(request, None).expect("request should map");
         let mapped_body: Value =
             serde_json::from_slice(&prepared.body).expect("mapped body should be json");
         let input = mapped_body

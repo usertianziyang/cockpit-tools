@@ -698,7 +698,13 @@
       "codexLocalAccessEntryVisibleDesc": "Управляет только отображением пункта API-сервиса в обзоре Codex. Это не останавливает локальный API-сервис; его можно снова включить здесь или в быстрых настройках.",
       "codexLocalAccessEnabled": "Включить API-сервис",
       "codexLocalAccessEnabledDesc": "Определяет, будет ли локальный API-сервис Codex действительно работать.",
-      "codexLocalAccessEnabledRequiresCollection": "Перед включением или отключением сервиса сначала добавьте аккаунты в коллекцию API-сервиса."
+      "codexLocalAccessEnabledRequiresCollection": "Перед включением или отключением сервиса сначала добавьте аккаунты в коллекцию API-сервиса.",
+      "codexRestartSpecifiedAppOnSwitch": "Перезапускать указанное приложение при переключении Codex",
+      "codexRestartSpecifiedAppOnSwitchDesc": "При включении перезапускает приложение по пути ниже (для сценариев с хостом плагинов).",
+      "codexSpecifiedAppPath": "Путь к указанному приложению",
+      "codexSpecifiedAppPathDesc": "Путь приложения, которое перезапускается вместе с переключением Codex.",
+      "codexSpecifiedAppPathPlaceholder": "Например /Applications/Host.app",
+      "codexSpecifiedAppPathClear": "Очистить"
     },
     "network": {
       "apiTitle": "API антигравитационной кабины",
@@ -1746,7 +1752,16 @@
       "enableAndActivateAction": "Включить и переключить",
       "apiPortUrl": "URL API-порта",
       "modelId": "ID модели",
-      "modelIdPlaceholder": "Выберите ID модели"
+      "modelIdPlaceholder": "Выберите ID модели",
+      "serviceTierSaveSuccess": "Скорость API-сервиса обновлена",
+      "serviceTier": {
+        "label": "Скорость",
+        "placeholder": "Выбрать скорость",
+        "standard": "Стандартная",
+        "fast": "Быстрая",
+        "standardHint": "Скорость по умолчанию",
+        "fastHint": "Скорость 1,5x, расход плана 2x"
+      }
     },
     "local": {
       "desc": "Импортировать текущий аккаунт из ~/.codex/auth.json",

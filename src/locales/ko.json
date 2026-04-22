@@ -698,7 +698,13 @@
       "codexLocalAccessEntryVisibleDesc": "Codex 개요에서 API 서비스 항목을 표시할지만 제어합니다. 로컬 API 서비스 자체를 중지하지 않으며, 여기나 빠른 설정에서 다시 켤 수 있습니다.",
       "codexLocalAccessEnabled": "API 서비스 사용",
       "codexLocalAccessEnabledDesc": "로컬 Codex API 서비스가 실제로 실행될지 제어합니다.",
-      "codexLocalAccessEnabledRequiresCollection": "서비스를 켜거나 끄기 전에 먼저 API 서비스 컬렉션에 계정을 추가하세요."
+      "codexLocalAccessEnabledRequiresCollection": "서비스를 켜거나 끄기 전에 먼저 API 서비스 컬렉션에 계정을 추가하세요.",
+      "codexRestartSpecifiedAppOnSwitch": "Codex 전환 시 지정 앱 재시작",
+      "codexRestartSpecifiedAppOnSwitchDesc": "활성화하면 아래 경로의 앱을 재시작합니다(플러그인 호스트 워크플로우용).",
+      "codexSpecifiedAppPath": "지정 앱 경로",
+      "codexSpecifiedAppPathDesc": "Codex 전환 시 함께 재시작할 앱 경로",
+      "codexSpecifiedAppPathPlaceholder": "예: /Applications/Host.app",
+      "codexSpecifiedAppPathClear": "지우기"
     },
     "network": {
       "apiTitle": "반중력 조종석 API",
@@ -1746,7 +1752,16 @@
       "enableAndActivateAction": "활성화 후 전환",
       "apiPortUrl": "API 포트 URL",
       "modelId": "모델 ID",
-      "modelIdPlaceholder": "모델 ID 선택"
+      "modelIdPlaceholder": "모델 ID 선택",
+      "serviceTierSaveSuccess": "API 서비스 속도가 업데이트되었습니다",
+      "serviceTier": {
+        "label": "속도",
+        "placeholder": "속도 선택",
+        "standard": "표준",
+        "fast": "빠름",
+        "standardHint": "기본 속도",
+        "fastHint": "1.5배 속도, 플랜 사용량 2배"
+      }
     },
     "local": {
       "desc": "~/.codex/auth.json에서 현재 로그인된 계정 가져오기",

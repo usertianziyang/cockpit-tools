@@ -698,7 +698,13 @@
       "codexLocalAccessEntryVisibleDesc": "Určuje pouze, zda se v přehledu Codex zobrazuje položka služby API. Místní službu API to nezastaví; můžete ji znovu zapnout zde nebo v rychlém nastavení.",
       "codexLocalAccessEnabled": "Zapnout službu API",
       "codexLocalAccessEnabledDesc": "Určuje, zda místní služba Codex API skutečně běží.",
-      "codexLocalAccessEnabledRequiresCollection": "Před zapnutím nebo vypnutím služby nejprve přidejte účty do kolekce služby API."
+      "codexLocalAccessEnabledRequiresCollection": "Před zapnutím nebo vypnutím služby nejprve přidejte účty do kolekce služby API.",
+      "codexRestartSpecifiedAppOnSwitch": "Při přepnutí Codex restartovat zadanou aplikaci",
+      "codexRestartSpecifiedAppOnSwitchDesc": "Po zapnutí restartuje aplikaci na níže uvedené cestě (pro workflow s hostitelem pluginů).",
+      "codexSpecifiedAppPath": "Cesta k zadané aplikaci",
+      "codexSpecifiedAppPathDesc": "Cesta k aplikaci, která se restartuje spolu s přepnutím Codex.",
+      "codexSpecifiedAppPathPlaceholder": "Např. /Applications/Host.app",
+      "codexSpecifiedAppPathClear": "Vymazat"
     },
     "network": {
       "apiTitle": "Antigravity Cockpit API",
@@ -1746,7 +1752,16 @@
       "enableAndActivateAction": "Zapnout a přepnout",
       "apiPortUrl": "URL portu API",
       "modelId": "ID modelu",
-      "modelIdPlaceholder": "Vyberte ID modelu"
+      "modelIdPlaceholder": "Vyberte ID modelu",
+      "serviceTierSaveSuccess": "Rychlost API služby byla aktualizována",
+      "serviceTier": {
+        "label": "Rychlost",
+        "placeholder": "Vybrat rychlost",
+        "standard": "Standardní",
+        "fast": "Rychlá",
+        "standardHint": "Výchozí rychlost",
+        "fastHint": "Rychlost 1,5x, spotřeba tarifu 2x"
+      }
     },
     "local": {
       "desc": "Importovat aktuální účet z ~/.codex/auth.json",

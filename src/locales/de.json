@@ -698,7 +698,13 @@
       "codexLocalAccessEntryVisibleDesc": "Steuert nur, ob der API-Service-Eintrag in der Codex-Übersicht angezeigt wird. Der lokale API-Service wird dadurch nicht gestoppt; du kannst ihn hier oder in den Schnelleinstellungen wieder einblenden.",
       "codexLocalAccessEnabled": "API-Service aktivieren",
       "codexLocalAccessEnabledDesc": "Steuert, ob der lokale Codex-API-Service tatsächlich läuft.",
-      "codexLocalAccessEnabledRequiresCollection": "Füge zuerst Konten zur API-Service-Sammlung hinzu, bevor du den Service aktivierst oder deaktivierst."
+      "codexLocalAccessEnabledRequiresCollection": "Füge zuerst Konten zur API-Service-Sammlung hinzu, bevor du den Service aktivierst oder deaktivierst.",
+      "codexRestartSpecifiedAppOnSwitch": "Beim Wechsel von Codex angegebene App neu starten",
+      "codexRestartSpecifiedAppOnSwitchDesc": "Wenn aktiviert, wird die App unter dem folgenden Pfad neu gestartet (für Plugin-Host-Workflows).",
+      "codexSpecifiedAppPath": "Pfad der angegebenen App",
+      "codexSpecifiedAppPathDesc": "Pfad der App, die beim Codex-Wechsel mit neu gestartet wird.",
+      "codexSpecifiedAppPathPlaceholder": "z. B. /Applications/Host.app",
+      "codexSpecifiedAppPathClear": "Leeren"
     },
     "network": {
       "apiTitle": "Antigravity-Cockpit-API",
@@ -1746,7 +1752,16 @@
       "enableAndActivateAction": "Aktivieren und wechseln",
       "apiPortUrl": "API-Port-URL",
       "modelId": "Modell-ID",
-      "modelIdPlaceholder": "Modell-ID wählen"
+      "modelIdPlaceholder": "Modell-ID wählen",
+      "serviceTierSaveSuccess": "API-Service-Geschwindigkeit wurde aktualisiert",
+      "serviceTier": {
+        "label": "Geschwindigkeit",
+        "placeholder": "Geschwindigkeit wählen",
+        "standard": "Normal",
+        "fast": "Schnell",
+        "standardHint": "Standardgeschwindigkeit",
+        "fastHint": "1,5x Geschwindigkeit, 2x Tarifverbrauch"
+      }
     },
     "local": {
       "desc": "Aktuell eingeloggtes Konto aus ~/.codex/auth.json importieren",

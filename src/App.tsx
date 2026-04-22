@@ -182,9 +182,10 @@ type AppPathMissingDetail = {
     | { kind: 'switchAccount'; accountId?: string };
 };
 
-  const WAKEUP_ENABLED_KEY = 'agtools.wakeup.enabled';
+const WAKEUP_ENABLED_KEY = 'agtools.wakeup.enabled';
 const TASKS_STORAGE_KEY = 'agtools.wakeup.tasks';
 const WAKEUP_FORCE_DISABLE_MIGRATION_KEY = 'agtools.wakeup.migration.force_disable_0_8_14';
+const TOP_RIGHT_AD_REFRESH_INTERVAL_MS = 10 * 60 * 1000;
 
 type WakeupHistoryRecord = {
   id: string;
@@ -567,6 +568,15 @@ function MainApp() {
 
   useEffect(() => {
     void fetchTopRightAdState();
+  }, [fetchTopRightAdState]);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      void fetchTopRightAdState();
+    }, TOP_RIGHT_AD_REFRESH_INTERVAL_MS);
+    return () => {
+      window.clearInterval(intervalId);
+    };
   }, [fetchTopRightAdState]);
 
   useEffect(() => {

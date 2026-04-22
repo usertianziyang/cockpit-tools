@@ -13,6 +13,31 @@ use tauri_plugin_opener::OpenerExt;
 
 static CODEX_POST_REFRESH_CHECK_IN_PROGRESS: AtomicBool = AtomicBool::new(false);
 
+fn restart_codex_specified_app_if_enabled(user_config: &config::UserConfig) {
+    if !user_config.codex_restart_specified_app_on_switch {
+        logger::log_info("已关闭切换 Codex 时自动重启指定应用");
+        return;
+    }
+
+    let path = user_config.codex_specified_app_path.trim();
+    if path.is_empty() {
+        logger::log_warn("已开启切换 Codex 时自动重启指定应用，但未配置应用路径，已跳过");
+        return;
+    }
+
+    match process::restart_specified_app_by_path(path, 20) {
+        Ok(()) => {
+            logger::log_info(&format!("已重启指定应用: {}", path));
+        }
+        Err(error) => {
+            logger::log_warn(&format!(
+                "重启指定应用失败（path={}）：{}",
+                path, error
+            ));
+        }
+    }
+}
+
 /// 列出所有 Codex 账号
 #[tauri::command]
 pub fn list_codex_accounts() -> Result<Vec<CodexAccount>, String> {
@@ -209,6 +234,8 @@ pub async fn switch_codex_account(
     } else {
         logger::log_info("已关闭切换 Codex 时自动启动 Codex App");
     }
+
+    restart_codex_specified_app_if_enabled(&user_config);
 
     let _ = crate::modules::tray::update_tray_menu(&app);
     Ok(account)
@@ -725,6 +752,13 @@ pub async fn codex_local_access_update_routing_strategy(
 }
 
 #[tauri::command]
+pub async fn codex_local_access_update_service_tier(
+    service_tier: Option<String>,
+) -> Result<CodexLocalAccessState, String> {
+    codex_local_access::update_local_access_service_tier(service_tier).await
+}
+
+#[tauri::command]
 pub async fn codex_local_access_set_enabled(
     enabled: bool,
 ) -> Result<CodexLocalAccessState, String> {
@@ -777,6 +811,8 @@ pub async fn codex_local_access_activate(app: AppHandle) -> Result<CodexLocalAcc
     } else {
         logger::log_info("已关闭切换 Codex 时自动启动 Codex App");
     }
+
+    restart_codex_specified_app_if_enabled(&user_config);
 
     let _ = crate::modules::tray::update_tray_menu(&app);
     Ok(state)

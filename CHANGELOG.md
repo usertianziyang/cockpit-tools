@@ -7,6 +7,16 @@ All notable changes to Cockpit Tools will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
+## [0.22.8] - 2026-04-22
+
+### Added
+- **Codex Local API Service now supports a `Speed` selector (`Standard` / `Fast`) with persisted defaults**: the account-page API Service modal can save the default tier, and gateway request rewriting now injects `service_tier: "fast"` for `/v1/responses` (including chat-completions translated requests), while standard mode keeps the field unset.
+- **Codex switching now supports restarting a user-specified host app after switch/activate**: Settings and Quick Settings add the `Restart specified app when switching Codex` toggle plus path picker/input controls, and backend runtime restarts the configured app path after account switch or API Service activation.
+
+### Changed
+- **Local API Service upstream retry now honors retry hints with bounded jitter backoff**: transient `429/5xx/timeout` statuses can retry using `Retry-After` (HTTP header or upstream hint parser) under a total retry budget, instead of fixed single-account status retries.
+
+---
 ## [0.22.7] - 2026-04-22
 
 ### Added

@@ -698,7 +698,13 @@
       "codexLocalAccessEntryVisibleDesc": "Chỉ kiểm soát việc mục Dịch vụ API có hiển thị trong tổng quan Codex hay không. Thao tác này không dừng dịch vụ API cục bộ; bạn có thể bật lại tại đây hoặc trong Cài đặt nhanh.",
       "codexLocalAccessEnabled": "Bật Dịch vụ API",
       "codexLocalAccessEnabledDesc": "Kiểm soát việc dịch vụ Codex API cục bộ có thực sự chạy hay không.",
-      "codexLocalAccessEnabledRequiresCollection": "Hãy thêm tài khoản vào bộ sưu tập Dịch vụ API trước khi bật hoặc tắt dịch vụ."
+      "codexLocalAccessEnabledRequiresCollection": "Hãy thêm tài khoản vào bộ sưu tập Dịch vụ API trước khi bật hoặc tắt dịch vụ.",
+      "codexRestartSpecifiedAppOnSwitch": "Khởi động lại ứng dụng chỉ định khi chuyển Codex",
+      "codexRestartSpecifiedAppOnSwitchDesc": "Khi bật, sẽ khởi động lại ứng dụng ở đường dẫn bên dưới (cho luồng dùng host plugin).",
+      "codexSpecifiedAppPath": "Đường dẫn ứng dụng chỉ định",
+      "codexSpecifiedAppPathDesc": "Đường dẫn ứng dụng được khởi động lại cùng lúc chuyển Codex.",
+      "codexSpecifiedAppPathPlaceholder": "Ví dụ /Applications/Host.app",
+      "codexSpecifiedAppPathClear": "Xóa"
     },
     "network": {
       "apiTitle": "API Antigravity Cockpit",
@@ -1746,7 +1752,16 @@
       "enableAndActivateAction": "Bật và chuyển",
       "apiPortUrl": "URL cổng API",
       "modelId": "ID mô hình",
-      "modelIdPlaceholder": "Chọn ID mô hình"
+      "modelIdPlaceholder": "Chọn ID mô hình",
+      "serviceTierSaveSuccess": "Đã cập nhật tốc độ dịch vụ API",
+      "serviceTier": {
+        "label": "Tốc độ",
+        "placeholder": "Chọn tốc độ",
+        "standard": "Tiêu chuẩn",
+        "fast": "Nhanh",
+        "standardHint": "Tốc độ mặc định",
+        "fastHint": "Tốc độ 1.5x, dùng gói 2x"
+      }
     },
     "local": {
       "desc": "Nhập tài khoản hiện tại từ ~/.codex/auth.json",

@@ -23,6 +23,7 @@ import type { CodexAccount } from '../types/codex';
 import type { CodexAccountGroup } from '../services/codexAccountGroupService';
 import type {
   CodexLocalAccessRoutingStrategy,
+  CodexLocalAccessServiceTier,
   CodexLocalAccessState,
   CodexLocalAccessStatsWindow,
 } from '../types/codexLocalAccess';
@@ -59,6 +60,9 @@ interface CodexLocalAccessModalProps {
   onUpdatePort: (port: number) => Promise<unknown> | unknown;
   onUpdateRoutingStrategy: (
     strategy: CodexLocalAccessRoutingStrategy,
+  ) => Promise<unknown> | unknown;
+  onUpdateServiceTier: (
+    serviceTier: CodexLocalAccessServiceTier | null,
   ) => Promise<unknown> | unknown;
   onRotateApiKey: () => Promise<unknown> | unknown;
   onToggleEnabled: () => Promise<unknown> | unknown;
@@ -100,13 +104,14 @@ export function CodexLocalAccessModal({
   accountGroups,
   initialSelectedIds,
   maskAccountText,
-    onClose,
-    onSaveAccounts,
-    onClearStats,
-    onRefreshStats,
-    onUpdatePort,
-    onUpdateRoutingStrategy,
-    onRotateApiKey,
+  onClose,
+  onSaveAccounts,
+  onClearStats,
+  onRefreshStats,
+  onUpdatePort,
+  onUpdateRoutingStrategy,
+  onUpdateServiceTier,
+  onRotateApiKey,
   onToggleEnabled,
   onTest,
   saving,
@@ -150,6 +155,7 @@ export function CodexLocalAccessModal({
   }, [stats, statsRange]);
   const selectedTotals = selectedStatsWindow?.totals;
   const routingStrategy = collection?.routingStrategy ?? 'auto';
+  const serviceTier = collection?.defaultServiceTier ?? null;
   const modelIdOptions = useMemo(
     () => modelIds.map((modelId) => ({ value: modelId, label: modelId })),
     [modelIds],
@@ -478,6 +484,22 @@ export function CodexLocalAccessModal({
     [t],
   );
 
+  const serviceTierOptions = useMemo(
+    () => [
+      {
+        value: 'standard',
+        label: t('codex.localAccess.serviceTier.standard', '标准'),
+        description: t('codex.localAccess.serviceTier.standardHint', '默认速度'),
+      },
+      {
+        value: 'fast',
+        label: t('codex.localAccess.serviceTier.fast', '快速'),
+        description: t('codex.localAccess.serviceTier.fastHint', '1.5 倍速度，2 倍套餐用量'),
+      },
+    ] satisfies Array<{ value: 'standard' | 'fast'; label: string; description: string }>,
+    [t],
+  );
+
   const renderQuotaPreview = (
     presentation: ReturnType<typeof buildCodexAccountPresentation>,
     limit = 2,
@@ -620,6 +642,20 @@ export function CodexLocalAccessModal({
         await onUpdateRoutingStrategy(nextStrategy as CodexLocalAccessRoutingStrategy);
       },
       t('codex.localAccess.routingSaveSuccess', 'API 服务调度策略已更新'),
+    );
+  };
+
+  const handleChangeServiceTier = async (nextTier: string) => {
+    if (!collection) return;
+    const normalizedNextTier: CodexLocalAccessServiceTier | null =
+      nextTier === 'fast' ? 'fast' : null;
+    if (normalizedNextTier === serviceTier) return;
+
+    await runAction(
+      async () => {
+        await onUpdateServiceTier(normalizedNextTier);
+      },
+      t('codex.localAccess.serviceTierSaveSuccess', 'API 服务速度已更新'),
     );
   };
 
@@ -773,6 +809,22 @@ export function CodexLocalAccessModal({
                         onChange={(value) => void handleChangeRoutingStrategy(value)}
                         disabled={saving || testing || starting}
                         ariaLabel={t('codex.localAccess.routingLabel', '调度策略')}
+                      />
+                    </div>
+                  )}
+                  {collection && (
+                    <div className="codex-local-access-header-service-tier">
+                      <SingleSelectDropdown
+                        value={serviceTier === 'fast' ? 'fast' : 'standard'}
+                        options={serviceTierOptions}
+                        onChange={(value) => {
+                          void handleChangeServiceTier(value);
+                        }}
+                        disabled={actionBusy}
+                        ariaLabel={t('codex.localAccess.serviceTier.label', '速度')}
+                        menuMinWidth={268}
+                        menuMaxHeight={300}
+                        menuAlign="right"
                       />
                     </div>
                   )}
@@ -1078,6 +1130,7 @@ export function CodexLocalAccessModal({
                         </div>
                       </div>
                     ) : null}
+
                   </div>
                 ) : null}
               </section>

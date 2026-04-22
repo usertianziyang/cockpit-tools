@@ -744,7 +744,13 @@
       "codexLocalAccessEntryVisibleDesc": "Hanya mengatur apakah entri Layanan API ditampilkan di ringkasan Codex. Ini tidak menghentikan layanan API lokal; Anda bisa menyalakannya lagi di sini atau di Pengaturan Cepat.",
       "codexLocalAccessEnabled": "Aktifkan Layanan API",
       "codexLocalAccessEnabledDesc": "Mengatur apakah layanan API Codex lokal benar-benar berjalan.",
-      "codexLocalAccessEnabledRequiresCollection": "Tambahkan akun ke koleksi Layanan API terlebih dahulu sebelum mengaktifkan atau menonaktifkan layanan."
+      "codexLocalAccessEnabledRequiresCollection": "Tambahkan akun ke koleksi Layanan API terlebih dahulu sebelum mengaktifkan atau menonaktifkan layanan.",
+      "codexRestartSpecifiedAppOnSwitch": "Mulai ulang aplikasi tertentu saat mengganti Codex",
+      "codexRestartSpecifiedAppOnSwitchDesc": "Saat diaktifkan, aplikasi pada path berikut akan dimulai ulang (untuk alur host plugin).",
+      "codexSpecifiedAppPath": "Path aplikasi tertentu",
+      "codexSpecifiedAppPathDesc": "Path aplikasi yang ikut dimulai ulang saat ganti Codex.",
+      "codexSpecifiedAppPathPlaceholder": "Contoh /Applications/Host.app",
+      "codexSpecifiedAppPathClear": "Kosongkan"
     },
     "network": {
       "apiTitle": "API Antigravity Cockpit",
@@ -1795,7 +1801,16 @@
       "enableAndActivateAction": "Aktifkan dan alihkan",
       "apiPortUrl": "URL Port API",
       "modelId": "ID Model",
-      "modelIdPlaceholder": "Pilih ID model"
+      "modelIdPlaceholder": "Pilih ID model",
+      "serviceTierSaveSuccess": "Kecepatan layanan API telah diperbarui",
+      "serviceTier": {
+        "label": "Kecepatan",
+        "placeholder": "Pilih kecepatan",
+        "standard": "Standar",
+        "fast": "Cepat",
+        "standardHint": "Kecepatan default",
+        "fastHint": "Kecepatan 1,5x, pemakaian paket 2x"
+      }
     },
     "api": {
       "baseUrl": "URL Dasar",

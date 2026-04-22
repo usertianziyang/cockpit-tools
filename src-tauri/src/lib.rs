@@ -480,6 +480,7 @@ pub fn run() {
             commands::codex::codex_local_access_clear_stats,
             commands::codex::codex_local_access_update_port,
             commands::codex::codex_local_access_update_routing_strategy,
+            commands::codex::codex_local_access_update_service_tier,
             commands::codex::codex_local_access_set_enabled,
             commands::codex::codex_local_access_activate,
             // GitHub Copilot Commands
