@@ -133,6 +133,7 @@ export interface ProviderPageConfig<TAccount extends ProviderAccountBase> {
   }) => void | Promise<void>;
   /** OAuth 成功后的提示文案（可选） */
   resolveOauthSuccessMessage?: () => string;
+  defaultSortBy?: string;
 }
 
 export interface ProviderAccountBase {
@@ -360,7 +361,9 @@ export function useProviderAccountsPage<TAccount extends ProviderAccountBase>(
     oauthService,
     oauthTabKeys: oauthTabKeysConfig,
     dataService,
+    defaultSortBy: defaultSortByConfig,
   } = config;
+  const defaultSortBy = defaultSortByConfig?.trim() || DEFAULT_SORT_BY;
 
   const oauthTabKeys = useMemo(() => {
     const normalized = (oauthTabKeysConfig || [])
@@ -469,14 +472,14 @@ export function useProviderAccountsPage<TAccount extends ProviderAccountBase>(
   // ─── Sort ─────────────────────────────────────────────────────────────
   const [sortBy, setSortBy] = useState<string>(() => {
     if (!readAccountsOverviewFilterPersistenceEnabled(filterPersistenceScope)) {
-      return DEFAULT_SORT_BY;
+      return defaultSortBy;
     }
     const saved = readAccountsOverviewFilterField<string | null>(
       filterPersistenceScope,
       FILTER_FIELD_SORT_BY,
       null,
     );
-    return saved?.trim() ? saved : DEFAULT_SORT_BY;
+    return saved?.trim() ? saved : defaultSortBy;
   });
   const [sortDirection, setSortDirection] = useState<SortDirection>(() => {
     if (!readAccountsOverviewFilterPersistenceEnabled(filterPersistenceScope)) {
