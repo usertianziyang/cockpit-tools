@@ -2,6 +2,7 @@
 name = "cockpit-codex-adapter"
 version = "0.1.0"
 edition = "2021"
+build = "build.rs"
 
 [dependencies]
 cockpit-core = { path = "../cockpit-core" }
@@ -11,3 +12,6 @@ reqwest = { workspace = true }
 tokio = { workspace = true }
 tiny_http = { workspace = true }
 uuid = { workspace = true }
+
+[build-dependencies]
+embed-resource = { workspace = true }

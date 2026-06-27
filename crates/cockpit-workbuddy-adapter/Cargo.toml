@@ -2,6 +2,7 @@
 name = "cockpit-workbuddy-adapter"
 version = "0.1.0"
 edition = "2021"
+build = "build.rs"
 
 [dependencies]
 cockpit-core = { path = "../cockpit-core" }
@@ -11,3 +12,6 @@ tokio = { workspace = true }
 tiny_http = "0.12"
 uuid = { workspace = true }
 chrono = { workspace = true }
+
+[build-dependencies]
+embed-resource = { workspace = true }

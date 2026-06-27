@@ -124,6 +124,7 @@ Core Shell + Platform Package + Remote React UI + Sidecar Adapter + runtimeReady
 7. 多系统远端 artifact 必须使用 `os-arch` 文件名，例如 `zed-0.26.7-macos-aarch64.zip`；本地兼容包才允许继续使用 `zed-0.26.7.zip`。
 8. `.github/workflows/platform-packages.yml` 是标准跨系统构建入口；CI 每个 runner 只输出当前 OS/arch 的 zip 和 metadata JSON，不直接改写远端 index。
 9. 远端正式索引 `platform-packages/index.json` 与测试索引 `platform-packages/index.test.json` 必须通过 `npm run package:platform-index` 基于各 OS/arch metadata 汇总生成，确认 size、sha256、downloadUrl 和 artifact 覆盖后再发布；zip 统一放在 `platform-packages/dist`，由不同索引控制正式/测试可见性。
+10. 所有 Rust `sidecarAdapter` 的 Windows adapter exe 必须在编译期嵌入 `Microsoft.Windows.Common-Controls` v6 manifest：adapter crate 必须声明 `build = "build.rs"`，通过共享 `crates/adapter-windows-common-controls-build.rs`、`crates/windows-common-controls-v6.rc` 和 `crates/windows-common-controls-v6.manifest` 编译资源。禁止把外置 `*.exe.manifest` 当作正式平台包修复方案；外置 manifest 只能用于临时定位问题，正式 zip 必须依赖已嵌入资源的 exe。
 
 ### 5.1 单平台升级流程
 
@@ -190,10 +191,10 @@ Core Shell + Platform Package + Remote React UI + Sidecar Adapter + runtimeReady
 3. 把账号、OAuth、切号、配额、runtime 等业务命令迁到 sidecar adapter。
 4. 保留 Core Shell 的稳定 command facade，让 UI 不直接依赖 adapter 进程细节。
 5. 编写并校验 `manifest.json` 和 `runtime/index.json`。
-6. 构建 `ui/remoteEntry.js`、`ui/style.css` 和当前 OS/arch adapter，并验证 remote UI 产物实际导出 `mount/unmount` 且不残留 `process.env`。
+6. 构建 `ui/remoteEntry.js`、`ui/style.css` 和当前 OS/arch adapter，并验证 remote UI 产物实际导出 `mount/unmount` 且不残留 `process.env`；Windows adapter 必须通过共享 build rule 嵌入 Common Controls v6 manifest，不得依赖外置 `*.exe.manifest`。
 7. 用 `npm run package:platform` 打包 zip，计算真实大小和 `sha256`。
 8. 用 `npm run package:platform-index` 汇总各 OS/arch metadata，更新或生成远端 `platform-packages/index.json`。
-9. 执行 `npm run verify:platform-packages`，确认预期平台集合、标准打包脚本/CI workflow、manifest、runtime、index、dist zip、artifact size/sha、更新日志、`assets/package-info.json`、remote UI 导出、remote source 复用原业务 content、zip 内容、sidecar adapter crate/workspace/binary、宿主平台包清单、生命周期入口、平台页壳 `runtimeReady` gate 和隐藏入口 gate 一致；隐藏入口审计至少覆盖 Dashboard、SideNav、平台布局弹框、App 路由、自动刷新、账号迁移、数据备份/恢复、浮动卡片、托盘、macOS 原生菜单、token keeper、Web report 和 provider current。
+9. 执行 `npm run verify:platform-packages`，确认预期平台集合、标准打包脚本/CI workflow、manifest、runtime、index、dist zip、artifact size/sha、更新日志、`assets/package-info.json`、remote UI 导出、remote source 复用原业务 content、zip 内容、sidecar adapter crate/workspace/binary、Windows manifest 嵌入规则、宿主平台包清单、生命周期入口、平台页壳 `runtimeReady` gate 和隐藏入口 gate 一致；隐藏入口审计至少覆盖 Dashboard、SideNav、平台布局弹框、App 路由、自动刷新、账号迁移、数据备份/恢复、浮动卡片、托盘、macOS 原生菜单、token keeper、Web report 和 provider current。
 10. 完整热更新总目标验收时必须执行 `npm run audit:platform-full-hot-update`；该命令要求所有平台都是 `sidecarAdapter` 且 `nativeBoundaries=[]`，未通过时只能说明还有平台业务残留在宿主，不能宣称全部迁移完成。
 11. 批量导入、批量测试、流式聊天、任务调度等依赖进度事件、取消状态、会话缓存或 `AppHandle.emit` 的命令，迁入 sidecar adapter 前必须先定义 sidecar-to-host 事件桥、轮询状态协议或持久化 session；没有事件/状态协议时必须保留为过渡 `nativeBoundary`，禁止只改 command facade 或只删 boundary。
 12. 接入平台页右上角 `PlatformPackageToolbar`、通用不可用页和 `runtimeReady` gate。

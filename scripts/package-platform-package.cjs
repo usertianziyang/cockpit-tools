@@ -9,6 +9,11 @@ const ROOT = path.resolve(__dirname, '..');
 const INDEX_PATH = path.join(ROOT, 'platform-packages', 'index.json');
 const INDEX_SEED_PATH = path.join(ROOT, 'platform-packages', 'index.seed.json');
 const DEFAULT_DIST_DIR = path.join(ROOT, 'platform-packages', 'dist');
+const WORKSPACE_CARGO_TOML_PATH = path.join(ROOT, 'Cargo.toml');
+const WINDOWS_COMMON_CONTROLS_BUILD_RULE_PATH = path.join(ROOT, 'crates', 'adapter-windows-common-controls-build.rs');
+const WINDOWS_COMMON_CONTROLS_RC_PATH = path.join(ROOT, 'crates', 'windows-common-controls-v6.rc');
+const WINDOWS_COMMON_CONTROLS_MANIFEST_PATH = path.join(ROOT, 'crates', 'windows-common-controls-v6.manifest');
+const WINDOWS_ADAPTER_BUILD_RS_INCLUDE = 'include!("../adapter-windows-common-controls-build.rs");';
 
 function fail(message) {
   console.error(message);
@@ -95,6 +100,14 @@ function readJson(filePath, label) {
   }
 }
 
+function readText(filePath, label) {
+  try {
+    return fs.readFileSync(filePath, 'utf8');
+  } catch (error) {
+    fail(`${label}: failed to read file: ${error.message}`);
+  }
+}
+
 function safeRelativePath(relativePath, label) {
   if (!relativePath || typeof relativePath !== 'string') {
     fail(`${label}: path is required`);
@@ -151,6 +164,50 @@ function assertDir(filePath, label) {
   if (!fs.existsSync(filePath) || !fs.statSync(filePath).isDirectory()) {
     fail(`${label}: missing directory ${path.relative(ROOT, filePath)}`);
   }
+}
+
+function assertIncludes(label, source, expected) {
+  if (!source.includes(expected)) {
+    fail(`${label}: missing ${expected}`);
+  }
+}
+
+function verifyWindowsAdapterManifestBuild(platformId, crateTomlPath) {
+  assertFile(WINDOWS_COMMON_CONTROLS_BUILD_RULE_PATH, 'shared Windows adapter build rule');
+  assertFile(WINDOWS_COMMON_CONTROLS_RC_PATH, 'Windows Common Controls v6 resource file');
+  assertFile(WINDOWS_COMMON_CONTROLS_MANIFEST_PATH, 'Windows Common Controls v6 manifest');
+
+  const workspaceCargoToml = readText(WORKSPACE_CARGO_TOML_PATH, 'workspace Cargo.toml');
+  if (!/^\s*embed-resource\s*=\s*["{]/m.test(workspaceCargoToml)) {
+    fail('workspace Cargo.toml: missing embed-resource workspace dependency');
+  }
+
+  const buildRule = readText(WINDOWS_COMMON_CONTROLS_BUILD_RULE_PATH, 'shared Windows adapter build rule');
+  assertIncludes('shared Windows adapter build rule', buildRule, 'windows-common-controls-v6.rc');
+  assertIncludes('shared Windows adapter build rule', buildRule, 'embed_resource::compile');
+  assertIncludes('shared Windows adapter build rule', buildRule, 'manifest_required');
+
+  const resource = readText(WINDOWS_COMMON_CONTROLS_RC_PATH, 'Windows Common Controls v6 resource file');
+  assertIncludes('Windows Common Controls v6 resource file', resource, 'RT_MANIFEST');
+  assertIncludes('Windows Common Controls v6 resource file', resource, 'windows-common-controls-v6.manifest');
+
+  const manifest = readText(WINDOWS_COMMON_CONTROLS_MANIFEST_PATH, 'Windows Common Controls v6 manifest');
+  assertIncludes('Windows Common Controls v6 manifest', manifest, 'Microsoft.Windows.Common-Controls');
+  assertIncludes('Windows Common Controls v6 manifest', manifest, 'version="6.0.0.0"');
+
+  const crateDir = path.dirname(crateTomlPath);
+  const crateCargoToml = readText(crateTomlPath, `${platformId}: adapter Cargo.toml`);
+  const buildRsPath = path.join(crateDir, 'build.rs');
+  assertFile(buildRsPath, `${platformId}: adapter build.rs`);
+  if (!/^\s*build\s*=\s*["']build\.rs["']/m.test(crateCargoToml)) {
+    fail(`${platformId}: adapter Cargo.toml must declare build = "build.rs"`);
+  }
+  if (!/^\s*embed-resource\s*=\s*\{\s*workspace\s*=\s*true\s*\}/m.test(crateCargoToml)) {
+    fail(`${platformId}: adapter Cargo.toml must use embed-resource workspace build dependency`);
+  }
+
+  const buildRs = readText(buildRsPath, `${platformId}: adapter build.rs`);
+  assertIncludes(`${platformId}: adapter build.rs`, buildRs, WINDOWS_ADAPTER_BUILD_RS_INCLUDE);
 }
 
 function copyAdapterIfAvailable(packageRoot, manifest, os, adapterBinDir) {
@@ -324,6 +381,9 @@ function main() {
   if (manifest.adapter) {
     const cratePath = path.join(ROOT, 'crates', expectedAdapterCrateName(args.platformId), 'Cargo.toml');
     assertFile(cratePath, `${args.platformId}: adapter crate`);
+    if (args.os === 'windows') {
+      verifyWindowsAdapterManifestBuild(args.platformId, cratePath);
+    }
   }
 
   const zipName = zipNameFor(args.platformId, manifest.version, args.os, args.arch, args.filenameTemplate);

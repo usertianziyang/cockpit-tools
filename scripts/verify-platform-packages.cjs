@@ -16,6 +16,10 @@ const BUILD_PLATFORM_UI_SCRIPT_PATH = path.join(ROOT, 'scripts', 'build-platform
 const PACKAGE_PLATFORM_SCRIPT_PATH = path.join(ROOT, 'scripts', 'package-platform-package.cjs');
 const PACKAGE_INDEX_SCRIPT_PATH = path.join(ROOT, 'scripts', 'build-platform-package-index.cjs');
 const PREPARE_BOOTSTRAP_SCRIPT_PATH = path.join(ROOT, 'scripts', 'prepare-platform-bootstrap.cjs');
+const WINDOWS_COMMON_CONTROLS_BUILD_RULE_PATH = path.join(ROOT, 'crates', 'adapter-windows-common-controls-build.rs');
+const WINDOWS_COMMON_CONTROLS_RC_PATH = path.join(ROOT, 'crates', 'windows-common-controls-v6.rc');
+const WINDOWS_COMMON_CONTROLS_MANIFEST_PATH = path.join(ROOT, 'crates', 'windows-common-controls-v6.manifest');
+const WINDOWS_ADAPTER_BUILD_RS_INCLUDE = 'include!("../adapter-windows-common-controls-build.rs");';
 const PLATFORM_PACKAGES_WORKFLOW_PATH = path.join(ROOT, '.github', 'workflows', 'platform-packages.yml');
 const BUILD_MATRIX_WORKFLOW_PATH = path.join(ROOT, '.github', 'workflows', 'build-matrix.yml');
 const STORE_PATH = path.join(ROOT, 'src', 'stores', 'usePlatformPackageStore.ts');
@@ -361,6 +365,57 @@ function cargoPackageName(crateTomlPath) {
   return match?.[1] ?? null;
 }
 
+function verifyWindowsAdapterManifestBuild(packageId, crateTomlPath) {
+  const workspaceCargoToml = readText(CARGO_TOML_PATH, relative(CARGO_TOML_PATH));
+  if (!/^\s*embed-resource\s*=\s*["{]/m.test(workspaceCargoToml)) {
+    fail('Cargo.toml: missing embed-resource workspace dependency for Windows adapter manifests');
+  }
+
+  for (const filePath of [
+    WINDOWS_COMMON_CONTROLS_BUILD_RULE_PATH,
+    WINDOWS_COMMON_CONTROLS_RC_PATH,
+    WINDOWS_COMMON_CONTROLS_MANIFEST_PATH,
+  ]) {
+    if (!fs.existsSync(filePath)) {
+      fail(`${packageId}: missing shared Windows adapter manifest file ${relative(filePath)}`);
+    }
+  }
+
+  if (fs.existsSync(WINDOWS_COMMON_CONTROLS_BUILD_RULE_PATH)) {
+    const buildRule = readText(WINDOWS_COMMON_CONTROLS_BUILD_RULE_PATH, relative(WINDOWS_COMMON_CONTROLS_BUILD_RULE_PATH));
+    assertIncludes(relative(WINDOWS_COMMON_CONTROLS_BUILD_RULE_PATH), buildRule, 'windows-common-controls-v6.rc');
+    assertIncludes(relative(WINDOWS_COMMON_CONTROLS_BUILD_RULE_PATH), buildRule, 'embed_resource::compile');
+    assertIncludes(relative(WINDOWS_COMMON_CONTROLS_BUILD_RULE_PATH), buildRule, 'manifest_required');
+  }
+
+  if (fs.existsSync(WINDOWS_COMMON_CONTROLS_RC_PATH)) {
+    const resource = readText(WINDOWS_COMMON_CONTROLS_RC_PATH, relative(WINDOWS_COMMON_CONTROLS_RC_PATH));
+    assertIncludes(relative(WINDOWS_COMMON_CONTROLS_RC_PATH), resource, 'RT_MANIFEST');
+    assertIncludes(relative(WINDOWS_COMMON_CONTROLS_RC_PATH), resource, 'windows-common-controls-v6.manifest');
+  }
+
+  if (fs.existsSync(WINDOWS_COMMON_CONTROLS_MANIFEST_PATH)) {
+    const manifest = readText(WINDOWS_COMMON_CONTROLS_MANIFEST_PATH, relative(WINDOWS_COMMON_CONTROLS_MANIFEST_PATH));
+    assertIncludes(relative(WINDOWS_COMMON_CONTROLS_MANIFEST_PATH), manifest, 'Microsoft.Windows.Common-Controls');
+    assertIncludes(relative(WINDOWS_COMMON_CONTROLS_MANIFEST_PATH), manifest, 'version="6.0.0.0"');
+  }
+
+  const crateToml = readText(crateTomlPath, relative(crateTomlPath));
+  const buildRsPath = path.join(path.dirname(crateTomlPath), 'build.rs');
+  if (!/^\s*build\s*=\s*["']build\.rs["']/m.test(crateToml)) {
+    fail(`${packageId}: adapter Cargo.toml must declare build = "build.rs"`);
+  }
+  if (!/^\s*embed-resource\s*=\s*\{\s*workspace\s*=\s*true\s*\}/m.test(crateToml)) {
+    fail(`${packageId}: adapter Cargo.toml must use embed-resource workspace build dependency`);
+  }
+  if (!fs.existsSync(buildRsPath)) {
+    fail(`${packageId}: missing adapter build.rs at ${relative(buildRsPath)}`);
+    return;
+  }
+  const buildRs = readText(buildRsPath, relative(buildRsPath));
+  assertIncludes(relative(buildRsPath), buildRs, WINDOWS_ADAPTER_BUILD_RS_INCLUDE);
+}
+
 function expectedAdapterCrateName(packageId) {
   if (packageId === 'claude_manager') return 'cockpit-claude-adapter';
   return `cockpit-${packageId.replace(/_/g, '-')}-adapter`;
@@ -445,6 +500,7 @@ function verifySidecarAdapterPackage(packageId, manifest, artifacts, workspaceMe
     fail(`${packageId}: missing sidecar adapter Cargo.toml at ${relative(crateTomlPath)}`);
   } else {
     assertEqual(`${packageId}: adapter crate package.name`, cargoPackageName(crateTomlPath), expectedCrate);
+    verifyWindowsAdapterManifestBuild(packageId, crateTomlPath);
   }
 
   const adapter = manifest.adapter;
@@ -945,6 +1001,8 @@ function verifyPackagingTooling() {
     '--adapter-bin-dir <path>',
     '--metadata-out <path>',
     '--update-index',
+    'verifyWindowsAdapterManifestBuild',
+    'windows-common-controls-v6.manifest',
   ]) {
     assertIncludes(relative(PACKAGE_PLATFORM_SCRIPT_PATH), packageScript, expected);
   }

@@ -213,6 +213,7 @@ Core Shell 不应继续承载已迁移平台的业务 UI：
 3. 每个 artifact 必须有真实 `downloadSizeBytes` 和 `sha256`。
 4. GitHub Actions 应分别构建 macOS、Windows、Linux adapter，并分别产出 zip。
 5. 顶层 `downloadUrl` 可以作为旧客户端兼容字段，但新实现必须优先使用 `artifacts[]`。
+6. 所有 Rust `sidecarAdapter` 的 Windows adapter exe 必须在编译期嵌入 Common Controls v6 manifest。标准实现是每个 adapter crate 声明 `build = "build.rs"` 并 include 共享 `crates/adapter-windows-common-controls-build.rs`，由 `crates/windows-common-controls-v6.rc` 和 `crates/windows-common-controls-v6.manifest` 生成资源。正式平台包禁止依赖外置 `*.exe.manifest`，否则 CI 或本地打包必须失败。
 
 ### 5.1 标准打包脚本与 CI
 
@@ -529,10 +530,10 @@ adapter 使用本地 `http-json-v1`：
 4. 保留 Core Shell 的稳定 command facade，让前端不直接依赖 adapter 细节。
 5. 编写 `manifest.json` 和 `runtime/index.json`。
 6. 构建 `ui/remoteEntry.js` 和 `ui/style.css`。
-7. 构建各 OS/arch adapter artifact。
+7. 构建各 OS/arch adapter artifact；Windows Rust adapter 必须嵌入 Common Controls v6 manifest，外置 `*.exe.manifest` 只允许用于临时诊断，不允许进入正式平台包标准。
 8. 用 `npm run package:platform` 打包 zip，计算大小和 `sha256`。
 9. 更新 `platform-packages/index.json` 的 `artifacts[]`。
-10. 执行 `npm run verify:platform-packages`，确认预期平台集合、标准打包脚本/CI workflow、manifest、runtime、index、dist zip、artifact size/sha、更新日志、`assets/package-info.json`、remote UI 导出、remote source 复用原业务 content、zip 内容、sidecar adapter crate/workspace/binary、宿主平台包清单、生命周期入口、平台页壳 `runtimeReady` gate 和隐藏入口 gate 一致；隐藏入口审计至少覆盖 Dashboard、SideNav、平台布局弹框、App 路由、自动刷新、账号迁移、数据备份/恢复、浮动卡片、托盘、macOS 原生菜单、token keeper、Web report 和 provider current。
+10. 执行 `npm run verify:platform-packages`，确认预期平台集合、标准打包脚本/CI workflow、manifest、runtime、index、dist zip、artifact size/sha、更新日志、`assets/package-info.json`、remote UI 导出、remote source 复用原业务 content、zip 内容、sidecar adapter crate/workspace/binary、Windows manifest 嵌入规则、宿主平台包清单、生命周期入口、平台页壳 `runtimeReady` gate 和隐藏入口 gate 一致；隐藏入口审计至少覆盖 Dashboard、SideNav、平台布局弹框、App 路由、自动刷新、账号迁移、数据备份/恢复、浮动卡片、托盘、macOS 原生菜单、token keeper、Web report 和 provider current。
 11. 接入平台页右上角 `PlatformPackageToolbar`，并让可更新状态通过“更新”按钮打开平台更新弹框展示更新内容。
 12. 接入通用不可用页和 `runtimeReady` gate。
 13. 接入 Dashboard、托盘/菜单、自动刷新、账号迁移、数据备份/恢复、Web report、provider current、token keeper、浮动卡片和路径重试等隐藏入口 gate。

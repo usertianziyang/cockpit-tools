@@ -730,6 +730,7 @@ version = "0.1.0"
 dependencies = [
  "base64 0.22.1",
  "cockpit-core",
+ "embed-resource",
  "reqwest 0.12.28",
  "rusqlite",
  "serde",
@@ -746,6 +747,7 @@ version = "0.1.0"
 dependencies = [
  "base64 0.22.1",
  "cockpit-core",
+ "embed-resource",
  "reqwest 0.12.28",
  "rusqlite",
  "serde",
@@ -761,6 +763,7 @@ name = "cockpit-claude-adapter"
 version = "0.1.0"
 dependencies = [
  "cockpit-core",
+ "embed-resource",
  "serde",
  "serde_json",
  "tiny_http",
@@ -789,6 +792,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "cockpit-core",
+ "embed-resource",
  "rusqlite",
  "serde",
  "serde_json",
@@ -803,6 +807,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "cockpit-core",
+ "embed-resource",
  "rusqlite",
  "serde",
  "serde_json",
@@ -816,6 +821,7 @@ name = "cockpit-codex-adapter"
 version = "0.1.0"
 dependencies = [
  "cockpit-core",
+ "embed-resource",
  "reqwest 0.12.28",
  "serde",
  "serde_json",
@@ -882,6 +888,7 @@ name = "cockpit-cursor-adapter"
 version = "0.1.0"
 dependencies = [
  "cockpit-core",
+ "embed-resource",
  "serde",
  "serde_json",
  "tiny_http",
@@ -894,6 +901,7 @@ name = "cockpit-gemini-adapter"
 version = "0.1.0"
 dependencies = [
  "cockpit-core",
+ "embed-resource",
  "serde",
  "serde_json",
  "tiny_http",
@@ -906,6 +914,7 @@ name = "cockpit-github-copilot-adapter"
 version = "0.1.0"
 dependencies = [
  "cockpit-core",
+ "embed-resource",
  "serde",
  "serde_json",
  "tiny_http",
@@ -918,6 +927,7 @@ name = "cockpit-kiro-adapter"
 version = "0.1.0"
 dependencies = [
  "cockpit-core",
+ "embed-resource",
  "serde",
  "serde_json",
  "tiny_http",
@@ -930,6 +940,7 @@ name = "cockpit-qoder-adapter"
 version = "0.1.0"
 dependencies = [
  "cockpit-core",
+ "embed-resource",
  "serde",
  "serde_json",
  "tiny_http",
@@ -1011,6 +1022,7 @@ name = "cockpit-trae-adapter"
 version = "0.1.0"
 dependencies = [
  "cockpit-core",
+ "embed-resource",
  "serde",
  "serde_json",
  "tiny_http",
@@ -1023,6 +1035,7 @@ name = "cockpit-windsurf-adapter"
 version = "0.1.0"
 dependencies = [
  "cockpit-core",
+ "embed-resource",
  "serde",
  "serde_json",
  "tiny_http",
@@ -1036,6 +1049,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "cockpit-core",
+ "embed-resource",
  "serde",
  "serde_json",
  "tiny_http",
@@ -1048,6 +1062,7 @@ name = "cockpit-zed-adapter"
 version = "0.1.0"
 dependencies = [
  "cockpit-core",
+ "embed-resource",
  "serde",
  "serde_json",
  "tiny_http",

@@ -2,6 +2,7 @@
 name = "cockpit-cursor-adapter"
 version = "0.1.0"
 edition = "2021"
+build = "build.rs"
 
 [dependencies]
 cockpit-core = { path = "../cockpit-core" }
@@ -10,3 +11,6 @@ serde_json = { workspace = true }
 tokio = { workspace = true }
 tiny_http = "0.12"
 uuid = { workspace = true }
+
+[build-dependencies]
+embed-resource = { workspace = true }
