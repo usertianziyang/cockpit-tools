@@ -17,6 +17,7 @@ const BUILD_PLATFORM_UI_SCRIPT_PATH = path.join(ROOT, 'scripts', 'build-platform
 const PACKAGE_PLATFORM_SCRIPT_PATH = path.join(ROOT, 'scripts', 'package-platform-package.cjs');
 const PACKAGE_INDEX_SCRIPT_PATH = path.join(ROOT, 'scripts', 'build-platform-package-index.cjs');
 const PREPARE_BOOTSTRAP_SCRIPT_PATH = path.join(ROOT, 'scripts', 'prepare-platform-bootstrap.cjs');
+const RELEASE_INDEX_GUARD_SCRIPT_PATH = path.join(ROOT, 'scripts', 'guard-platform-release-index.cjs');
 const WINDOWS_COMMON_CONTROLS_BUILD_RULE_PATH = path.join(ROOT, 'crates', 'adapter-windows-common-controls-build.rs');
 const WINDOWS_COMMON_CONTROLS_RC_PATH = path.join(ROOT, 'crates', 'windows-common-controls-v6.rc');
 const WINDOWS_COMMON_CONTROLS_MANIFEST_PATH = path.join(ROOT, 'crates', 'windows-common-controls-v6.manifest');
@@ -585,6 +586,20 @@ function verifyNoTrackedPlatformPackageArtifacts() {
   }
 }
 
+function verifyProtectedReleaseIndexNotEdited() {
+  try {
+    execFileSync(process.execPath, [RELEASE_INDEX_GUARD_SCRIPT_PATH], {
+      cwd: ROOT,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+  } catch (error) {
+    const stdout = error.stdout ? String(error.stdout).trim() : '';
+    const stderr = error.stderr ? String(error.stderr).trim() : '';
+    fail([stdout, stderr].filter(Boolean).join('\n') || `failed to run ${relative(RELEASE_INDEX_GUARD_SCRIPT_PATH)}`);
+  }
+}
+
 function verifyPackageHistory(indexPackage) {
   if (sourceOnly) return;
   const packageId = indexPackage.id;
@@ -1129,6 +1144,7 @@ function verifyPackagingTooling() {
     PACKAGE_PLATFORM_SCRIPT_PATH,
     PACKAGE_INDEX_SCRIPT_PATH,
     PREPARE_BOOTSTRAP_SCRIPT_PATH,
+    RELEASE_INDEX_GUARD_SCRIPT_PATH,
   ]) {
     if (!fs.existsSync(scriptPath)) {
       fail(`missing platform package tooling script ${relative(scriptPath)}`);
@@ -1454,6 +1470,8 @@ function verifyStrictHostPlatformBusinessResiduals(indexPackages) {
 }
 
 function main() {
+  verifyProtectedReleaseIndexNotEdited();
+
   const index = readJson(INDEX_PATH, 'platform package index');
   if (!index) process.exit(1);
   const packages = (index.packages ?? []).filter((pkg) => requestedIds.size === 0 || requestedIds.has(pkg.id));

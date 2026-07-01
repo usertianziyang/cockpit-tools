@@ -30,6 +30,7 @@ on:
       - "scripts/build-platform-package-history.cjs"
       - "scripts/build-platform-package-index.cjs"
       - "scripts/package-platform-package.cjs"
+      - "scripts/guard-platform-release-index.cjs"
       - "scripts/verify-platform-packages.cjs"
       - "src/**"
       - "src-tauri/**"
@@ -413,6 +414,8 @@ jobs:
       - name: Publish main platform package branch
         if: github.event_name == 'workflow_dispatch' && inputs.channel == 'main' && inputs.publish_main_branch == true
         shell: bash
+        env:
+          ALLOW_PLATFORM_RELEASE_INDEX_WRITE: "1"
         run: |
           set -euo pipefail
           tmp_dir="$(mktemp -d)"
