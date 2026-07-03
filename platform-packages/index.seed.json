@@ -247,7 +247,7 @@
     {
       "id": "antigravity_ide",
       "platformId": "antigravity_ide",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "apiVersion": 1,
       "minCoreVersion": "1.0.0",
       "displayName": "Antigravity IDE",
@@ -274,6 +274,25 @@
         "verification"
       ],
       "changelog": [
+        {
+          "version": "1.0.3",
+          "date": "2026-07-04",
+          "notes": [
+            "Added support for switching Antigravity IDE accounts without launching the desktop app when launch-on-switch is disabled."
+          ],
+          "locales": {
+            "zh-CN": {
+              "notes": [
+                "新增 Antigravity IDE 切号时可选择不启动桌面应用的支持，关闭切号启动后仅写入账号配置。"
+              ]
+            },
+            "zh-TW": {
+              "notes": [
+                "新增 Antigravity IDE 切號時可選擇不啟動桌面應用的支援，關閉切號啟動後僅寫入帳號配置。"
+              ]
+            }
+          }
+        },
         {
           "version": "1.0.2",
           "date": "2026-07-02",
@@ -372,42 +391,42 @@
         {
           "os": "macos",
           "arch": "aarch64",
-          "downloadUrl": "https://github.com/jlcodes99/cockpit-tools/releases/download/platform-packages-main/antigravity_ide-1.0.2-macos-aarch64.zip",
-          "downloadSizeBytes": 7071422,
-          "sha256": "10f1143fe4b28865a8ae3c4f38ac5987e5a159e09fef5073c22c62f34fc2ed0c"
+          "downloadUrl": "https://github.com/jlcodes99/cockpit-tools/releases/download/platform-packages-main/antigravity_ide-1.0.3-macos-aarch64.zip",
+          "downloadSizeBytes": 7094711,
+          "sha256": "c0cb6430f49321c7ef9ac8cca8e5d3566c7ba688af37715f71044ca2b6a8bae1"
         },
         {
           "os": "macos",
           "arch": "x86_64",
-          "downloadUrl": "https://github.com/jlcodes99/cockpit-tools/releases/download/platform-packages-main/antigravity_ide-1.0.2-macos-x86_64.zip",
-          "downloadSizeBytes": 7364052,
-          "sha256": "3e64c3c858154da886f107b0c74c1f2d02914e50282ff367ff1ba47c82f88a78"
+          "downloadUrl": "https://github.com/jlcodes99/cockpit-tools/releases/download/platform-packages-main/antigravity_ide-1.0.3-macos-x86_64.zip",
+          "downloadSizeBytes": 7385596,
+          "sha256": "b3d095158abc06639fb78ee4eb5186904576b77b31427aa4765c3f755def5c0f"
         },
         {
           "os": "linux",
           "arch": "x86_64",
-          "downloadUrl": "https://github.com/jlcodes99/cockpit-tools/releases/download/platform-packages-main/antigravity_ide-1.0.2-linux-x86_64.zip",
-          "downloadSizeBytes": 7931944,
-          "sha256": "8bdbcbc946bc44621aa1e9639aea42aac009879ef988f1f32c997b8713d8da60"
+          "downloadUrl": "https://github.com/jlcodes99/cockpit-tools/releases/download/platform-packages-main/antigravity_ide-1.0.3-linux-x86_64.zip",
+          "downloadSizeBytes": 7951612,
+          "sha256": "2de6e070bdb241d281c6efa9464720af4a1e99843fc60dd4dabfc0061529de0a"
         },
         {
           "os": "linux",
           "arch": "aarch64",
-          "downloadUrl": "https://github.com/jlcodes99/cockpit-tools/releases/download/platform-packages-main/antigravity_ide-1.0.2-linux-aarch64.zip",
-          "downloadSizeBytes": 7702501,
-          "sha256": "dfacbd2743662475f20dae8687e9e4c4d4e6ccce3a6cf27a1e5c0668bc5293b7"
+          "downloadUrl": "https://github.com/jlcodes99/cockpit-tools/releases/download/platform-packages-main/antigravity_ide-1.0.3-linux-aarch64.zip",
+          "downloadSizeBytes": 7724299,
+          "sha256": "3379d3089ee1a6831b41d398ffac1a43a3eeaddb5e0ccdfb151002400c4d70e4"
         },
         {
           "os": "windows",
           "arch": "x86_64",
-          "downloadUrl": "https://github.com/jlcodes99/cockpit-tools/releases/download/platform-packages-main/antigravity_ide-1.0.2-windows-x86_64.zip",
-          "downloadSizeBytes": 7155954,
-          "sha256": "05471e481910b1623c7b87af820257b18235856a804f0fec03c24adac02c640a"
+          "downloadUrl": "https://github.com/jlcodes99/cockpit-tools/releases/download/platform-packages-main/antigravity_ide-1.0.3-windows-x86_64.zip",
+          "downloadSizeBytes": 7176239,
+          "sha256": "7b1f0dbcdb6710dfe801e993dbc7972d1bc152f4b199cb1b7f44fd46e0f09266"
         }
       ],
-      "downloadUrl": "https://github.com/jlcodes99/cockpit-tools/releases/download/platform-packages-main/antigravity_ide-1.0.2-macos-aarch64.zip",
-      "downloadSizeBytes": 7071422,
-      "sha256": "10f1143fe4b28865a8ae3c4f38ac5987e5a159e09fef5073c22c62f34fc2ed0c",
+      "downloadUrl": "https://github.com/jlcodes99/cockpit-tools/releases/download/platform-packages-main/antigravity_ide-1.0.3-macos-aarch64.zip",
+      "downloadSizeBytes": 7094711,
+      "sha256": "c0cb6430f49321c7ef9ac8cca8e5d3566c7ba688af37715f71044ca2b6a8bae1",
       "adapter": {
         "protocol": "http-json-v1",
         "entry": "adapter/macos/cockpit-antigravity-ide-adapter",
@@ -2733,9 +2752,9 @@
     {
       "id": "codex",
       "platformId": "codex",
-      "version": "1.0.2",
+      "version": "1.0.5",
       "apiVersion": 1,
-      "minCoreVersion": "1.0.2",
+      "minCoreVersion": "1.0.3",
       "displayName": "Codex",
       "entry": "runtime/index.json",
       "packageMode": "hotUpdate",
@@ -2764,6 +2783,81 @@
         "cli"
       ],
       "changelog": [
+        {
+          "version": "1.0.5",
+          "date": "2026-07-04",
+          "notes": [
+            "Added pending OAuth account support so Codex account notes can be saved before authorization, imported from external links, and completed later from the same account card.",
+            "Expanded Codex account notes with 2FA secrets, passwords, phone numbers, general notes, current OTP display, and shared 2FA manager integration.",
+            "Improved Codex platform adapter coverage for API service, batch deletion, session transfer, account transfer, model provider usage, and request log repricing flows.",
+            "Fixed Codex local API service and image_generation settings so saved runtime options stay stable across reloads, switches, and API service startup.",
+            "Refined pending OAuth account cards with a dedicated pending state, note-dialog-only sensitive details, and reauthorization-style OAuth actions.",
+            "Improved Codex token refresh coordination and session activity ordering to reduce duplicate refreshes and stale session timestamps."
+          ],
+          "locales": {
+            "zh-CN": {
+              "notes": [
+                "新增 Codex 待授权 OAuth 账号支持：账号备注可先保存，可从外部链接导入，后续从同一张账号卡片继续完成授权。",
+                "扩展 Codex 账号备注：支持 2FA 秘钥、密码、手机号、其他备注、动态验证码展示，并联动通用 2FA 管理。",
+                "补齐 Codex 平台 adapter 对 API 服务、批量删除、会话迁移、账号迁移、模型供应商用量和请求日志重算费用等流程的支持。",
+                "修复 Codex 本地 API 服务和 image_generation 设置，保存后的运行选项在刷新、切号和 API 服务启动后保持稳定。",
+                "优化 Codex 待授权 OAuth 账号卡片：使用专门的待授权状态，敏感备注只在备注弹框中查看，OAuth 授权入口与重新授权操作区保持一致。",
+                "改进 Codex Token 刷新协调和会话活动时间排序，减少重复刷新和会话时间滞后。"
+              ]
+            },
+            "zh-TW": {
+              "notes": [
+                "新增 Codex 待授權 OAuth 帳號支援：帳號備註可先儲存，可從外部連結匯入，後續從同一張帳號卡片繼續完成授權。",
+                "擴充 Codex 帳號備註：支援 2FA 秘鑰、密碼、手機號碼、其他備註、動態驗證碼顯示，並連動通用 2FA 管理。",
+                "補齊 Codex 平台 adapter 對 API 服務、批量刪除、會話遷移、帳號遷移、模型供應商用量與請求日誌重算費用等流程的支援。",
+                "修復 Codex 本機 API 服務與 image_generation 設定，儲存後的執行選項在重新整理、切號與 API 服務啟動後保持穩定。",
+                "最佳化 Codex 待授權 OAuth 帳號卡片：使用專門的待授權狀態，敏感備註只在備註彈框中查看，OAuth 授權入口與重新授權操作區保持一致。",
+                "改進 Codex Token 刷新協調與會話活動時間排序，減少重複刷新與會話時間滯後。"
+              ]
+            }
+          }
+        },
+        {
+          "version": "1.0.4",
+          "date": "2026-07-04",
+          "notes": [
+            "Added pending OAuth account cards so Codex account notes can be saved before authorization and completed later from the same card."
+          ],
+          "locales": {
+            "zh-CN": {
+              "notes": [
+                "新增 Codex 待授权 OAuth 账号卡片，账号备注可先保存，后续从同一张卡片继续完成授权。"
+              ]
+            },
+            "zh-TW": {
+              "notes": [
+                "新增 Codex 待授權 OAuth 帳號卡片，帳號備註可先儲存，後續從同一張卡片繼續完成授權。"
+              ]
+            }
+          }
+        },
+        {
+          "version": "1.0.3",
+          "date": "2026-07-04",
+          "notes": [
+            "Improved Codex platform adapter coverage for API service, batch delete, session transfer, model provider usage, and request log repricing flows.",
+            "Fixed Codex local API service and image generation settings to keep saved runtime options stable across reloads."
+          ],
+          "locales": {
+            "zh-CN": {
+              "notes": [
+                "补齐 Codex 平台 adapter 对 API 服务、批量删除、会话迁移、模型供应商用量和请求日志重算费用等流程的支持。",
+                "修复 Codex 本地 API 服务和 image_generation 设置，保存后的运行选项在刷新或重启后保持稳定。"
+              ]
+            },
+            "zh-TW": {
+              "notes": [
+                "補齊 Codex 平台 adapter 對 API 服務、批量刪除、會話遷移、模型供應商用量與請求日誌重算費用等流程的支援。",
+                "修復 Codex 本機 API 服務與 image_generation 設定，儲存後的執行選項在重新整理或重啟後保持穩定。"
+              ]
+            }
+          }
+        },
         {
           "version": "1.0.2",
           "date": "2026-07-03",
@@ -2887,42 +2981,42 @@
         {
           "os": "macos",
           "arch": "aarch64",
-          "downloadUrl": "https://github.com/jlcodes99/cockpit-tools/releases/download/platform-packages-main/codex-1.0.2-macos-aarch64.zip",
-          "downloadSizeBytes": 14900991,
-          "sha256": "bd4cabf1a0b53e8a95d9e8f2112f6c96dcb5b66de75673e211a41fc7c13c7d08"
+          "downloadUrl": "https://github.com/jlcodes99/cockpit-tools/releases/download/platform-packages-main/codex-1.0.5-macos-aarch64.zip",
+          "downloadSizeBytes": 14922179,
+          "sha256": "33139d62f5c98cf293552b841106a58c0e3b09207fd43b6d59bd14b6bb7e9876"
         },
         {
           "os": "macos",
           "arch": "x86_64",
-          "downloadUrl": "https://github.com/jlcodes99/cockpit-tools/releases/download/platform-packages-main/codex-1.0.2-macos-x86_64.zip",
-          "downloadSizeBytes": 15894925,
-          "sha256": "81ccfad2fae7cb2e8d7aa81583bd9c1c6f49104f6af1c5349198417032d77a25"
+          "downloadUrl": "https://github.com/jlcodes99/cockpit-tools/releases/download/platform-packages-main/codex-1.0.5-macos-x86_64.zip",
+          "downloadSizeBytes": 15919800,
+          "sha256": "5868fad338c1cfe325f39d34de9c09ee08891d7c59aeb1df6c029e224c79f252"
         },
         {
           "os": "linux",
           "arch": "x86_64",
-          "downloadUrl": "https://github.com/jlcodes99/cockpit-tools/releases/download/platform-packages-main/codex-1.0.2-linux-x86_64.zip",
-          "downloadSizeBytes": 16416365,
-          "sha256": "ad8f6b516b66eb4faee2ce9b68f598535d1cd9ab2ff02a8f6efbc5e3a6fa1ea4"
+          "downloadUrl": "https://github.com/jlcodes99/cockpit-tools/releases/download/platform-packages-main/codex-1.0.5-linux-x86_64.zip",
+          "downloadSizeBytes": 16443245,
+          "sha256": "f4d8128c24fdcb34a6e71a9a513348ddb09ace6919f59ca0c4fe158df9b31bbd"
         },
         {
           "os": "linux",
           "arch": "aarch64",
-          "downloadUrl": "https://github.com/jlcodes99/cockpit-tools/releases/download/platform-packages-main/codex-1.0.2-linux-aarch64.zip",
-          "downloadSizeBytes": 15400569,
-          "sha256": "02e26c5ad0805cde957ede64d46fc821d7c5f5e1acafa8942b33386e9ca04bb7"
+          "downloadUrl": "https://github.com/jlcodes99/cockpit-tools/releases/download/platform-packages-main/codex-1.0.5-linux-aarch64.zip",
+          "downloadSizeBytes": 15425165,
+          "sha256": "cad5f1db22dcbedf7fe0440880fbb193b53c8a6a741b3a1be2977ee41d3c685c"
         },
         {
           "os": "windows",
           "arch": "x86_64",
-          "downloadUrl": "https://github.com/jlcodes99/cockpit-tools/releases/download/platform-packages-main/codex-1.0.2-windows-x86_64.zip",
-          "downloadSizeBytes": 15672039,
-          "sha256": "75cd7b3887ecb2421e176a7903e78a4244b6328c996938c29620b7b17ca8f6a3"
+          "downloadUrl": "https://github.com/jlcodes99/cockpit-tools/releases/download/platform-packages-main/codex-1.0.5-windows-x86_64.zip",
+          "downloadSizeBytes": 15694829,
+          "sha256": "043a5fa907fcc3ead2aaf135690247142e7a970c85df0ed3481ccd244ff6a25a"
         }
       ],
-      "downloadUrl": "https://github.com/jlcodes99/cockpit-tools/releases/download/platform-packages-main/codex-1.0.2-macos-aarch64.zip",
-      "downloadSizeBytes": 14900991,
-      "sha256": "bd4cabf1a0b53e8a95d9e8f2112f6c96dcb5b66de75673e211a41fc7c13c7d08",
+      "downloadUrl": "https://github.com/jlcodes99/cockpit-tools/releases/download/platform-packages-main/codex-1.0.5-macos-aarch64.zip",
+      "downloadSizeBytes": 14922179,
+      "sha256": "33139d62f5c98cf293552b841106a58c0e3b09207fd43b6d59bd14b6bb7e9876",
       "adapter": {
         "protocol": "http-json-v1",
         "entry": "adapter/macos/cockpit-codex-adapter",
@@ -2941,8 +3035,15 @@
           "switch.account",
           "accounts.delete",
           "accounts.deleteMany",
+          "accounts.batchDelete.start",
+          "accounts.batchDelete.get",
+          "accounts.batchDelete.resume",
+          "accounts.batchDelete.pause",
+          "accounts.batchDelete.retryFailed",
+          "accounts.batchDelete.clear",
           "accounts.addToken",
           "accounts.addApiKey",
+          "accounts.createPendingOAuth",
           "accounts.updateName",
           "accounts.updateApiKeyCredentials",
           "accounts.updateTags",
@@ -3008,6 +3109,7 @@
           "localAccess.updateAccountModelRules",
           "localAccess.updateModelRules",
           "localAccess.updateModelPricings",
+          "localAccess.repriceRequestLogs",
           "localAccess.updateRoutingOptions",
           "localAccess.updateTimeouts",
           "localAccess.updateTimeoutPresets",
@@ -3050,6 +3152,8 @@
           "modelProviders.queryUsage",
           "sessions.syncThreadsAcrossInstances",
           "sessions.syncToInstance",
+          "sessions.transfer.export",
+          "sessions.transfer.import",
           "sessions.visibilityRepairProviders.list",
           "sessions.visibilityRepairInstances.list",
           "sessions.visibilityRepair.run",
