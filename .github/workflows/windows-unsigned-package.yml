@@ -1,0 +1,61 @@
+name: Windows Unsigned Package
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "codex/windows-unsigned-package"
+
+jobs:
+  build-windows:
+    name: Build Windows unsigned package
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Rust setup
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Go setup
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: sidecars/cockpit-cliproxy/go.mod
+          cache-dependency-path: sidecars/cockpit-cliproxy/go.sum
+
+      - name: Node.js setup
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Install frontend dependencies
+        run: npm install
+
+      - name: Build Windows app
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          npx tauri build --ci --config src-tauri/tauri.ci.conf.json 2>&1 | tee build-windows-latest.log
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-windows-latest
+          retention-days: 7
+          if-no-files-found: error
+          path: build-windows-latest.log
+
+      - name: Upload Windows bundles
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundles-windows-latest
+          retention-days: 7
+          if-no-files-found: error
+          path: target/release/bundle
