@@ -552,10 +552,13 @@ fn enforce_deepseek_responses_account(account: &mut CodexAccount) -> bool {
     if !account.is_api_key_auth() || !is_deepseek_account(account) {
         return false;
     }
-    let model_catalog = DEEPSEEK_CODEX_MODELS
-        .iter()
-        .map(|model| model.to_string())
-        .collect::<Vec<_>>();
+    let mut model_catalog = normalize_api_model_catalog(account.api_model_catalog.clone());
+    if model_catalog.is_empty() {
+        model_catalog = DEEPSEEK_CODEX_MODELS
+            .iter()
+            .map(|model| model.to_string())
+            .collect();
+    }
     let changed = account.api_base_url.as_deref() != Some(DEEPSEEK_API_BASE_URL)
         || account.api_provider_id.as_deref() != Some(DEEPSEEK_PROVIDER_ID)
         || account.api_wire_api.as_deref() != Some(CODEX_PROVIDER_WIRE_API)
@@ -1278,7 +1281,19 @@ fn sync_api_key_model_catalog_to_dir(
     }
 
     let upstream_models = normalize_api_model_catalog(account.api_model_catalog.clone());
-    let slots = crate::modules::codex_local_access::allocate_provider_model_slots(&upstream_models);
+    let slots = if is_deepseek_account(account) {
+        upstream_models
+            .iter()
+            .map(
+                |model| crate::modules::codex_local_access::ProviderGatewayModelSlot {
+                    client_model: model.clone(),
+                    upstream_model: model.clone(),
+                },
+            )
+            .collect::<Vec<_>>()
+    } else {
+        crate::modules::codex_local_access::allocate_provider_model_slots(&upstream_models)
+    };
     let client_models = slots
         .iter()
         .map(|slot| slot.client_model.clone())
@@ -1299,7 +1314,11 @@ fn sync_api_key_model_catalog_to_dir(
             doc["model"] = value(default_model.as_str());
         }
     }
-    let content = crate::modules::codex_local_access::build_provider_model_catalog_json(&slots)?;
+    let content = if is_deepseek_account(account) {
+        crate::modules::codex_local_access::build_deepseek_model_catalog_json(&upstream_models)?
+    } else {
+        crate::modules::codex_local_access::build_provider_model_catalog_json(&slots)?
+    };
     let catalog_path = base_dir.join(CODEX_MANAGED_MODEL_CATALOG_FILE);
     write_string_atomic(&catalog_path, &content).map_err(|e| {
         format!(
@@ -1571,17 +1590,37 @@ fn write_api_key_bearer_provider_override_to_config_toml(
     // A custom compatibility provider owns its endpoint. Drop any URL left by the previously
     // active built-in OpenAI relay so two accounts' routing state cannot coexist.
     let _ = doc.remove(CODEX_CONFIG_OPENAI_BASE_URL_KEY);
-    doc[CODEX_CONFIG_MODEL_PROVIDER_KEY] = value(CODEX_RUNTIME_MODEL_PROVIDER_ID);
+    let runtime_provider_id = if provider_config
+        .provider_id
+        .as_deref()
+        .is_some_and(|value| value.eq_ignore_ascii_case(DEEPSEEK_PROVIDER_ID))
+    {
+        DEEPSEEK_PROVIDER_ID
+    } else {
+        CODEX_RUNTIME_MODEL_PROVIDER_ID
+    };
+    doc[CODEX_CONFIG_MODEL_PROVIDER_KEY] = value(runtime_provider_id);
+    if runtime_provider_id == DEEPSEEK_PROVIDER_ID {
+        doc["preferred_auth_method"] = value("apikey");
+        doc["forced_login_method"] = value("api");
+        let reasoning_effort_supported = doc
+            .get("model_reasoning_effort")
+            .and_then(|item| item.as_str())
+            .is_some_and(|effort| matches!(effort, "low" | "high" | "max"));
+        if !reasoning_effort_supported {
+            doc["model_reasoning_effort"] = value("high");
+        }
+    }
     if doc.get(CODEX_CONFIG_MODEL_PROVIDERS_KEY).is_none() {
         doc[CODEX_CONFIG_MODEL_PROVIDERS_KEY] = toml_edit::table();
     }
     let model_providers = doc[CODEX_CONFIG_MODEL_PROVIDERS_KEY]
         .as_table_mut()
         .ok_or("config.toml 中 model_providers 不是合法表结构")?;
-    if !model_providers.contains_key(CODEX_RUNTIME_MODEL_PROVIDER_ID) {
-        model_providers[CODEX_RUNTIME_MODEL_PROVIDER_ID] = toml_edit::table();
+    if !model_providers.contains_key(runtime_provider_id) {
+        model_providers[runtime_provider_id] = toml_edit::table();
     }
-    let provider_table = model_providers[CODEX_RUNTIME_MODEL_PROVIDER_ID]
+    let provider_table = model_providers[runtime_provider_id]
         .as_table_mut()
         .ok_or("config.toml 中目标 provider 不是合法表结构")?;
     provider_table["name"] = value(provider_name);
@@ -1662,7 +1701,8 @@ fn api_key_account_requires_bearer_provider_override(
         && !account.api_supports_websockets
         && !account_syncs_model_catalog_to_codex(account);
 
-    oauth_bound
+    is_deepseek_account(account)
+        || oauth_bound
         || uses_local_runtime
         || requires_immediate_provider_override
         || requires_http_only_responses_provider
@@ -1694,7 +1734,11 @@ fn write_api_key_runtime_provider_to_config_toml(
         account.api_provider_mode == CodexApiProviderMode::Custom
             && account.api_supports_websockets,
         supports_image,
-        oauth_bound || !supports_image,
+        if is_deepseek_account(account) {
+            false
+        } else {
+            oauth_bound || !supports_image
+        },
     )
 }
 
@@ -5984,6 +6028,17 @@ pub async fn reactivate_if_imported_matches_current(
     }
 }
 
+async fn disable_local_access_before_direct_switch() -> Result<(), String> {
+    if crate::modules::codex_local_access::get_local_access_state()
+        .await?
+        .collection
+        .is_some_and(|collection| collection.enabled)
+    {
+        crate::modules::codex_local_access::set_local_access_enabled(false).await?;
+    }
+    Ok(())
+}
+
 pub async fn switch_account_managed(account_id: &str) -> Result<CodexAccount, String> {
     let account = load_account_after_index_repair(account_id)
         .ok_or_else(|| format!("账号不存在: {}", account_id))?;
@@ -5995,12 +6050,14 @@ pub async fn switch_account_managed(account_id: &str) -> Result<CodexAccount, St
     }
     if account.is_api_key_auth() {
         if normalize_optional_ref(account.bound_oauth_account_id.as_deref()).is_none() {
+            disable_local_access_before_direct_switch().await?;
             let updated_account = switch_account_with_prepared(account_id, account)?;
             let codex_home = get_codex_home();
             activate_provider_gateway_after_switch_if_needed(&codex_home, &updated_account).await?;
             return Ok(updated_account);
         }
         let oauth_account = refresh_bound_oauth_account_for_api_key(&account, "switch").await?;
+        disable_local_access_before_direct_switch().await?;
         let codex_home = get_codex_home();
         let auth_path = codex_home.join("auth.json");
         logger::log_info(&format!(
@@ -6041,6 +6098,7 @@ pub async fn switch_account_managed(account_id: &str) -> Result<CodexAccount, St
     let _guard = lock.lock().await;
     let _file_guard = acquire_codex_token_refresh_file_lock(account_id, "switch").await?;
     let account = refresh_managed_account_locked(account_id, false, "switch", None).await?;
+    disable_local_access_before_direct_switch().await?;
     switch_account_with_prepared(account_id, account)
 }
 
@@ -9165,7 +9223,7 @@ mod tests {
         parse_agent_identity_from_value, parse_auth_file_last_refresh, parse_codex_account_compat,
         parse_line_delimited_json_values, read_api_provider_from_config_toml,
         read_quick_config_from_config_toml, remove_accounts, resolve_api_provider_config,
-        save_account, save_account_index, should_accept_authority_snapshot,
+        save_account, save_account_index, should_accept_authority_snapshot, switch_account_managed,
         sync_account_from_auth_dir, sync_api_key_account_from_local_state,
         sync_api_key_provider_accounts, sync_managed_projection_from_auth_dir,
         try_parse_pending_oauth_delimited_line, update_api_key_credentials, upsert_account,
@@ -9181,7 +9239,7 @@ mod tests {
         CODEX_AUTHORIZATION_STATUS_PENDING, CODEX_AUTO_COMPACT_DEFAULT_LIMIT,
         CODEX_CONTEXT_WINDOW_1M_VALUE, CODEX_DISABLE_HOSTED_IMAGE_GENERATION_HEADER,
         CODEX_DISABLE_HOSTED_IMAGE_GENERATION_HEADER_VALUE, CODEX_IMAGEGEN_ACTOR_HEADER,
-        CODEX_IMAGEGEN_ACTOR_HEADER_VALUE, CODEX_IMAGE_MODEL_ID,
+        CODEX_IMAGEGEN_ACTOR_HEADER_VALUE, CODEX_IMAGE_MODEL_ID, CODEX_RUNTIME_MODEL_PROVIDER_ID,
     };
     use crate::models::codex::{
         CodexAccount, CodexAgentIdentity, CodexApiProviderMode, CodexTokens,
@@ -13255,7 +13313,7 @@ supports_websockets = false
     }
 
     #[test]
-    fn deepseek_account_migration_enforces_official_responses_profile() {
+    fn deepseek_account_migration_preserves_custom_model_catalog() {
         let mut account = CodexAccount::new_api_key(
             "deepseek-api-key".to_string(),
             "deepseek@example.com".to_string(),
@@ -13264,7 +13322,7 @@ supports_websockets = false
             Some("https://api.deepseek.com/v1".to_string()),
             Some("deepseek".to_string()),
             Some("DeepSeek".to_string()),
-            vec!["deepseek-v4-pro".to_string()],
+            vec!["custom-deepseek-model".to_string()],
         );
         account.api_wire_api = Some("chat_completions".to_string());
         account.api_supports_websockets = true;
@@ -13279,10 +13337,136 @@ supports_websockets = false
         assert!(account.api_sync_model_catalog_to_codex);
         assert!(!account.api_supports_websockets);
         assert!(!account.api_supports_vision);
+        assert_eq!(account.api_model_catalog, vec!["custom-deepseek-model"]);
+    }
+
+    #[tokio::test(flavor = "current_thread")]
+    async fn switching_direct_account_disables_local_access_takeover() {
+        let _lock = crate::modules::test_support::env_lock()
+            .lock()
+            .unwrap_or_else(|err| err.into_inner());
+        let env = TestEnvGuard::new("codex-direct-switch-disables-local-access-test");
+        let _runtime_guard =
+            crate::modules::codex_local_access::set_local_access_enabled_for_test(true).await;
+
+        let account = upsert_api_key_account(
+            "sk-deepseek-test".to_string(),
+            Some("https://api.deepseek.com".to_string()),
+            Some(CodexApiProviderMode::Custom),
+            Some("deepseek".to_string()),
+            Some("DeepSeek".to_string()),
+            vec!["deepseek-v4-pro".to_string()],
+            Some(true),
+            Some("responses".to_string()),
+            false,
+            false,
+            std::collections::HashMap::new(),
+            None,
+            None,
+        )
+        .expect("create DeepSeek account");
+
+        switch_account_managed(&account.id)
+            .await
+            .expect("switch to DeepSeek account");
+
+        let state = crate::modules::codex_local_access::get_local_access_state()
+            .await
+            .expect("read local access state");
         assert_eq!(
-            account.api_model_catalog,
-            vec!["deepseek-v4-flash", "deepseek-v4-pro"]
+            state.collection.map(|collection| collection.enabled),
+            Some(false)
         );
+        let config =
+            fs::read_to_string(env.codex_home().join("config.toml")).expect("read switched config");
+        assert!(config.contains("model_provider = \"deepseek\""));
+        assert!(config.contains("model = \"deepseek-v4-pro\""));
+    }
+
+    #[test]
+    fn deepseek_api_key_bundle_writes_native_provider_and_catalog() {
+        let base_dir = make_temp_dir("codex-deepseek-native-responses-test");
+        let mut account = CodexAccount::new_api_key(
+            "deepseek-api-key".to_string(),
+            "deepseek@example.com".to_string(),
+            "sk-deepseek".to_string(),
+            CodexApiProviderMode::Custom,
+            Some("https://api.deepseek.com/v1".to_string()),
+            Some("deepseek".to_string()),
+            Some("DeepSeek".to_string()),
+            vec![
+                "deepseek-v4-pro".to_string(),
+                "custom-deepseek-model".to_string(),
+            ],
+        );
+        account.api_wire_api = Some("chat_completions".to_string());
+        assert!(super::enforce_deepseek_responses_account(&mut account));
+
+        write_account_bundle_to_dir(&base_dir, &account).expect("write DeepSeek account bundle");
+
+        let config = fs::read_to_string(base_dir.join("config.toml")).expect("read config");
+        assert!(config.contains("model_provider = \"deepseek\""));
+        assert!(config.contains("model = \"deepseek-v4-pro\""));
+        assert!(config.contains("preferred_auth_method = \"apikey\""));
+        assert!(config.contains("forced_login_method = \"api\""));
+        assert!(config.contains("model_reasoning_effort = \"high\""));
+        assert!(config.contains("[model_providers.deepseek]"));
+        assert!(config.contains("base_url = \"https://api.deepseek.com\""));
+        assert!(config.contains("wire_api = \"responses\""));
+        assert!(config.contains("requires_openai_auth = false"));
+        assert!(config.contains("experimental_bearer_token = \"sk-deepseek\""));
+
+        let catalog: serde_json::Value = serde_json::from_str(
+            &fs::read_to_string(base_dir.join(super::CODEX_MANAGED_MODEL_CATALOG_FILE))
+                .expect("read DeepSeek model catalog"),
+        )
+        .expect("parse DeepSeek model catalog");
+        let models = catalog
+            .get("models")
+            .and_then(serde_json::Value::as_array)
+            .expect("models should be an array");
+        assert_eq!(models.len(), 2);
+        let official = models
+            .iter()
+            .find(|model| {
+                model.get("slug").and_then(serde_json::Value::as_str) == Some("deepseek-v4-pro")
+            })
+            .expect("official DeepSeek model should retain its native slug");
+        assert_eq!(
+            official.get("use_responses_lite"),
+            Some(&serde_json::json!(false))
+        );
+        assert_eq!(
+            official.get("context_window"),
+            Some(&serde_json::json!(1_048_576))
+        );
+        assert_eq!(
+            official.get("input_modalities"),
+            Some(&serde_json::json!(["text"]))
+        );
+        assert_eq!(
+            official.get("web_search_tool_type"),
+            Some(&serde_json::json!("text"))
+        );
+        let custom = models
+            .iter()
+            .find(|model| {
+                model.get("slug").and_then(serde_json::Value::as_str)
+                    == Some("custom-deepseek-model")
+            })
+            .expect("custom DeepSeek model should be visible");
+        assert_eq!(
+            custom
+                .get("display_name")
+                .and_then(serde_json::Value::as_str),
+            Some("custom-deepseek-model")
+        );
+        assert_eq!(
+            custom.get("visibility").and_then(serde_json::Value::as_str),
+            Some("list")
+        );
+
+        fs::remove_dir_all(&base_dir).expect("cleanup temp dir");
     }
 
     #[test]

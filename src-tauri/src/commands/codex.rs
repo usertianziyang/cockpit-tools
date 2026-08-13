@@ -2678,7 +2678,9 @@ fn summarize_deepseek_balance(
 
     CodexModelProviderUsageSummary {
         mode: Some("deepseek".to_string()),
-        is_valid: Some(is_available),
+        // A successful authenticated response proves the API key is valid.
+        // DeepSeek's is_available only reports whether the account has usable balance.
+        is_valid: Some(true),
         status: Some(if is_available { "available" } else { "unavailable" }.to_string()),
         plan_name: None,
         remaining: total_balance,
@@ -3918,5 +3920,25 @@ mod tests {
             .details
             .iter()
             .any(|detail| detail.key == "grantedBalance" && detail.value == "10"));
+    }
+
+    #[test]
+    fn deepseek_zero_balance_does_not_mark_api_key_invalid() {
+        let summary = summarize_deepseek_balance(
+            &serde_json::json!({
+                "is_available": false,
+                "balance_infos": [{
+                    "currency": "CNY",
+                    "total_balance": "0.00",
+                    "granted_balance": "0.00",
+                    "topped_up_balance": "0.00"
+                }]
+            }),
+            8,
+        );
+
+        assert_eq!(summary.is_valid, Some(true));
+        assert_eq!(summary.status.as_deref(), Some("unavailable"));
+        assert_eq!(summary.balance, Some(0.0));
     }
 }

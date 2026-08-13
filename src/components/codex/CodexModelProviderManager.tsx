@@ -4736,28 +4736,30 @@ export function CodexModelProviderManager({
                       {t("codex.modelProviders.wireApi.responses", "Responses 原生")}
                     </span>
                   </button>
-                  <button
-                    type="button"
-                    className={`api-provider-chip ${form.wireApi === "chat_completions" ? "active" : ""}`}
-                    onClick={() =>
-                      mutateForm({
-                        wireApi: "chat_completions",
-                        supportsWebsockets: false,
-                        enableModePreference:
-                          resolveEnableModePreferenceForWireApi(
-                            "chat_completions",
-                          ),
-                      })
-                    }
-                    disabled={saving || selectedPresetId === DEEPSEEK_API_PROVIDER_ID}
-                  >
-                    <span>
-                      {t(
-                        "codex.modelProviders.wireApi.chatCompletions",
-                        "Chat Completions 协议",
-                      )}
-                    </span>
-                  </button>
+                  {selectedPresetId !== DEEPSEEK_API_PROVIDER_ID && (
+                    <button
+                      type="button"
+                      className={`api-provider-chip ${form.wireApi === "chat_completions" ? "active" : ""}`}
+                      onClick={() =>
+                        mutateForm({
+                          wireApi: "chat_completions",
+                          supportsWebsockets: false,
+                          enableModePreference:
+                            resolveEnableModePreferenceForWireApi(
+                              "chat_completions",
+                            ),
+                        })
+                      }
+                      disabled={saving}
+                    >
+                      <span>
+                        {t(
+                          "codex.modelProviders.wireApi.chatCompletions",
+                          "Chat Completions 协议",
+                        )}
+                      </span>
+                    </button>
+                  )}
                 </div>
               </div>
               {form.wireApi === "responses" && (
@@ -4814,7 +4816,7 @@ export function CodexModelProviderManager({
                       onChange={(event) =>
                         mutateForm({ modelCatalogText: event.target.value })
                       }
-                      placeholder={"deepseek-v4-flash\ndeepseek-v4-pro"}
+                      placeholder={"model-id-1\nmodel-id-2"}
                       disabled={saving}
                     />
                   </div>

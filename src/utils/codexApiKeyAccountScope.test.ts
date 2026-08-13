@@ -54,7 +54,7 @@ test("excludes provider-gateway accounts but keeps a persisted fixed scope visib
   );
 });
 
-test("excludes a provider-gateway account inferred from its upstream URL", () => {
+test("keeps a legacy DeepSeek account eligible because the official endpoint uses Responses", () => {
   const selected = selectCodexApiKeyScopeAccounts({
     restrictFreeAccounts: true,
     scopedAccountIds: [],
@@ -71,7 +71,7 @@ test("excludes a provider-gateway account inferred from its upstream URL", () =>
 
   assert.deepEqual(
     selected.map((account) => account.id),
-    ["pro-account"],
+    ["pro-account", "provider-gateway-account"],
   );
 });
 

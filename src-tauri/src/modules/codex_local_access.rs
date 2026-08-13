@@ -727,6 +727,30 @@ fn gateway_runtime() -> &'static TokioMutex<GatewayRuntime> {
     GATEWAY_RUNTIME.get_or_init(|| TokioMutex::new(GatewayRuntime::default()))
 }
 
+#[cfg(test)]
+pub(crate) struct LocalAccessTestRuntimeGuard(Option<GatewayRuntime>);
+
+#[cfg(test)]
+impl Drop for LocalAccessTestRuntimeGuard {
+    fn drop(&mut self) {
+        if let (Some(previous), Ok(mut runtime)) = (self.0.take(), gateway_runtime().try_lock()) {
+            *runtime = previous;
+        }
+    }
+}
+
+#[cfg(test)]
+pub(crate) async fn set_local_access_enabled_for_test(
+    enabled: bool,
+) -> LocalAccessTestRuntimeGuard {
+    let mut collection = new_empty_local_access_collection().expect("create test collection");
+    collection.enabled = enabled;
+    let mut runtime = gateway_runtime().lock().await;
+    let previous = std::mem::take(&mut *runtime);
+    sync_runtime_collection(&mut runtime, collection);
+    LocalAccessTestRuntimeGuard(Some(previous))
+}
+
 fn gateway_runtime_load_notify() -> &'static Notify {
     GATEWAY_RUNTIME_LOAD_NOTIFY.get_or_init(Notify::new)
 }
@@ -2519,29 +2543,50 @@ fn visible_codex_model_ids_for_api_key_with_optional_accounts(
         accounts,
         health_by_account_id,
     );
-    let base = supported_codex_model_ids()
-        .into_iter()
-        .filter(|model| model != CODEX_IMAGE_MODEL_ID || image_allowed)
-        .collect();
+    let selected_account_ids: HashSet<&str> =
+        scoped_account_ids.iter().map(String::as_str).collect();
+    let routed_accounts = accounts
+        .unwrap_or_default()
+        .iter()
+        .filter(|account| {
+            selected_account_ids.contains(account.id.as_str())
+                && is_local_access_eligible_account(account, collection.restrict_free_accounts)
+        })
+        .collect::<Vec<_>>();
+    let base = if accounts.is_none()
+        || routed_accounts.is_empty()
+        || routed_accounts
+            .iter()
+            .any(|account| !account.is_api_key_auth() || account.api_model_catalog.is_empty())
+    {
+        supported_codex_model_ids()
+            .into_iter()
+            .filter(|model| model != CODEX_IMAGE_MODEL_ID || image_allowed)
+            .collect()
+    } else {
+        Vec::new()
+    };
     let mut visible = apply_model_filters(
         apply_model_aliases_to_ids(base, &collection.model_aliases),
         &[],
         &collection.excluded_models,
     );
+    let mut routed_models = routed_accounts
+        .iter()
+        .flat_map(|account| account.api_model_catalog.iter().cloned())
+        .collect::<Vec<_>>();
     if let Some(provider_gateway) = api_key.provider_gateway.as_ref() {
-        let mut seen: HashSet<String> = visible
-            .iter()
-            .map(|model| model.trim().to_ascii_lowercase())
-            .filter(|model| !model.is_empty())
-            .collect();
-        for model in apply_model_aliases_to_ids(
-            provider_gateway.upstream_models.clone(),
-            &collection.model_aliases,
-        ) {
-            let model = model.trim();
-            if !model.is_empty() && seen.insert(model.to_ascii_lowercase()) {
-                visible.push(model.to_string());
-            }
+        routed_models.extend(provider_gateway.upstream_models.clone());
+    }
+    let mut seen: HashSet<String> = visible
+        .iter()
+        .map(|model| model.trim().to_ascii_lowercase())
+        .filter(|model| !model.is_empty())
+        .collect();
+    for model in apply_model_aliases_to_ids(routed_models, &collection.model_aliases) {
+        let model = model.trim();
+        if !model.is_empty() && seen.insert(model.to_ascii_lowercase()) {
+            visible.push(model.to_string());
         }
     }
     let filtered = apply_model_filters(visible, &api_key.allowed_models, &api_key.excluded_models);
@@ -13187,25 +13232,31 @@ fn profile_api_key_supports_websockets(
 
 fn write_local_access_profile_model_catalog(
     profile_dir: &Path,
+    collection: &CodexLocalAccessCollection,
+    runtime_api_key: &str,
     supports_websockets: bool,
 ) -> Result<(), String> {
-    let mut client_models =
-        codex_protocol::build_codex_client_models_response(&supported_codex_model_ids());
-    if let Some(models) = client_models
-        .get_mut("models")
-        .and_then(Value::as_array_mut)
-    {
+    let resolved_api_key = resolve_collection_api_key(collection, runtime_api_key);
+    let model_ids = resolved_api_key
+        .as_ref()
+        .map(|api_key| visible_codex_model_ids_for_api_key(collection, api_key, None))
+        .unwrap_or_else(supported_codex_model_ids);
+    let catalog_json = resolved_api_key
+        .as_ref()
+        .and_then(|api_key| api_key.provider_gateway.as_ref())
+        .map(|gateway| {
+            build_provider_model_catalog_json(&provider_gateway_model_slots(
+                &gateway.upstream_models,
+            ))
+        })
+        .unwrap_or_else(|| build_deepseek_model_catalog_json(&model_ids))?;
+    let mut catalog: Value = serde_json::from_str(&catalog_json)
+        .map_err(|e| format!("解析 Codex API 服务模型目录失败: {}", e))?;
+    if let Some(models) = catalog.get_mut("models").and_then(Value::as_array_mut) {
         for model in models {
             model["prefer_websockets"] = json!(supports_websockets);
         }
     }
-    let catalog = json!({
-        "models": client_models
-            .get("models")
-            .and_then(Value::as_array)
-            .cloned()
-            .unwrap_or_default(),
-    });
     let content = serde_json::to_string_pretty(&catalog)
         .map_err(|e| format!("生成 Codex API 服务模型目录失败: {}", e))?;
     write_string_atomic(
@@ -13261,7 +13312,12 @@ async fn write_local_access_profile_takeover(
         supports_websockets,
     );
     codex_account::write_account_bundle_to_dir(profile_dir, &runtime_account)?;
-    write_local_access_profile_model_catalog(profile_dir, supports_websockets)
+    write_local_access_profile_model_catalog(
+        profile_dir,
+        collection,
+        &runtime_api_key,
+        supports_websockets,
+    )
 }
 
 fn push_local_access_takeover_dir(
@@ -17030,6 +17086,158 @@ pub(crate) fn build_provider_model_catalog_json(
     serde_json::to_string_pretty(&catalog).map_err(|e| format!("生成 Codex 模型目录失败: {}", e))
 }
 
+/// Build the native model catalog published by DeepSeek for Codex.
+///
+/// DeepSeek model IDs must not be projected onto OpenAI model shells: doing so
+/// would inherit Responses Lite, image input, and the wrong context window.
+pub(crate) fn build_deepseek_model_catalog_json(model_ids: &[String]) -> Result<String, String> {
+    let model_specs = [
+        (
+            "deepseek-v4-flash",
+            "DeepSeek-V4-Flash",
+            "Latest frontier agentic coding model.",
+            1,
+        ),
+        (
+            "deepseek-v4-pro",
+            "DeepSeek-V4-Pro",
+            "Most capable frontier agentic coding model.",
+            2,
+        ),
+    ];
+    let mut client_models = codex_protocol::build_codex_client_models_response(model_ids);
+    let models = client_models
+        .get_mut("models")
+        .and_then(Value::as_array_mut)
+        .ok_or_else(|| {
+            "Failed to generate DeepSeek Codex model catalog: missing models".to_string()
+        })?;
+
+    for model in models.iter_mut() {
+        let Some(slug) = model
+            .get("slug")
+            .and_then(Value::as_str)
+            .map(str::to_string)
+        else {
+            continue;
+        };
+        let Some((_, display_name, description, priority)) = model_specs
+            .iter()
+            .find(|(official_slug, _, _, _)| official_slug.eq_ignore_ascii_case(&slug))
+        else {
+            continue;
+        };
+        let object = model.as_object_mut().ok_or_else(|| {
+            "Failed to generate DeepSeek Codex model catalog: invalid model".to_string()
+        })?;
+        object.insert("slug".to_string(), Value::String(slug));
+        object.insert("prefer_websockets".to_string(), Value::Bool(false));
+        object.insert("support_verbosity".to_string(), Value::Bool(true));
+        object.insert(
+            "default_verbosity".to_string(),
+            Value::String("low".to_string()),
+        );
+        object.insert(
+            "apply_patch_tool_type".to_string(),
+            Value::String("freeform".to_string()),
+        );
+        object.insert(
+            "web_search_tool_type".to_string(),
+            Value::String("text".to_string()),
+        );
+        object.insert("input_modalities".to_string(), json!(["text"]));
+        object.insert(
+            "supports_image_detail_original".to_string(),
+            Value::Bool(false),
+        );
+        object.insert(
+            "truncation_policy".to_string(),
+            json!({"mode": "tokens", "limit": 10_000}),
+        );
+        object.insert(
+            "supports_parallel_tool_calls".to_string(),
+            Value::Bool(true),
+        );
+        object.insert("tool_mode".to_string(), Value::Null);
+        object.insert(
+            "multi_agent_version".to_string(),
+            Value::String("v2".to_string()),
+        );
+        object.insert("use_responses_lite".to_string(), Value::Bool(false));
+        object.insert(
+            "include_skills_usage_instructions".to_string(),
+            Value::Bool(false),
+        );
+        object.insert("auto_review_model_override".to_string(), Value::Null);
+        object.insert("context_window".to_string(), json!(1_048_576));
+        object.insert("max_context_window".to_string(), json!(1_048_576));
+        object.insert("effective_context_window_percent".to_string(), json!(95));
+        object.insert("auto_compact_token_limit".to_string(), Value::Null);
+        object.insert("comp_hash".to_string(), Value::String("3000".to_string()));
+        object.insert(
+            "reasoning_summary_format".to_string(),
+            Value::String("experimental".to_string()),
+        );
+        object.insert(
+            "default_reasoning_summary".to_string(),
+            Value::String("none".to_string()),
+        );
+        object.insert(
+            "display_name".to_string(),
+            Value::String((*display_name).to_string()),
+        );
+        object.insert(
+            "description".to_string(),
+            Value::String((*description).to_string()),
+        );
+        object.insert(
+            "default_reasoning_level".to_string(),
+            Value::String("high".to_string()),
+        );
+        object.insert(
+            "supported_reasoning_levels".to_string(),
+            json!([
+                {"effort": "low", "description": "Fast responses with lighter reasoning"},
+                {"effort": "high", "description": "Extra high reasoning depth for complex problems"},
+                {"effort": "max", "description": "Maximum reasoning depth for the hardest problems"}
+            ]),
+        );
+        object.insert(
+            "shell_type".to_string(),
+            Value::String("shell_command".to_string()),
+        );
+        object.insert("visibility".to_string(), Value::String("list".to_string()));
+        object.insert(
+            "minimal_client_version".to_string(),
+            Value::String("0.144.0".to_string()),
+        );
+        object.insert("supported_in_api".to_string(), Value::Bool(true));
+        object.insert("availability_nux".to_string(), Value::Null);
+        object.insert("upgrade".to_string(), Value::Null);
+        object.insert("priority".to_string(), json!(*priority));
+    }
+
+    serde_json::to_string_pretty(&json!({"models": models}))
+        .map_err(|e| format!("Failed to generate DeepSeek Codex model catalog: {}", e))
+}
+
+fn account_model_catalog_allows_model(account: &CodexAccount, model: &str) -> bool {
+    if is_codex_internal_model(model) {
+        return true;
+    }
+    if !account.is_api_key_auth() {
+        return default_codex_model_ids()
+            .iter()
+            .any(|candidate| candidate.eq_ignore_ascii_case(model.trim()))
+            || model.trim().eq_ignore_ascii_case(CODEX_IMAGE_MODEL_ID);
+    }
+    account.api_model_catalog.is_empty()
+        || account
+            .api_model_catalog
+            .iter()
+            .any(|candidate| candidate.trim().eq_ignore_ascii_case(model.trim()))
+}
+
 fn apply_provider_gateway_model_slots(
     collection: &mut CodexLocalAccessCollection,
     models: &[String],
@@ -17082,7 +17290,6 @@ fn provider_gateway_wire_api_for_account(account: &CodexAccount) -> String {
         .and_then(|url| url.host_str().map(|host| host.to_ascii_lowercase()))
         .unwrap_or_default();
     let chat_hosts = [
-        "api.deepseek.com",
         "api.moonshot.cn",
         "api.siliconflow.cn",
         "api.siliconflow.com",
@@ -17135,6 +17342,19 @@ fn account_uses_synced_model_shell_gateway(account: &CodexAccount) -> bool {
     // official shells for UI display, route through provider gateway so requests can be
     // rewritten back to the real upstream model IDs.
     if provider_gateway_wire_api_for_account(account) != "responses" {
+        return false;
+    }
+    let is_deepseek = account
+        .api_provider_id
+        .as_deref()
+        .is_some_and(|value| value.eq_ignore_ascii_case("deepseek"))
+        || account
+            .api_base_url
+            .as_deref()
+            .and_then(|value| Url::parse(value.trim()).ok())
+            .and_then(|url| url.host_str().map(str::to_string))
+            .is_some_and(|host| host.eq_ignore_ascii_case("api.deepseek.com"));
+    if is_deepseek {
         return false;
     }
     let models = provider_gateway_models_for_account(account);
@@ -23579,6 +23799,15 @@ async fn proxy_request_with_account_pool(
                 }
             };
 
+            if !account_model_catalog_allows_model(&account, &routing_hint.model_key) {
+                last_error = format!(
+                    "模型 {} 不在账号 {} 的模型目录中",
+                    routing_hint.model_key, account.email
+                );
+                last_error_category = Some("account_model_unavailable".to_string());
+                continue;
+            }
+
             if collection.restrict_free_accounts && is_free_plan_type(account.plan_type.as_deref())
             {
                 mark_account_failure(
@@ -24694,6 +24923,14 @@ async fn proxy_websocket_with_account_pool(
                 continue;
             }
         };
+        if !account_model_catalog_allows_model(&account, &routing_hint.model_key) {
+            last_error = format!(
+                "模型 {} 不在账号 {} 的模型目录中",
+                routing_hint.model_key, account.email
+            );
+            last_error_category = Some("account_model_unavailable".to_string());
+            continue;
+        }
         if collection.restrict_free_accounts && is_free_plan_type(account.plan_type.as_deref()) {
             mark_account_failure(
                 &account,
@@ -26249,9 +26486,9 @@ mod tests {
     use ed25519_dalek::{pkcs8::EncodePrivateKey, SigningKey};
 
     use super::{
-        account_model_rule_blocks_model, account_requires_bound_oauth_local_gateway,
-        account_requires_provider_gateway, account_upstream_base_url, account_usage_priority,
-        add_api_key_token_usage,
+        account_model_catalog_allows_model, account_model_rule_blocks_model,
+        account_requires_bound_oauth_local_gateway, account_requires_provider_gateway,
+        account_upstream_base_url, account_usage_priority, add_api_key_token_usage,
         align_codex_prompt_cache, api_key_inherits_account_pool, api_key_priority_account_ids,
         api_key_token_limit_exceeded, append_eligible_local_access_account_ids, append_usage_event,
         apply_account_usage_priority_ids, apply_codex_official_headers, apply_routing_strategy,
@@ -26297,12 +26534,11 @@ mod tests {
         recover_invalid_stats_file, remove_account_refs_from_collection,
         remove_codex_local_access_config, reprice_request_logs_for_collection,
         request_image_generation_mode, request_logs_has_column, request_ordered_account_ids,
-        resolve_collection_api_key,
-        resolve_effective_model_pricing, resolve_plan_rank, resolve_sidecar_upstream_base_url,
-        resolve_sidecar_upstream_base_url_with, resolve_supported_model_alias,
-        resolve_upstream_target, restore_config_toml_from_takeover_backup,
-        sanitize_collection_with_accounts, scutil_proxy_map,
-        selected_account_ids_have_image_generation_capacity,
+        resolve_collection_api_key, resolve_effective_model_pricing, resolve_plan_rank,
+        resolve_sidecar_upstream_base_url, resolve_sidecar_upstream_base_url_with,
+        resolve_supported_model_alias, resolve_upstream_target,
+        restore_config_toml_from_takeover_backup, sanitize_collection_with_accounts,
+        scutil_proxy_map, selected_account_ids_have_image_generation_capacity,
         send_agent_identity_wakeup_request_with_base_urls,
         should_retry_single_account_upstream_status, should_treat_response_as_stream,
         should_try_next_account, sidecar_account_manifest_value,
@@ -27119,6 +27355,26 @@ HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings
     }
 
     #[test]
+    fn legacy_deepseek_api_key_defaults_to_native_responses() {
+        let account = CodexAccount::new_api_key(
+            "local-account-id".to_string(),
+            "deepseek@example.com".to_string(),
+            "sk-test".to_string(),
+            CodexApiProviderMode::Custom,
+            Some("https://api.deepseek.com/v1".to_string()),
+            Some("deepseek".to_string()),
+            Some("DeepSeek".to_string()),
+            Vec::new(),
+        );
+
+        assert_eq!(
+            super::provider_gateway_wire_api_for_account(&account),
+            "responses"
+        );
+        assert!(!account_requires_provider_gateway(&account));
+    }
+
+    #[test]
     fn responses_bound_oauth_api_key_uses_local_access_pool() {
         let mut account = CodexAccount::new_api_key(
             "local-account-id".to_string(),
@@ -27786,6 +28042,71 @@ wire_api = "responses"
         );
 
         assert!(!models.iter().any(|model| model == CODEX_IMAGE_MODEL_ID));
+    }
+
+    #[test]
+    fn custom_scope_model_visibility_includes_scoped_account_catalog() {
+        let mut account = CodexAccount::new_api_key(
+            "custom-api-key".to_string(),
+            "custom@example.com".to_string(),
+            "sk-test".to_string(),
+            CodexApiProviderMode::Custom,
+            Some("https://api.deepseek.com".to_string()),
+            Some("deepseek".to_string()),
+            Some("DeepSeek".to_string()),
+            vec!["custom-deepseek-model".to_string()],
+        );
+        account.api_wire_api = Some("responses".to_string());
+        let collection = test_local_access_collection(vec![account.id.clone()]);
+        let api_key = ResolvedLocalApiKey {
+            id: "key-scoped".to_string(),
+            label: "Scoped".to_string(),
+            provider_gateway: None,
+            inherit_account_pool: true,
+            account_ids: Vec::new(),
+            model_prefix: None,
+            allowed_models: Vec::new(),
+            excluded_models: Vec::new(),
+            token_limit: None,
+            token_used: 0,
+        };
+
+        let models = visible_codex_model_ids_for_api_key_with_accounts(
+            &collection,
+            &api_key,
+            &[account],
+            None,
+        );
+
+        assert!(models.iter().any(|model| model == "custom-deepseek-model"));
+        assert!(!models.iter().any(|model| model == "gpt-5.6-sol"));
+    }
+
+    #[test]
+    fn api_key_account_catalog_limits_routed_models() {
+        let account = CodexAccount::new_api_key(
+            "custom-api-key".to_string(),
+            "custom@example.com".to_string(),
+            "sk-test".to_string(),
+            CodexApiProviderMode::Custom,
+            Some("https://api.deepseek.com".to_string()),
+            Some("deepseek".to_string()),
+            Some("DeepSeek".to_string()),
+            vec!["custom-deepseek-model".to_string()],
+        );
+
+        assert!(account_model_catalog_allows_model(
+            &account,
+            "custom-deepseek-model"
+        ));
+        assert!(!account_model_catalog_allows_model(&account, "gpt-5.6-sol"));
+
+        let oauth = test_account_with_plan("pro");
+        assert!(account_model_catalog_allows_model(&oauth, "gpt-5.6-sol"));
+        assert!(!account_model_catalog_allows_model(
+            &oauth,
+            "custom-deepseek-model"
+        ));
     }
 
     #[test]
@@ -33220,8 +33541,8 @@ data: {"error":{"code":"server_error","type":"upstream","message":"stream aborte
             provider_gateway: Some(CodexLocalAccessProviderGateway {
                 base_url: "https://api.deepseek.com/v1".to_string(),
                 api_key: "sk-deepseek".to_string(),
-                upstream_model: "deepseek-v4-pro".to_string(),
-                upstream_models: vec!["deepseek-v4-pro".to_string()],
+                upstream_model: "custom-deepseek-model".to_string(),
+                upstream_models: vec!["custom-deepseek-model".to_string()],
                 wire_api: Some("chat_completions".to_string()),
                 supports_vision: false,
                 model_capabilities: HashMap::new(),
@@ -33249,6 +33570,17 @@ data: {"error":{"code":"server_error","type":"upstream","message":"stream aborte
         let config =
             fs::read_to_string(profile_dir.join(CODEX_PROFILE_CONFIG_FILE)).expect("read config");
         assert!(config.contains("supports_websockets = false"));
+        let catalog: Value = serde_json::from_str(
+            &fs::read_to_string(profile_dir.join(CODEX_LOCAL_ACCESS_MODEL_CATALOG_FILE))
+                .expect("read local access model catalog"),
+        )
+        .expect("parse local access model catalog");
+        assert!(catalog
+            .get("models")
+            .and_then(Value::as_array)
+            .is_some_and(|models| models.iter().any(|model| {
+                model.get("display_name").and_then(Value::as_str) == Some("custom-deepseek-model")
+            })));
         fs::remove_dir_all(&profile_dir).expect("cleanup temp dir");
     }
 

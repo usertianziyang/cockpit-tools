@@ -8,7 +8,6 @@ import {
 } from '../types/codex.ts';
 
 const CHAT_COMPLETIONS_PROVIDER_HOSTS = [
-  "api.deepseek.com",
   "api.moonshot.cn",
   "api.siliconflow.cn",
   "api.siliconflow.com",

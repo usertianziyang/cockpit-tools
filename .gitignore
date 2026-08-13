@@ -51,3 +51,4 @@ target/
 docs/plugin-architecture-proposal.md
 .aitasks
 .qoder/
+.gstack/
